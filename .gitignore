@@ -1,0 +1,19 @@
+doc/
+include/
+lib/
+.cache/
+build/
+
+.envrc
+
+*.sms
+*.smd
+*.x_t
+*.brep
+*.log
+*.lic
+*.step
+*.stl
+*.log# pixi environments
+.pixi/*
+!.pixi/config.toml
