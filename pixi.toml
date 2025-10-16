@@ -7,5 +7,8 @@ version = "0.1.0"
 
 [tasks]
 
+[pypi-dependencies]
+nanobindgen = { git = "https://github.com/pycad-dev/nanobindgen" }
+
 [dependencies]
-occt = "7.7.*"
+python = "3.12.*"

@@ -4,42 +4,6 @@ project(simmetrix)
 
 add_library(sms INTERFACE)
 
-# find_package(VTK REQUIRED)
-find_package(OpenCASCADE REQUIRED)
-
- set(OCCT_LIBS
-        TKXDESTEP
-        TKSTEP
-        TKSTEP209
-        TKSTEPAttr
-        TKSTEPBase
-        TKXCAF
-        TKXSBase
-        TKVCAF
-        TKCAF
-        TKLCAF
-        TKCDF
-        TKV3d
-        TKService
-        TKMesh
-        TKBO
-        TKPrim
-        TKHLR
-        TKShHealing
-        TKTopAlgo
-        TKGeomAlgo
-        TKBRep
-        TKGeomBase
-        TKG3d
-        TKG2d
-        TKMath
-        TKernel
-        TKOffset
-        TKIGES
-        TKXml
-        TKXmlXCAF
-    )
-
 
 target_include_directories(sms INTERFACE include/gmcore)
 target_link_directories(sms INTERFACE lib/gmcore)
@@ -50,15 +14,8 @@ target_link_directories(sms INTERFACE lib/mscore)
 target_include_directories(sms INTERFACE include/pskrnl)
 target_link_directories(sms INTERFACE lib/pskrnl lib/pskrnl/psKrnl)
 
-target_include_directories(sms INTERFACE include/occ)
-target_link_directories(sms INTERFACE lib/occ)
+target_link_libraries(sms INTERFACE SimParasolid371 SimPartitionedMesh SimPartitionWrapper SimMeshing SimMeshTools SimModel pskernel tirpc)
 
-# Manually add the include directories from the provided variable.
-target_include_directories(sms INTERFACE ${OpenCASCADE_INCLUDE_DIRS})
-
-target_link_libraries(sms INTERFACE SimOpenCascade77 SimParasolid371 SimPartitionedMesh SimPartitionWrapper SimMeshing SimMeshTools SimModel pskernel tirpc)
-
-target_link_libraries(sms INTERFACE ${OCCT_LIBS})
 add_library(
     main
     src/Mesh.cpp
