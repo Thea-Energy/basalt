@@ -9,6 +9,7 @@ build/
 *.sms
 *.smd
 *.x_t
+*.prt
 *.brep
 *.log
 *.lic
