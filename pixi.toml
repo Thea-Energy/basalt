@@ -9,6 +9,8 @@ version = "0.1.0"
 
 [pypi-dependencies]
 nanobindgen = { git = "https://github.com/pycad-dev/nanobindgen" }
+pysms = { path = ".", editable = true }
 
 [dependencies]
 python = "3.12.*"
+nanobind = ">=2.9.2,<3"
