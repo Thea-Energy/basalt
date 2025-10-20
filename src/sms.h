@@ -14,14 +14,22 @@ namespace nb = nanobind;
  * @nb extra: 'nb::intrusive_ptr<AssemblyModel>([](AssemblyModel* o, PyObject*
  po) noexcept { o->set_self_py(po); })'
  */
-class AssemblyModel : public nb::intrusive_base {
+class Model : public nb::intrusive_base {
+public:
+  pGModel s_model;
 
 public:
-  pGModel s_assembly_model;
+  Model(pGModel s_model) : s_model(s_model) {};
+};
 
-  AssemblyModel(pGModel s_assembly_model)
-      : s_assembly_model(s_assembly_model) {};
+/**
+ * @class Assembly Model
+ * @brief Assembly model
+ * @nb inherit: Model
+ */
+class AssemblyModel : public Model {
 
+public:
   /**
    * Make assembly model from parasolid file
    *
@@ -31,25 +39,23 @@ public:
    */
   static auto from_parasolid_file(std::string filename)
       -> nb::ref<AssemblyModel>;
+
+  AssemblyModel(pGModel s_model) : Model(s_model) {};
 };
 
 /**
  * @class Unified Model
  * @brief Unified model with shared topology
- * @nb
- * @nb extra: 'nb::intrusive_ptr<UnifiedModel>([](UnifiedModel* o,
- PyObject* po) noexcept { o->set_self_py(po); })'
+ * @nb inherit: Model
  */
-class UnifiedModel : public nb::intrusive_base {
+class UnifiedModel : public Model {
 public:
-  pGModel s_nonmanifold_model;
   pMConnector s_region_connector;
   pANMConnection s_part_connector;
 
-  UnifiedModel(pGModel s_nonmanifold_model, pMConnector s_region_connector,
+  UnifiedModel(pGModel s_model, pMConnector s_region_connector,
                pANMConnection s_part_connector)
-      : s_nonmanifold_model(s_nonmanifold_model),
-        s_region_connector(s_region_connector),
+      : Model(s_model), s_region_connector(s_region_connector),
         s_part_connector(s_part_connector) {};
 
   /**

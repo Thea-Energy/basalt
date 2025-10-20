@@ -17,7 +17,7 @@ auto AssemblyModel::from_parasolid_file(std::string filename)
 auto UnifiedModel::from_assembly_model(nb::ref<AssemblyModel> assembly_model)
     -> nb::ref<UnifiedModel> {
   auto s_region_connector = MC_new();
-  auto model = GM_createFromAssemblyModel(assembly_model->s_assembly_model,
+  auto model = GM_createFromAssemblyModel(assembly_model->s_model,
                                           s_region_connector, nullptr);
   auto s_part_connector = ANMConnection_new(s_region_connector);
 
@@ -28,9 +28,9 @@ auto UnifiedModel::from_assembly_model(nb::ref<AssemblyModel> assembly_model)
 }
 
 void UnifiedModel::mesh(std::string filename, double mesh_size) {
-  auto s_mesh = M_new(0, this->s_nonmanifold_model);
-  auto s_mesh_case = MS_newMeshCase(this->s_nonmanifold_model);
-  auto s_model_domain = GM_domain(this->s_nonmanifold_model);
+  auto s_mesh = M_new(0, this->s_model);
+  auto s_mesh_case = MS_newMeshCase(this->s_model);
+  auto s_model_domain = GM_domain(this->s_model);
 
   MS_setMeshSize(s_mesh_case, s_model_domain, 1, mesh_size, 0);
 
