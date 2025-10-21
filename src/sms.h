@@ -17,9 +17,19 @@ namespace nb = nanobind;
 class Model : public nb::intrusive_base {
 public:
   pGModel s_model;
+  nb::ref<Model> parent;
 
 public:
   Model(pGModel s_model) : s_model(s_model) {};
+
+  /**
+   * Whether this model is an assembly model (multiple root parts).
+   *
+   * @return True if assemby model.
+   */
+  bool is_assembly_model();
+
+  bool is_valid();
 };
 
 /**

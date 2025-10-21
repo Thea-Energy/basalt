@@ -1,9 +1,19 @@
 #include "sms.h"
 #include "MeshSim.h"
+#include "MeshTypes.h"
 #include "ModelTypes.h"
 #include "SimModel.h"
 #include "SimParasolidKrnl.h"
 #include "spdlog/spdlog.h"
+
+bool Model::is_assembly_model() { return GM_isAssemblyModel(this->s_model); }
+
+bool Model::is_valid() {
+  auto error_list{PList_new()};
+  auto is_valid = GM_isValid(this->s_model, 1, error_list);
+  PList_delete(error_list);
+  return is_valid;
+}
 
 auto AssemblyModel::from_parasolid_file(std::string filename)
     -> nb::ref<AssemblyModel> {
