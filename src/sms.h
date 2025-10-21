@@ -9,18 +9,22 @@
 namespace nb = nanobind;
 
 /**
- * @class Assembly Model
- * @brief Assembly model
- * @nb extra: 'nb::intrusive_ptr<AssemblyModel>([](AssemblyModel* o, PyObject*
+ * @class Model
+ * @brief model
+ * @nb extra: 'nb::intrusive_ptr<Model>([](Model* o, PyObject*
  po) noexcept { o->set_self_py(po); })'
  */
 class Model : public nb::intrusive_base {
-public:
+protected:
   pGModel s_model;
-  nb::ref<Model> parent;
+  nb::ref<Model> parent = nullptr;
+  pMConnector s_connector;
 
 public:
-  Model(pGModel s_model) : s_model(s_model) {};
+  Model(pGModel s_model) : s_model(s_model), s_connector(MC_new()) {};
+
+  Model(pGModel s_model, nb::ref<Model> parent, pMConnector s_connector)
+      : s_model(s_model), parent(parent), s_connector(s_connector) {};
 
   /**
    * Whether this model is an assembly model (multiple root parts).
@@ -30,16 +34,7 @@ public:
   bool is_assembly_model();
 
   bool is_valid();
-};
 
-/**
- * @class Assembly Model
- * @brief Assembly model
- * @nb inherit: Model
- */
-class AssemblyModel : public Model {
-
-public:
   /**
    * Make assembly model from parasolid file
    *
@@ -47,36 +42,15 @@ public:
    * @return Assembly model
    * @nb
    */
-  static auto from_parasolid_file(std::string filename)
-      -> nb::ref<AssemblyModel>;
-
-  AssemblyModel(pGModel s_model) : Model(s_model) {};
-};
-
-/**
- * @class Unified Model
- * @brief Unified model with shared topology
- * @nb inherit: Model
- */
-class UnifiedModel : public Model {
-public:
-  pMConnector s_region_connector;
-  pANMConnection s_part_connector;
-
-  UnifiedModel(pGModel s_model, pMConnector s_region_connector,
-               pANMConnection s_part_connector)
-      : Model(s_model), s_region_connector(s_region_connector),
-        s_part_connector(s_part_connector) {};
+  static auto from_parasolid_file(std::string filename) -> nb::ref<Model>;
 
   /**
-   * Make unified model from assembly model
+   * Make nonmanifold model from assembly model
    *
-   * @param assembly_model Assembly model
-   * @return Unified model
+   * @return NonManifold model
    * @nb
    */
-  static auto from_assembly_model(nb::ref<AssemblyModel> assembly_model)
-      -> nb::ref<UnifiedModel>;
+  auto make_nonmanifold_model() -> nb::ref<Model>;
 
   /**
    * Mesh
