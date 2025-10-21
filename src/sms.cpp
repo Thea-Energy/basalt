@@ -3,8 +3,33 @@
 #include "MeshTypes.h"
 #include "ModelTypes.h"
 #include "SimModel.h"
+#include "SimPList.h"
 #include "SimParasolidKrnl.h"
 #include "spdlog/spdlog.h"
+#include <optional>
+
+auto Entity::related_parts() -> std::vector<nb::ref<Part>> {
+  std::vector<nb::ref<Part>> parts;
+  auto s_assem_parts = ANMConnection_relatedParts(
+      this->model->s_model_connection, this->s_entity);
+
+  void *iter = 0;
+  while (auto s_part = (pGEntity)PList_next(s_assem_parts, &iter)) {
+    parts.push_back({new Part(s_part, this->model)});
+  }
+  PList_delete(s_assem_parts);
+  return parts;
+}
+
+auto Part::get_name() -> std::optional<std::string> {
+  char *name = GIP_nativeName((pGIPart)this->s_entity);
+  if (name != 0) {
+    return std::string(name);
+    Sim_deleteString(name);
+  } else {
+    return std::nullopt;
+  }
+}
 
 bool Model::is_assembly_model() { return GM_isAssemblyModel(this->s_model); }
 
@@ -23,14 +48,15 @@ auto Model::from_parasolid_file(std::string filename) -> nb::ref<Model> {
   return {new Model(assembly_model)};
 }
 
-auto Model::make_nonmanifold_model() -> nb::ref<Model> {
+auto Model::make_non_manifold_model() -> nb::ref<Model> {
   auto s_connector = MC_new();
   auto s_new_model =
       GM_createFromAssemblyModel(this->s_model, s_connector, nullptr);
 
-  auto unified_model = new Model(s_model, nb::ref<Model>(this), s_connector);
+  auto non_manifold_model =
+      new Model(s_new_model, nb::ref<Model>(this), s_connector);
 
-  return {unified_model};
+  return {non_manifold_model};
 }
 
 void Model::mesh(std::string filename, double mesh_size) {
@@ -47,4 +73,15 @@ void Model::mesh(std::string filename, double mesh_size) {
   SurfaceMesher_delete(s_surface_mesher);
   MS_deleteMeshCase(s_mesh_case);
   M_release(s_mesh);
+}
+
+auto Model::regions() -> std::vector<nb::ref<Region>> {
+  std::vector<nb::ref<Region>> regions;
+
+  auto s_model_regions = GM_regionIter(this->s_model);
+  while (auto s_model_region = GRIter_next(s_model_regions)) {
+    regions.push_back({new Region(s_model_region, {this})});
+  }
+
+  return regions;
 }
