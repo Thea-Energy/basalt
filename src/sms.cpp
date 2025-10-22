@@ -28,7 +28,7 @@ Model::Model(pGModel s_model_, nb::ref<Model> parent, pMConnector s_connector)
 
 auto Model::require_connection() const -> const Connection & {
   if (!this->connection)
-    throw std::runtime_error("operation requires a non-manifold connection");
+    throw_exception("Operation requires a connected model.");
   return *this->connection;
 }
 

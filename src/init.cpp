@@ -1,3 +1,4 @@
+#include "init.h"
 #include "MeshSim.h"
 #include "SimMessages.h"
 #include "SimParasolidKrnl.h"
@@ -45,7 +46,7 @@ void messageHandler(int type, const char *msg) {
     spdlog::warn(msg);
     break;
   case Sim_ErrorMsg:
-    spdlog::error(msg);
+    throw_exception(msg);
     break;
   }
   return;
