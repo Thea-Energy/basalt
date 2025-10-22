@@ -35,7 +35,7 @@ public:
    * @return Related parts
    * @nb
    */
-  auto related_parts() -> std::vector<nb::ref<Part>>;
+  auto related_parts() const -> std::vector<nb::ref<Part>>;
 };
 
 /**
@@ -54,7 +54,7 @@ public:
    * @return Name or None
    * @nb prop_r: name
    */
-  auto get_name() -> std::optional<std::string>;
+  auto get_name() const -> std::optional<std::string>;
 };
 
 /**
@@ -73,31 +73,41 @@ class Region : public Entity {
  po) noexcept { o->set_self_py(po); })'
  */
 class Model : public nb::intrusive_base {
+  struct Connection {
+    nb::ref<Model> parent;
+    pMConnector s_connector;
+    pANMConnection s_anm;
+
+    Connection(nb::ref<Model> parent, pMConnector connector);
+    Connection(const Connection &) = delete;
+    Connection &operator=(const Connection &) = delete;
+    Connection(Connection &&other) noexcept;
+    Connection &operator=(Connection &&other) noexcept;
+    ~Connection();
+  };
+
+  std::optional<Connection> connection;
 
 public:
   pGModel s_model;
-  nb::ref<Model> parent = nullptr;
-  pMConnector s_connector;
-  pANMConnection s_model_connection = nullptr;
-  Model(pGModel s_model) : s_model(s_model), s_connector(MC_new()) {};
 
-  Model(pGModel s_model, nb::ref<Model> parent, pMConnector s_connector)
-      : s_model(s_model), parent(parent), s_connector(s_connector),
-        s_model_connection(ANMConnection_new(s_connector)) {};
+  Model(pGModel s_model) : s_model(s_model) {};
+  Model(pGModel s_model, nb::ref<Model> parent, pMConnector s_connector);
+  ~Model();
 
   /**
    * Whether this model is an assembly model (multiple root parts).
    *
    * @return True if assemby model.
    */
-  bool is_assembly_model();
+  bool is_assembly_model() const;
 
   /**
    * Whether this model is topologically and geometrically valid.
    *
    * @return True if valid.
    */
-  bool is_valid();
+  bool is_valid() const;
 
   /**
    * Make assembly model from parasolid file
@@ -131,5 +141,8 @@ public:
    * @return Regions
    @ @nb
    */
-  auto regions() -> std::vector<nb::ref<Region>>;
+  auto regions() const -> std::vector<nb::ref<Region>>;
+
+  bool has_connection() const;
+  auto require_connection() const -> const struct Connection &;
 };
