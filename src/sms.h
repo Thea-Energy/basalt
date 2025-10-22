@@ -1,3 +1,4 @@
+#include "AttributeTypes.h"
 #include "MeshSim.h"
 #include "ModelTypes.h"
 #include "SimModel.h"
@@ -22,15 +23,13 @@ class Part;
  po) noexcept { o->set_self_py(po); })'
  */
 class Entity : public nb::intrusive_base {
-protected:
+public:
   pGEntity s_entity;
   nb::ref<Model> model;
 
-public:
   Entity(pGEntity s_entity, nb::ref<Model> model)
       : s_entity(s_entity), model(model) {};
 
-public:
   /**
    * Get related parts
    *
@@ -157,24 +156,31 @@ public:
  */
 class MeshCase : public nb::intrusive_base {
   nb::ref<Model> model;
-  pModelItem s_model_item;
   std::optional<double> mesh_size;
   std::optional<double> mesh_curve;
 
 public:
-  MeshCase(nb::ref<Model> model, double mesh_size);
+  pACase s_mesh_case;
+  MeshCase(nb::ref<Model> model);
 
   /**
    * Constructor
    *
    * @param model Model
-   * @param mesh_size Mesh size
    * @return Mesh case
    * @nb
    */
-  static auto make(nb::ref<Model> model, double mesh_size) -> nb::ref<MeshCase>;
+  static auto make(nb::ref<Model> model) -> nb::ref<MeshCase>;
 
-  auto gen_mesh_case() -> pACase;
+  /**
+   * Set the mesh size
+   *
+   * @param mesh_size Mesh size
+   * @param entity Optional model entity
+   * @nb
+   */
+  void set_mesh_size(double mesh_size,
+                     std::optional<nb::ref<Entity>> entity = std::nullopt);
 };
 
 /**

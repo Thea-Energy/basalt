@@ -126,29 +126,26 @@ auto Model::regions() const -> std::vector<nb::ref<Region>> {
 
 bool Model::has_connection() const { return connection.has_value(); }
 
-MeshCase::MeshCase(nb::ref<Model> model, double mesh_size)
-    : model(model), mesh_size(mesh_size) {
-  this->s_model_item = GM_domain(model->s_model);
+MeshCase::MeshCase(nb::ref<Model> model) : model(model) {
+  this->s_mesh_case = MS_newMeshCase(this->model->s_model);
 }
 
-auto MeshCase::make(nb::ref<Model> model, double mesh_size)
-    -> nb::ref<MeshCase> {
-  return {new MeshCase(model, mesh_size)};
+auto MeshCase::make(nb::ref<Model> model) -> nb::ref<MeshCase> {
+  return {new MeshCase(model)};
 }
 
-auto MeshCase::gen_mesh_case() -> pACase {
-  pACase s_mesh_case = MS_newMeshCase(this->model->s_model);
-  if (this->mesh_size.has_value()) {
-    MS_setMeshSize(s_mesh_case, this->s_model_item, 2, this->mesh_size.value(),
-                   0);
-  }
-  return s_mesh_case;
+void MeshCase::set_mesh_size(double mesh_size,
+                             std::optional<nb::ref<Entity>> entity) {
+  auto s_model_item = entity.has_value() ? entity.value()->s_entity
+                                         : GM_domain(this->model->s_model);
+
+  MS_setMeshSize(this->s_mesh_case, s_model_item, 2, mesh_size, 0);
 }
 
 auto Mesh::from_model(nb::ref<Model> model, nb::ref<MeshCase> mesh_case)
     -> nb::ref<Mesh> {
   auto s_mesh = M_new(0, model->s_model);
-  auto s_mesh_case = mesh_case->gen_mesh_case();
+  auto s_mesh_case = mesh_case->s_mesh_case;
   auto s_surface_mesher = SurfaceMesher_new(s_mesh_case, s_mesh);
 
   SurfaceMesher_execute(s_surface_mesher, nullptr);
