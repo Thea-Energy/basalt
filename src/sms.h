@@ -1,3 +1,4 @@
+#include "MeshSim.h"
 #include "ModelTypes.h"
 #include "SimModel.h"
 #include "nanobind/intrusive/counter.h"
@@ -6,6 +7,7 @@
 
 #include <nanobind/intrusive/ref.h>
 #include <nanobind/nanobind.h>
+#include <variant>
 #include <vector>
 
 namespace nb = nanobind;
@@ -145,4 +147,57 @@ public:
 
   bool has_connection() const;
   auto require_connection() const -> const struct Connection &;
+};
+
+/**
+ * @class MeshCase
+ * @brief Mesh attributes
+ * @nb extra: 'nb::intrusive_ptr<MeshCase>([](MeshCase* o, PyObject*
+ po) noexcept { o->set_self_py(po); })'
+ */
+class MeshCase : public nb::intrusive_base {
+  nb::ref<Model> model;
+  pModelItem s_model_item;
+  std::optional<double> mesh_size;
+  std::optional<double> mesh_curve;
+
+public:
+  MeshCase(nb::ref<Model> model, double mesh_size);
+
+  /**
+   * Constructor
+   *
+   * @param model Model
+   * @param mesh_size Mesh size
+   * @return Mesh case
+   * @nb
+   */
+  static auto make(nb::ref<Model> model, double mesh_size) -> nb::ref<MeshCase>;
+
+  auto gen_mesh_case() -> pACase;
+};
+
+/**
+ * @class Mesh
+ * @brief Mesh attributes
+ * @nb extra: 'nb::intrusive_ptr<Mesh>([](Mesh* o, PyObject*
+ po) noexcept { o->set_self_py(po); })'
+ */
+class Mesh : public nb::intrusive_base {
+  pMesh s_mesh;
+  nb::ref<Model> model;
+
+public:
+  Mesh(pMesh s_mesh, nb::ref<Model> model) : s_mesh(s_mesh), model(model) {};
+
+  /**
+   * Surface mesh
+   *
+   * @param model Model
+   * @param mesh_case Mesh case
+   * @return Mesh
+   * @nb
+   */
+  static auto from_model(nb::ref<Model> model, nb::ref<MeshCase> mesh_case)
+      -> nb::ref<Mesh>;
 };

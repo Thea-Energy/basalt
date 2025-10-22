@@ -1,1 +1,1 @@
-from ._core._core import Model
+from ._core._core import Model, Mesh, MeshCase
