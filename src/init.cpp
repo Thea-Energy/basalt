@@ -3,11 +3,14 @@
 #include "SimParasolidKrnl.h"
 #include "SimUtil.h"
 #include "spdlog/spdlog.h"
+#include <atomic>
 #include <iostream>
 
 void messageHandler(int type, const char *msg);
 void progressHandler(const char *what, int level, int startVal, int endVal,
                      int currentVal, void *);
+
+static std::atomic<bool> g_sms_initialized{false};
 
 void init() {
   Sim_logOn("sms.log");
@@ -15,13 +18,19 @@ void init() {
   Sim_readLicenseFile("TheaEnergyEval2025");
   SimParasolid_start(1);
   Sim_setMessageHandler(messageHandler);
+  g_sms_initialized.store(true, std::memory_order_release);
 }
 
 void terminate() {
+  g_sms_initialized.store(false, std::memory_order_release);
   SimParasolid_stop(1);
   Sim_unregisterAllKeys();
   MS_exit();
   Sim_logOff();
+}
+
+bool sms_is_initialized() {
+  return g_sms_initialized.load(std::memory_order_acquire);
 }
 
 void messageHandler(int type, const char *msg) {

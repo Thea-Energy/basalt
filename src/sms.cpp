@@ -5,6 +5,7 @@
 #include "SimModel.h"
 #include "SimPList.h"
 #include "SimParasolidKrnl.h"
+#include "init.h"
 #include "spdlog/spdlog.h"
 #include <optional>
 #include <stdexcept>
@@ -15,8 +16,10 @@ Model::Connection::Connection(nb::ref<Model> parent, pMConnector s_connector)
 }
 
 Model::Connection::~Connection() {
-  ANMConnection_delete(this->s_anm);
-  MC_release(this->s_connector);
+  if (sms_is_initialized()) {
+    ANMConnection_delete(this->s_anm);
+    MC_release(this->s_connector);
+  }
 }
 
 Model::Model(pGModel s_model_, nb::ref<Model> parent, pMConnector s_connector)
@@ -55,7 +58,8 @@ auto Part::get_name() const -> std::optional<std::string> {
 }
 
 Model::~Model() {
-  GM_release(s_model);
+  if (sms_is_initialized())
+    GM_release(s_model);
   connection.reset();
 }
 
