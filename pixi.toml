@@ -14,3 +14,4 @@ pysms = { path = ".", editable = true }
 [dependencies]
 python = "3.12.*"
 nanobind = ">=2.9.2,<3"
+gmsh = ">=4.13.1,<5"

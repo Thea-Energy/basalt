@@ -49,6 +49,7 @@ class Part : public Entity {
   using Entity::Entity;
 
 public:
+  pGIPart s_entity;
   /**
    * Name
    *
@@ -206,4 +207,12 @@ public:
    */
   static auto from_model(nb::ref<Model> model, nb::ref<MeshCase> mesh_case)
       -> nb::ref<Mesh>;
+
+  /**
+   * Write mesh to Gmsh file.
+   *
+   * @param filename Filename
+   * @nb
+   */
+  void write_gmsh(std::string filename);
 };

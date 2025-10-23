@@ -5,6 +5,8 @@ project(pysms)
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Resolves -fPIC errors
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_INSTALL_RPATH "${CMAKE_CURRENT_SOURCE_DIR}/.pixi/envs/default/lib")
 
 include(FetchContent)
 set(FETCHCONTENT_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/_deps)
@@ -42,6 +44,22 @@ target_link_directories(sms INTERFACE lib/pskrnl lib/pskrnl/psKrnl)
 target_link_libraries(sms INTERFACE SimParasolid371 SimPartitionedMesh SimPartitionWrapper SimMeshing SimMeshTools SimModel pskernel tirpc)
 
 # ===============================================================================
+# Gmsh
+# ===============================================================================
+find_library(GMSH_LIB gmsh)
+if(NOT GMSH_LIB)
+  message(FATAL_ERROR "Could not find libgmsh")
+endif()
+
+find_path(GMSH_INC gmsh.h)
+if(NOT GMSH_INC)
+  message(FATAL_ERROR "Could not find gmsh.h")
+endif()
+
+include_directories(${GMSH_INC})
+
+
+# ===============================================================================
 # Logging
 # ===============================================================================
 set(SPDLOG_VERSION v1.12.0)
@@ -53,18 +71,18 @@ FetchContent_MakeAvailable(spdlog)
 # ===============================================================================
 # Main Library
 # ===============================================================================
-set(SPDLOG_VERSION v1.12.0)
-FetchContent_Declare(
-        spdlog URL https://github.com/gabime/spdlog/archive/${SPDLOG_VERSION}.tar.gz)
-
-FetchContent_MakeAvailable(spdlog)
 add_library(
     main
     src/init.cpp
     src/sms.cpp
 )
 target_include_directories(main PUBLIC ${SRC_DIR})
-target_link_libraries(main PUBLIC nanobind sms spdlog::spdlog)
+target_link_libraries(main PUBLIC 
+nanobind 
+sms 
+spdlog::spdlog 
+${GMSH_LIB}
+)
 
 # ===============================================================================
 # Examples

@@ -6,8 +6,10 @@
 #include "SimModel.h"
 #include "SimPList.h"
 #include "SimParasolidKrnl.h"
+#include "gmsh.h"
 #include "init.h"
 #include "spdlog/spdlog.h"
+#include <cstddef>
 #include <optional>
 #include <stdexcept>
 
@@ -155,4 +157,80 @@ auto Mesh::from_model(nb::ref<Model> model, nb::ref<MeshCase> mesh_case)
   MS_deleteMeshCase(s_mesh_case);
 
   return {new Mesh(s_mesh, model)};
+}
+
+void Mesh::write_gmsh(std::string filename) {
+  gmsh::initialize();
+  gmsh::model::add("sms");
+
+  for (auto r : this->model->regions()) {
+    auto tag = GEN_tag(r->s_entity);
+
+    std::vector<int> region_boundary_tags;
+    auto s_faces = GEN_faces(r->s_entity);
+    void *iter = 0; // must initialize to 0
+    while (auto s_face = (pGFace)(PList_next(s_faces, &iter))) {
+      auto tag = GEN_tag(s_face);
+      region_boundary_tags.push_back(tag);
+      try {
+        gmsh::model::addDiscreteEntity(2, tag);
+      } catch (const std::runtime_error &e) {
+        continue;
+      }
+
+      // Write nodes
+      auto s_face_verts = M_classifiedVertexIter(this->s_mesh, s_face, 1);
+      pVertex vertex;
+      auto num_verts = M_numClassifiedVertices(this->s_mesh, s_face);
+      std::vector<size_t> node_tags(num_verts);
+      std::vector<double> node_coords(num_verts * 3);
+      size_t i = 0;
+      while (auto s_vertex = VIter_next(s_face_verts)) {
+        node_tags[i] = EN_id(s_vertex) + 1;
+        double coord[3];
+        V_coord(s_vertex, coord);
+        node_coords[i * 3] = coord[0];
+        node_coords[i * 3 + 1] = coord[1];
+        node_coords[i * 3 + 2] = coord[2];
+        ++i;
+      }
+      gmsh::model::mesh::addNodes(2, tag, node_tags, node_coords);
+      VIter_delete(s_face_verts);
+
+      int num_mesh_faces = M_numClassifiedFaces(this->s_mesh, s_face);
+      // get the mesh faces classified on this model face
+      std::vector<int> element_types(1, 2);
+      std::vector<std::vector<size_t>> element_tags(
+          1, std::vector<size_t>(num_mesh_faces));
+      spdlog::warn("Num element nodes {}", num_mesh_faces);
+      std::vector<std::vector<size_t>> element_nodes(
+          1, std::vector<size_t>(num_mesh_faces * 3));
+      auto s_mesh_faces = M_classifiedFaceIter(this->s_mesh, s_face, 1);
+      i = 0;
+      while (auto s_mesh_face = FIter_next(s_mesh_faces)) {
+        auto s_mesh_face_tag = EN_id(s_mesh_face) + 1;
+        element_tags[0][i] = s_mesh_face_tag;
+        auto s_face_verts = F_vertices(s_mesh_face, 1);
+        void *it2 = 0;
+        size_t j = 0;
+        while (auto s_vertex = (pVertex)PList_next(s_face_verts, &it2)) {
+          auto s_vertex_tag = EN_id(s_vertex) + 1;
+          element_nodes[0][3 * i + j] = s_vertex_tag;
+          ++j;
+        }
+        PList_delete(s_face_verts);
+        ++i;
+      }
+
+      gmsh::model::mesh::addElements(2, tag, element_types, element_tags,
+                                     element_nodes);
+      FIter_delete(s_mesh_faces);
+    }
+    PList_delete(s_faces);
+
+    gmsh::model::addDiscreteEntity(3, tag, region_boundary_tags);
+  }
+
+  gmsh::write(filename);
+  gmsh::finalize();
 }
