@@ -77,6 +77,18 @@ bool Model::is_valid() const {
   return is_valid;
 }
 
+void Model::write(std::string filename) {
+  // GM_write(this->s_model, filename.c_str(), 0, nullptr);
+  pNativeModel nonManNative = GM_nativeModel(this->s_model);
+  NM_write(nonManNative, filename.c_str(), nullptr);
+}
+
+auto Model::read(std::string filename) -> nb::ref<Model> {
+  auto model = GM_load(filename.c_str(), nullptr, nullptr);
+
+  return {new Model(model)};
+}
+
 auto Model::from_parasolid_file(std::string filename) -> nb::ref<Model> {
   auto parasolid_native_model = ParasolidNM_createFromFile(filename.c_str(), 0);
   if (!parasolid_native_model) {
@@ -89,10 +101,16 @@ auto Model::from_parasolid_file(std::string filename) -> nb::ref<Model> {
   return {new Model(assembly_model)};
 }
 
-auto Model::make_non_manifold_model() -> nb::ref<Model> {
+auto Model::make_non_manifold_model(std::optional<double> tolerance)
+    -> nb::ref<Model> {
   auto connector = MC_new();
-  auto s_new_model =
-      GM_createFromAssemblyModel(this->s_model, connector, nullptr);
+
+  auto model_builder = ModelBuilder_new(this->s_model);
+  ModelBuilder_setConnector(model_builder, connector);
+  if (tolerance.has_value()) {
+    ModelBuilder_setBooleanTolerance(model_builder, tolerance.value());
+  }
+  auto s_new_model = ModelBuilder_execute(model_builder, nullptr);
 
   return {new Model(s_new_model, nb::ref<Model>(this), connector)};
 }
@@ -163,65 +181,73 @@ void Mesh::write_gmsh(std::string filename) {
   gmsh::initialize();
   gmsh::model::add("sms");
 
+  auto vit = M_vertexIter(this->s_mesh);
+  size_t vid = 1;
+  while (auto v = VIter_next(vit)) {
+    EN_setID((pEntity)v, vid++);
+  }
+  VIter_delete(vit);
+
+  auto fitAll = M_faceIter(this->s_mesh);
+  size_t fid = 1;
+  while (auto f = FIter_next(fitAll)) {
+    EN_setID((pEntity)f, fid++);
+  }
+  FIter_delete(fitAll);
+
   for (auto r : this->model->regions()) {
     auto tag = GEN_tag(r->s_entity);
 
     std::vector<int> region_boundary_tags;
     auto s_faces = GEN_faces(r->s_entity);
-    void *iter = 0; // must initialize to 0
+    void *iter = 0;
     while (auto s_face = (pGFace)(PList_next(s_faces, &iter))) {
       auto tag = GEN_tag(s_face);
       region_boundary_tags.push_back(tag);
       try {
         gmsh::model::addDiscreteEntity(2, tag);
-      } catch (const std::runtime_error &e) {
+      } catch (const std::runtime_error &) {
         continue;
       }
 
-      // Write nodes
+      std::vector<size_t> node_tags;
+      std::vector<double> node_coords;
+
+      // REVIEW(akoen): M_numClassifiedVertices seems to give 0 sometimes.
       auto s_face_verts = M_classifiedVertexIter(this->s_mesh, s_face, 1);
-      pVertex vertex;
-      auto num_verts = M_numClassifiedVertices(this->s_mesh, s_face);
-      std::vector<size_t> node_tags(num_verts);
-      std::vector<double> node_coords(num_verts * 3);
-      size_t i = 0;
       while (auto s_vertex = VIter_next(s_face_verts)) {
-        node_tags[i] = EN_id(s_vertex) + 1;
+        auto s_vertex_id = EN_id(s_vertex);
+        node_tags.push_back(s_vertex_id);
         double coord[3];
         V_coord(s_vertex, coord);
-        node_coords[i * 3] = coord[0];
-        node_coords[i * 3 + 1] = coord[1];
-        node_coords[i * 3 + 2] = coord[2];
-        ++i;
+        node_coords.push_back(coord[0]);
+        node_coords.push_back(coord[1]);
+        node_coords.push_back(coord[2]);
       }
       gmsh::model::mesh::addNodes(2, tag, node_tags, node_coords);
       VIter_delete(s_face_verts);
 
-      int num_mesh_faces = M_numClassifiedFaces(this->s_mesh, s_face);
-      // get the mesh faces classified on this model face
       std::vector<int> element_types(1, 2);
-      std::vector<std::vector<size_t>> element_tags(
-          1, std::vector<size_t>(num_mesh_faces));
-      spdlog::warn("Num element nodes {}", num_mesh_faces);
-      std::vector<std::vector<size_t>> element_nodes(
-          1, std::vector<size_t>(num_mesh_faces * 3));
+      std::vector<std::vector<size_t>> element_tags(1);
+      std::vector<std::vector<size_t>> element_nodes(1);
+
       auto s_mesh_faces = M_classifiedFaceIter(this->s_mesh, s_face, 1);
-      i = 0;
       while (auto s_mesh_face = FIter_next(s_mesh_faces)) {
-        auto s_mesh_face_tag = EN_id(s_mesh_face) + 1;
-        element_tags[0][i] = s_mesh_face_tag;
+        auto s_mesh_face_tag = EN_id(s_mesh_face);
+        element_tags[0].push_back(s_mesh_face_tag);
+
         auto s_face_verts = F_vertices(s_mesh_face, 1);
         void *it2 = 0;
-        size_t j = 0;
+        std::vector<size_t> face_nodes;
         while (auto s_vertex = (pVertex)PList_next(s_face_verts, &it2)) {
-          auto s_vertex_tag = EN_id(s_vertex) + 1;
-          element_nodes[0][3 * i + j] = s_vertex_tag;
-          ++j;
+          auto s_vertex_tag = EN_id(s_vertex);
+          face_nodes.push_back(s_vertex_tag);
         }
         PList_delete(s_face_verts);
-        ++i;
-      }
 
+        element_nodes[0].insert(element_nodes[0].end(), face_nodes.begin(),
+                                face_nodes.end());
+      }
       gmsh::model::mesh::addElements(2, tag, element_types, element_tags,
                                      element_nodes);
       FIter_delete(s_mesh_faces);

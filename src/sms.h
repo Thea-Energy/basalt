@@ -112,6 +112,23 @@ public:
   bool is_valid() const;
 
   /**
+   * Write to SMS native file .smd
+   *
+   * @param filename Filename
+   * @nb
+   */
+  void write(std::string filename);
+
+  /**
+   * Read from SMS native file .smd
+   *
+   * @param filename Filename
+   * @return Model
+   * @nb
+   */
+  static auto read(std::string filename) -> nb::ref<Model>;
+
+  /**
    * Make assembly model from parasolid file
    *
    * @param filename Filename
@@ -123,10 +140,12 @@ public:
   /**
    * Make nonmanifold model from assembly model
    *
+   * @param tolerance Boolean tolerance other than default. Defaults to None.
    * @return NonManifold model
    * @nb
    */
-  auto make_non_manifold_model() -> nb::ref<Model>;
+  auto make_non_manifold_model(std::optional<double> tolerance = std::nullopt)
+      -> nb::ref<Model>;
 
   /**
    * Mesh
