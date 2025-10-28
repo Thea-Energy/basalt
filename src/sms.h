@@ -23,7 +23,7 @@ class Part;
  */
 class Entity : public nb::intrusive_base {
 public:
-  pGEntity s_entity;
+  const pGEntity s_entity;
   nb::ref<Model> model;
 
   Entity(pGEntity s_entity, nb::ref<Model> model)
@@ -48,7 +48,6 @@ class Part : public Entity {
   using Entity::Entity;
 
 public:
-  pGIPart s_entity;
   /**
    * Name
    *
