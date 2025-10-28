@@ -4,12 +4,15 @@ lib/
 .cache/
 _deps/
 build/
+pysms/_core/
+!pysms/_core/__init__.py
 autogen/
 scratch/
 
 .envrc
 .vscode/
 
+*.msh
 *.sms
 *.smd
 *.x_t

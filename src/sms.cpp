@@ -13,6 +13,47 @@
 #include <optional>
 #include <stdexcept>
 
+template <typename T> auto plist_to_vec(pPList plist) -> std::vector<T> {
+  std::vector<T> vec;
+  void *it2 = 0;
+  std::vector<size_t> face_nodes;
+  while (auto item = static_cast<T>(PList_next(plist, &it2))) {
+    vec.push_back(item);
+  }
+  PList_delete(plist);
+  return vec;
+};
+
+Group::Group(pModelItemGroup s_group, nb::ref<Model> model)
+    : s_group(s_group), model(model) {
+  this->name = ModelItemGroup_name(s_group);
+}
+
+Group::Group(std::string &name, nb::ref<Model> model)
+    : name(name), model(model) {
+  GM_addGroup(model->s_model, name.c_str());
+};
+
+auto Group::make(std::string &name, nb::ref<Model> model) -> nb::ref<Group> {
+  return {new Group(name, model)};
+}
+
+void Group::add(nb::ref<ModelItem> item) {
+  ModelItemGroup_addItem(this->s_group, item->s_model_item);
+}
+
+auto Group::items() -> std::vector<nb::ref<ModelItem>> {
+  auto s_items = ModelItemGroup_items(this->s_group);
+  std::vector<nb::ref<ModelItem>> items;
+  void *it = 0;
+  std::vector<size_t> face_nodes;
+  while (auto item = static_cast<pModelItem>(PList_next(s_items, &it))) {
+    items.push_back({new ModelItem(item, this->model)});
+  }
+  PList_delete(s_items);
+  return items;
+}
+
 Model::Connection::Connection(nb::ref<Model> parent, pMConnector s_connector)
     : parent(std::move(parent)), s_connector(s_connector) {
   this->s_anm = ANMConnection_new(s_connector);
@@ -39,7 +80,8 @@ auto Entity::related_parts() const -> std::vector<nb::ref<Part>> {
   const auto &conn = this->model->require_connection();
 
   std::vector<nb::ref<Part>> parts;
-  auto s_assem_parts = ANMConnection_relatedParts(conn.s_anm, this->s_entity);
+  auto s_assem_parts = ANMConnection_relatedParts(
+      conn.s_anm, static_cast<pGEntity>(this->s_model_item));
 
   void *iter = 0;
   while (auto s_part = (pGEntity)PList_next(s_assem_parts, &iter)) {
@@ -50,7 +92,7 @@ auto Entity::related_parts() const -> std::vector<nb::ref<Part>> {
 }
 
 auto Part::get_name() const -> std::optional<std::string> {
-  char *name = GIP_nativeName((pGIPart)this->s_entity);
+  char *name = GIP_nativeName((pGIPart)this->s_model_item);
   if (name != nullptr) {
     std::string result(name);
     Sim_deleteString(name);
@@ -144,6 +186,19 @@ auto Model::regions() const -> std::vector<nb::ref<Region>> {
   return regions;
 }
 
+auto Model::get_groups() const -> std::vector<nb::ref<Group>> {
+  std::vector<nb::ref<Group>> groups;
+
+  auto s_groups = GM_groups(this->s_model);
+  void *itr;
+  while (auto s_group =
+             static_cast<pModelItemGroup>(PList_next(s_groups, &itr))) {
+    groups.push_back({new Group(s_group, {new Model(this->s_model)})});
+  }
+  PList_delete(s_groups);
+  return groups;
+}
+
 bool Model::has_connection() const { return connection.has_value(); }
 
 MeshCase::MeshCase(nb::ref<Model> model) : model(model) {
@@ -156,7 +211,7 @@ auto MeshCase::make(nb::ref<Model> model) -> nb::ref<MeshCase> {
 
 void MeshCase::set_mesh_size(double mesh_size,
                              std::optional<nb::ref<Entity>> entity) {
-  auto s_model_item = entity.has_value() ? entity.value()->s_entity
+  auto s_model_item = entity.has_value() ? entity.value()->s_model_item
                                          : GM_domain(this->model->s_model);
 
   MS_setMeshSize(this->s_mesh_case, s_model_item, 2, mesh_size, 0);
@@ -196,10 +251,11 @@ void Mesh::write_gmsh(std::string filename) {
   FIter_delete(fitAll);
 
   for (auto r : this->model->regions()) {
-    auto tag = GEN_tag(r->s_entity);
+    auto s_entity = static_cast<pGEntity>(r->s_model_item);
+    auto tag = GEN_tag(s_entity);
 
     std::vector<int> region_boundary_tags;
-    auto s_faces = GEN_faces(r->s_entity);
+    auto s_faces = GEN_faces(s_entity);
     void *iter = 0;
     while (auto s_face = (pGFace)(PList_next(s_faces, &iter))) {
       auto tag = GEN_tag(s_face);
