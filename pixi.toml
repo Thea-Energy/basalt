@@ -8,7 +8,7 @@ version = "0.1.0"
 [tasks]
 
 [pypi-dependencies]
-nanobindgen = { git = "https://github.com/pycad-dev/nanobindgen" }
+nanobindgen = { path = "../nanobindgen", editable = true }
 pysms = { path = ".", editable = true }
 
 [dependencies]

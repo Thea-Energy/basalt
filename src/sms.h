@@ -8,7 +8,6 @@
 
 #include <nanobind/intrusive/ref.h>
 #include <nanobind/nanobind.h>
-#include <variant>
 #include <vector>
 
 namespace nb = nanobind;
@@ -188,7 +187,7 @@ public:
    *
    * @param model Model
    * @return Mesh case
-   * @nb
+   * @nb new
    */
   static auto make(nb::ref<Model> model) -> nb::ref<MeshCase>;
 
