@@ -250,9 +250,9 @@ void Mesh::write_gmsh(std::string filename) {
   }
   FIter_delete(fitAll);
 
-  for (auto r : this->model->regions()) {
-    auto s_entity = static_cast<pGEntity>(r->s_model_item);
-    auto tag = GEN_tag(s_entity);
+  for (auto region : this->model->regions()) {
+    auto s_entity = static_cast<pGEntity>(region->s_model_item);
+    auto region_tag = GEN_tag(s_entity);
 
     std::vector<int> region_boundary_tags;
     auto s_faces = GEN_faces(s_entity);
@@ -310,9 +310,28 @@ void Mesh::write_gmsh(std::string filename) {
     }
     PList_delete(s_faces);
 
-    gmsh::model::addDiscreteEntity(3, tag, region_boundary_tags);
+    gmsh::model::addDiscreteEntity(3, region_tag, region_boundary_tags);
+
+    // Set physical group
+    // TODO (akoen): This does not handle duplicate names.
+    auto related_parts = region->related_parts();
+    if (related_parts.size() == 0) {
+      spdlog::warn("Region has no related parts");
+    } else if (related_parts.size() > 1) {
+      spdlog::warn("Region has more than one related part.");
+    } else {
+      auto name = related_parts.at(0)->get_name();
+      if (!name.has_value()) {
+        spdlog::warn("Related part has no name.");
+      } else {
+        auto physical_tag =
+            gmsh::model::addPhysicalGroup(3, std::vector<int>{region_tag});
+        gmsh::model::setPhysicalName(3, physical_tag, "mat:" + name.value());
+      }
+    }
   }
 
+  gmsh::option::setNumber("Mesh.SaveAll", 1);
   gmsh::write(filename);
   gmsh::finalize();
 }
