@@ -210,11 +210,32 @@ auto MeshCase::make(nb::ref<Model> model) -> nb::ref<MeshCase> {
 }
 
 void MeshCase::set_mesh_size(double mesh_size,
-                             std::optional<nb::ref<Entity>> entity) {
-  auto s_model_item = entity.has_value() ? entity.value()->s_model_item
-                                         : GM_domain(this->model->s_model);
+                             std::optional<nb::ref<Entity>> model_item) {
+  auto s_model_item = model_item.has_value() ? model_item.value()->s_model_item
+                                             : GM_domain(this->model->s_model);
 
   MS_setMeshSize(this->s_mesh_case, s_model_item, 2, mesh_size, 0);
+}
+
+void MeshCase::set_mesh_curvature_refinement(
+    double value, bool relative, bool use_edges, std::optional<double> min_size,
+    bool anisotropic, std::optional<nb::ref<Entity>> model_item) {
+  auto s_model_item = model_item.has_value() ? model_item.value()->s_model_item
+                                             : GM_domain(this->model->s_model);
+
+  int s_type = relative ? 2 : 1;
+  int s_calc_from = use_edges ? 3 : 2;
+  if (anisotropic) {
+    MS_setAnisoMeshCurv(this->s_mesh_case, s_model_item, s_type, value,
+                        s_calc_from);
+  } else {
+    MS_setMeshCurv(this->s_mesh_case, s_model_item, s_type, value, s_calc_from);
+  }
+
+  if (min_size.has_value()) {
+    MS_setMinCurvSize(this->s_mesh_case, s_model_item, s_type,
+                      min_size.value());
+  }
 }
 
 auto Mesh::from_model(nb::ref<Model> model, nb::ref<MeshCase> mesh_case)

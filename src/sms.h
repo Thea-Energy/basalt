@@ -246,8 +246,6 @@ public:
  */
 class MeshCase : public nb::intrusive_base {
   nb::ref<Model> model;
-  std::optional<double> mesh_size;
-  std::optional<double> mesh_curve;
 
 public:
   pACase s_mesh_case;
@@ -271,6 +269,21 @@ public:
    */
   void set_mesh_size(double mesh_size,
                      std::optional<nb::ref<Entity>> entity = std::nullopt);
+
+  /**
+   * Set the mesh curvature refinement.
+   *
+   * @param value Value of curvature refinement.
+   * @param relative Use relative rather than absolute value. Defaults to False.
+   * @param use_edges Consider edge curvature in addition to face curvature.
+   * Defaults to False.
+   * @param entity Optional model entity
+   * @nb
+   */
+  void set_mesh_curvature_refinement(
+      double value, bool relative = false, bool use_edges = false,
+      std::optional<double> min_size = std::nullopt, bool anisotropic = false,
+      std::optional<nb::ref<Entity>> entity = std::nullopt);
 };
 
 /**
