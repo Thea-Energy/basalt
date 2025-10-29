@@ -277,6 +277,8 @@ public:
    * @param relative Use relative rather than absolute value. Defaults to False.
    * @param use_edges Consider edge curvature in addition to face curvature.
    * Defaults to False.
+   * @param min_size Min allowable refinement size. Defaults to None.
+   * @param anisotropic Whether refinement is anisotropic. Defaults to False.
    * @param entity Optional model entity
    * @nb
    */
@@ -284,6 +286,19 @@ public:
       double value, bool relative = false, bool use_edges = false,
       std::optional<double> min_size = std::nullopt, bool anisotropic = false,
       std::optional<nb::ref<Entity>> entity = std::nullopt);
+
+  // TODO Should be model item not entity.
+  /**
+   * Set proximity refinement for thin sections.
+   *
+   * @param value Mesh size will be set to (section thickness) / value.
+   * @param min_size Min allowable refinement size. Defaults to None.
+   * @param model_item Optional model entity
+   * @nb
+   */
+  void set_mesh_proximity_refinement(
+      double value, std::optional<double> min_size = std::nullopt,
+      std::optional<nb::ref<Entity>> model_item = std::nullopt);
 };
 
 /**

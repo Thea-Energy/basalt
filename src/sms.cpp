@@ -238,6 +238,20 @@ void MeshCase::set_mesh_curvature_refinement(
   }
 }
 
+void MeshCase::set_mesh_proximity_refinement(
+    double value, std::optional<double> min_size,
+    std::optional<nb::ref<Entity>> model_item) {
+
+  auto s_model_item = model_item.has_value() ? model_item.value()->s_model_item
+                                             : GM_domain(this->model->s_model);
+
+  MS_setProximityRefinement(this->s_mesh_case, s_model_item, value);
+
+  if (min_size.has_value()) {
+    MS_setMinProximitySize(this->s_mesh_case, s_model_item, min_size.value());
+  }
+}
+
 auto Mesh::from_model(nb::ref<Model> model, nb::ref<MeshCase> mesh_case)
     -> nb::ref<Mesh> {
   auto s_mesh = M_new(0, model->s_model);
