@@ -267,8 +267,8 @@ public:
    * @param entity Optional model entity
    * @nb
    */
-  void set_mesh_size(double mesh_size,
-                     std::optional<nb::ref<Entity>> entity = std::nullopt);
+  void set_size(double mesh_size,
+                std::optional<nb::ref<ModelItem>> model_item = std::nullopt);
 
   /**
    * Set the mesh curvature refinement.
@@ -282,10 +282,10 @@ public:
    * @param entity Optional model entity
    * @nb
    */
-  void set_mesh_curvature_refinement(
+  void set_curvature_refinement(
       double value, bool relative = false, bool use_edges = false,
       std::optional<double> min_size = std::nullopt, bool anisotropic = false,
-      std::optional<nb::ref<Entity>> entity = std::nullopt);
+      std::optional<nb::ref<ModelItem>> model_item = std::nullopt);
 
   // TODO Should be model item not entity.
   /**
@@ -296,9 +296,9 @@ public:
    * @param model_item Optional model entity
    * @nb
    */
-  void set_mesh_proximity_refinement(
+  void set_proximity_refinement(
       double value, std::optional<double> min_size = std::nullopt,
-      std::optional<nb::ref<Entity>> model_item = std::nullopt);
+      std::optional<nb::ref<ModelItem>> model_item = std::nullopt);
 };
 
 /**

@@ -209,17 +209,17 @@ auto MeshCase::make(nb::ref<Model> model) -> nb::ref<MeshCase> {
   return {new MeshCase(model)};
 }
 
-void MeshCase::set_mesh_size(double mesh_size,
-                             std::optional<nb::ref<Entity>> model_item) {
+void MeshCase::set_size(double mesh_size,
+                        std::optional<nb::ref<ModelItem>> model_item) {
   auto s_model_item = model_item.has_value() ? model_item.value()->s_model_item
                                              : GM_domain(this->model->s_model);
 
   MS_setMeshSize(this->s_mesh_case, s_model_item, 2, mesh_size, 0);
 }
 
-void MeshCase::set_mesh_curvature_refinement(
+void MeshCase::set_curvature_refinement(
     double value, bool relative, bool use_edges, std::optional<double> min_size,
-    bool anisotropic, std::optional<nb::ref<Entity>> model_item) {
+    bool anisotropic, std::optional<nb::ref<ModelItem>> model_item) {
   auto s_model_item = model_item.has_value() ? model_item.value()->s_model_item
                                              : GM_domain(this->model->s_model);
 
@@ -238,9 +238,9 @@ void MeshCase::set_mesh_curvature_refinement(
   }
 }
 
-void MeshCase::set_mesh_proximity_refinement(
+void MeshCase::set_proximity_refinement(
     double value, std::optional<double> min_size,
-    std::optional<nb::ref<Entity>> model_item) {
+    std::optional<nb::ref<ModelItem>> model_item) {
 
   auto s_model_item = model_item.has_value() ? model_item.value()->s_model_item
                                              : GM_domain(this->model->s_model);
