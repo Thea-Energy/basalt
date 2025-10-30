@@ -14,7 +14,7 @@
 namespace nb = nanobind;
 using namespace nb::literals;
 
-#include "autogen/bind_sms.h"
+#include "autogen/bind_phnx.h"
 
 NB_MODULE(_core, m) {
   init();
@@ -30,7 +30,7 @@ NB_MODULE(_core, m) {
         Py_DECREF(o);
       });
 
-  bind_sms(m);
+  bind_phnx(m);
 
   // Register memory cleanup on interpreter exit
   const auto atexit = nb::module_::import_("atexit");

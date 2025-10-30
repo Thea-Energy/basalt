@@ -6,8 +6,8 @@ wheelhouse/
 .cache/
 _deps/
 build/
-pysms/_core/
-!pysms/_core/__init__.py
+phnx/_core/
+!phnx/_core/__init__.py
 autogen/
 scratch/
 *.lock

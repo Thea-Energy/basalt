@@ -8,7 +8,7 @@ platforms = ["linux-64"]
 
 [pypi-dependencies]
 nanobindgen = { path = "../nanobindgen", editable = true }
-pysms = { path = ".", editable = true }
+phnx = { path = ".", editable = true }
 
 [dependencies]
 python = "3.12.*"

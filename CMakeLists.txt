@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(pysms)
+project(phnx)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -72,7 +72,7 @@ FetchContent_MakeAvailable(spdlog)
 add_library(
     main
     src/init.cpp
-    src/sms.cpp
+    src/phnx.cpp
 )
 target_include_directories(main PUBLIC ${SRC_DIR})
 target_link_libraries(main PUBLIC 
@@ -99,9 +99,9 @@ file(GLOB PYTHON_SOURCES ${SRC_DIR}/python/*.cpp)
 nanobind_add_module(_core NB_SHARED # STATIC is the default
         ${PYTHON_SOURCES})
 
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/pysms/_core)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/phnx/_core)
 
-# Inspect RPATH with readelf -d pysms/_core/_core.cpython-312-x86_64-linux-gnu.so | grep RUNPATH
+# Inspect RPATH with readelf -d phnx/_core/_core.cpython-312-x86_64-linux-gnu.so | grep RUNPATH
 set_property(
         TARGET _core
         APPEND
@@ -124,7 +124,7 @@ target_include_directories(_core PRIVATE ${SRC_DIR}/python)
 target_include_directories(_core PRIVATE ${SRC_DIR}/autogen)
 
 set(GEN_FILES
-sms.h
+phnx.h
 )
 foreach (SOURCE_FILE ${GEN_FILES})
     get_filename_component(FILE_NAME ${SOURCE_FILE} NAME_WE)
