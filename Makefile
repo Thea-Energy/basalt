@@ -7,4 +7,4 @@ build:
 	cmake --build build -j 8 -t install
 
 clean:
-	rm -rf build
+	rm -rf build pysms/_core

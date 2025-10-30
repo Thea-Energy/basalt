@@ -5,8 +5,6 @@ project(pysms)
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Resolves -fPIC errors
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(CMAKE_INSTALL_RPATH "${CMAKE_CURRENT_SOURCE_DIR}/.pixi/envs/default/lib")
 
 include(FetchContent)
 set(FETCHCONTENT_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/_deps)
@@ -103,15 +101,15 @@ nanobind_add_module(_core NB_SHARED # STATIC is the default
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/pysms/_core)
 
-# From https://nanobind.readthedocs.io/en/latest/faq.html
+# Inspect RPATH with readelf -d pysms/_core/_core.cpython-312-x86_64-linux-gnu.so | grep RUNPATH
 set_property(
         TARGET _core
         APPEND
-        PROPERTY INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}")
+        PROPERTY INSTALL_RPATH 
+        "${CMAKE_INSTALL_PREFIX}:${CMAKE_CURRENT_SOURCE_DIR}/.pixi/envs/default/lib:${CMAKE_CURRENT_SOURCE_DIR}/lib/pskrnl/psKrnl")
 
 nanobind_add_stub(
         _core_stub
-        # INSTALL_TIME
         MODULE
         _core
         OUTPUT
@@ -149,9 +147,7 @@ add_dependencies(_core generate_bindings)
 # ===============================================================================
 # Install
 # ===============================================================================
-# set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY true)
 install(TARGETS _core nanobind DESTINATION ".")
-# FIXME(akoen): should not need build/
 install(FILES build/_core.pyi DESTINATION ".")
 
 # ===============================================================================
