@@ -2735,8 +2735,8 @@ packages:
   requires_python: '>=3.8'
 - pypi: ./
   name: pysms
-  version: 0.1.dev4+gd810850c9.d20251017
-  sha256: 820b6e5aea19646f1f8c37f7a4da11dc8c4e48efa30d95e312a38e966445d9de
+  version: 0.1.dev23+g1eee7cf17.d20251030
+  sha256: d5a9adf290c6bb3ed69d50052a30b5bb552aa27d6657d2fc89503f22f1176742
   requires_python: '>=3.12'
   editable: true
 - pypi: https://files.pythonhosted.org/packages/a8/a4/20da314d277121d6534b3a980b29035dcd51e6744bd79075a6ce8fa4eb8d/pytest-8.4.2-py3-none-any.whl

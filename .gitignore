@@ -1,6 +1,8 @@
 doc/
 include/
 lib/
+dist/
+wheelhouse/
 .cache/
 _deps/
 build/
@@ -8,6 +10,7 @@ pysms/_core/
 !pysms/_core/__init__.py
 autogen/
 scratch/
+*.lock
 
 .envrc
 .vscode/
@@ -22,7 +25,7 @@ scratch/
 *.lic
 *.step
 *.stl
-
+*.conda
 *.so
 *.pyi
 
