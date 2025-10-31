@@ -287,7 +287,6 @@ public:
       std::optional<double> min_size = std::nullopt, bool anisotropic = false,
       std::optional<nb::ref<ModelItem>> model_item = std::nullopt);
 
-  // TODO Should be model item not entity.
   /**
    * Set proximity refinement for thin sections.
    *

@@ -2,6 +2,7 @@
 #include "MeshSim.h"
 #include "SimMessages.h"
 #include "SimParasolidKrnl.h"
+#include "SimPartitionedMesh.h"
 #include "SimUtil.h"
 #include "spdlog/spdlog.h"
 #include <atomic>
@@ -14,6 +15,7 @@ void progressHandler(const char *what, int level, int startVal, int endVal,
 static std::atomic<bool> g_sms_initialized{false};
 
 void init() {
+  SimPartitionedMesh_start(nullptr, nullptr);
   Sim_logOn("sms.log");
   MS_init();
   Sim_readLicenseFile("TheaEnergyEval2025");
@@ -28,6 +30,7 @@ void terminate() {
   Sim_unregisterAllKeys();
   MS_exit();
   Sim_logOff();
+  SimPartitionedMesh_start(nullptr, nullptr);
 }
 
 bool sms_is_initialized() {
