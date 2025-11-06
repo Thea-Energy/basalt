@@ -252,21 +252,6 @@ void MeshCase::set_proximity_refinement(
   }
 }
 
-auto Mesh::from_model(nb::ref<Model> model, nb::ref<MeshCase> mesh_case)
-    -> nb::ref<Mesh> {
-  auto s_mesh = M_new(0, model->s_model);
-  auto s_mesh_case = mesh_case->s_mesh_case;
-  auto s_surface_mesher = SurfaceMesher_new(s_mesh_case, s_mesh);
-
-  SurfaceMesher_execute(s_surface_mesher, nullptr);
-  M_write(s_mesh, "mesh.sms", 0, nullptr);
-
-  SurfaceMesher_delete(s_surface_mesher);
-  MS_deleteMeshCase(s_mesh_case);
-
-  return {new Mesh(s_mesh, model)};
-}
-
 void Mesh::write_gmsh(std::string filename) {
   gmsh::initialize();
   gmsh::model::add("sms");
@@ -369,4 +354,31 @@ void Mesh::write_gmsh(std::string filename) {
   gmsh::option::setNumber("Mesh.SaveAll", 1);
   gmsh::write(filename);
   gmsh::finalize();
+}
+
+auto SurfaceMesh::from_model(nb::ref<Model> model, nb::ref<MeshCase> mesh_case)
+    -> nb::ref<Mesh> {
+  auto s_mesh = M_new(0, model->s_model);
+  auto s_mesh_case = mesh_case->s_mesh_case;
+  auto s_surface_mesher = SurfaceMesher_new(s_mesh_case, s_mesh);
+
+  SurfaceMesher_execute(s_surface_mesher, nullptr);
+  M_write(s_mesh, "mesh.sms", 0, nullptr);
+
+  SurfaceMesher_delete(s_surface_mesher);
+
+  return {new SurfaceMesh(s_mesh, model, mesh_case)};
+}
+
+auto VolumeMesh::from_surface_mesh(nb::ref<SurfaceMesh> surface_mesh)
+    -> nb::ref<VolumeMesh> {
+  auto s_new_mesh = M_copy(surface_mesh->s_mesh, 1);
+  auto s_volume_mesher =
+      VolumeMesher_new(surface_mesh->mesh_case->s_mesh_case, s_new_mesh);
+  VolumeMesher_execute(s_volume_mesher, nullptr);
+  M_write(s_new_mesh, "meshv.sms", 0, nullptr);
+  VolumeMesher_delete(s_volume_mesher);
+
+  return {
+      new VolumeMesh(s_new_mesh, surface_mesh->model, surface_mesh->mesh_case)};
 }

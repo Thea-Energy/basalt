@@ -307,11 +307,31 @@ public:
  po) noexcept { o->set_self_py(po); })'
  */
 class Mesh : public nb::intrusive_base {
+public:
   pMesh s_mesh;
   nb::ref<Model> model;
+  nb::ref<MeshCase> mesh_case;
 
+  Mesh(pMesh s_mesh, nb::ref<Model> model, nb::ref<MeshCase> mesh_case)
+      : s_mesh(s_mesh), model(model), mesh_case(mesh_case) {};
+
+  /**
+   * Write mesh to Gmsh file.
+   *
+   * @param filename Filename
+   * @nb
+   */
+  void write_gmsh(std::string filename);
+};
+
+/**
+ * @class SurfaceMesh
+ * @brief Surface Mesh
+ * @nb inherit: Mesh
+ */
+class SurfaceMesh : public Mesh {
 public:
-  Mesh(pMesh s_mesh, nb::ref<Model> model) : s_mesh(s_mesh), model(model) {};
+  using Mesh::Mesh;
 
   /**
    * Surface mesh
@@ -323,12 +343,24 @@ public:
    */
   static auto from_model(nb::ref<Model> model, nb::ref<MeshCase> mesh_case)
       -> nb::ref<Mesh>;
+};
+
+/**
+ * @class VolumeMesh
+ * @brief Volume Mesh
+ * @nb inherit: Mesh
+ */
+class VolumeMesh : public Mesh {
+public:
+  using Mesh::Mesh;
 
   /**
-   * Write mesh to Gmsh file.
+   * Create from surface mesh
    *
-   * @param filename Filename
+   * @param surface_mesh Surface mesh
+   * @return Volume Mesh
    * @nb
    */
-  void write_gmsh(std::string filename);
+  static auto from_surface_mesh(nb::ref<SurfaceMesh> surface_mesh)
+      -> nb::ref<VolumeMesh>;
 };
