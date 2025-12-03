@@ -19,6 +19,7 @@ scratch/
 *.sms
 *.smd
 *.x_t
+*.x_b
 *.prt
 *.brep
 *.log

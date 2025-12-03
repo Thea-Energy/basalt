@@ -15,6 +15,7 @@ namespace nb = nanobind;
 
 class Model;
 class Part;
+class Assembly;
 
 /**
  * Push pPList to std::vector.
@@ -40,6 +41,9 @@ public:
 
   ModelItem(pModelItem s_model_item, nb::ref<Model> model)
       : s_model_item(s_model_item), model(model) {};
+
+  static auto downcast(pModelItem s_model_item, nb::ref<Model> model)
+      -> nb::ref<ModelItem>;
 };
 
 /**
@@ -54,19 +58,27 @@ public:
    * Get related parts
    *
    * @return Related parts
-   * @nb
+   * @nb prop_r: related_parts
    */
-  auto related_parts() const -> std::vector<nb::ref<Part>>;
+  auto get_related_parts() const -> std::vector<nb::ref<Part>>;
+
+  /**
+   * Name
+   *
+   * @return Name or None
+   * @nb prop_r: name
+   */
+  auto get_name() const -> std::optional<std::string>;
 };
 
 /**
  * @class Part
  * @brief Model part
- * @nb inherit: Entity
+ * @nb inherit: ModelItem
  */
-class Part : public Entity {
+class Part : public ModelItem {
 
-  using Entity::Entity;
+  using ModelItem::ModelItem;
 
 public:
   /**
@@ -76,6 +88,41 @@ public:
    * @nb prop_r: name
    */
   auto get_name() const -> std::optional<std::string>;
+
+  /**
+   * Get the parent assembly
+   *
+   * @return Assembly or none
+   * @nb prop_r: parent_assembly
+   */
+  auto get_parent_assembly() const -> std::optional<nb::ref<Assembly>>;
+};
+
+/**
+ * @class Assembly
+ * @brief Model assembly
+ * @nb inherit: ModelItem
+ */
+class Assembly : public ModelItem {
+
+  using ModelItem::ModelItem;
+
+public:
+  /**
+   * Get the name
+   *
+   * @return Name or None
+   * @nb prop_r: name
+   */
+  auto get_name() const -> std::optional<std::string>;
+
+  /**
+   * Get the parent assembly
+   *
+   * @return Assembly or None
+   * @nb prop_r: parent_assembly
+   */
+  auto get_parent_assembly() const -> std::optional<nb::ref<Assembly>>;
 };
 
 /**
@@ -167,6 +214,14 @@ public:
   bool is_assembly_model() const;
 
   /**
+   * @brief Get model root items.
+   *
+   * @return Root items.
+   * @nb prop_r: root_items
+   */
+  auto get_root_items() const -> std::vector<nb::ref<ModelItem>>;
+
+  /**
    * Whether this model is topologically and geometrically valid.
    *
    * @return True if valid.
@@ -222,9 +277,9 @@ public:
    * Return all the regions in this model.
    *
    * @return Regions
-   * @nb
+   * @nb prop_r: regions
    */
-  auto regions() const -> std::vector<nb::ref<Region>>;
+  auto get_regions() const -> std::vector<nb::ref<Region>>;
 
   /**
    * Get groups in this model
@@ -274,7 +329,8 @@ public:
    * Set the mesh curvature refinement.
    *
    * @param value Value of curvature refinement.
-   * @param relative Use relative rather than absolute value. Defaults to False.
+   * @param relative Use relative rather than absolute value. Defaults to
+   * False.
    * @param use_edges Consider edge curvature in addition to face curvature.
    * Defaults to False.
    * @param min_size Min allowable refinement size. Defaults to None.

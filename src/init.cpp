@@ -18,7 +18,7 @@ void init() {
   SimPartitionedMesh_start(nullptr, nullptr);
   Sim_logOn("sms.log");
   MS_init();
-  Sim_readLicenseFile("TheaEnergyEval2025_Extension");
+  Sim_readLicenseFile("TheaEnergyTemp");
   SimParasolid_start(1);
   Sim_setMessageHandler(messageHandler);
   g_sms_initialized.store(true, std::memory_order_release);

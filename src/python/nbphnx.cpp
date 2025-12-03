@@ -19,6 +19,9 @@ using namespace nb::literals;
 NB_MODULE(_core, m) {
   init();
 
+  spdlog::set_level(spdlog::level::debug);
+  spdlog::set_pattern("[%^%l%$] %v");
+
   // Install the instrusive reference counters
   nb::intrusive_init(
       [](PyObject *o) noexcept {

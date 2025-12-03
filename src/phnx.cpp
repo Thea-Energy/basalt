@@ -2,6 +2,7 @@
 #include "AttributeTypes.h"
 #include "MeshSim.h"
 #include "MeshTypes.h"
+#include "ModelEnums.h"
 #include "ModelTypes.h"
 #include "SimModel.h"
 #include "SimPList.h"
@@ -23,6 +24,21 @@ template <typename T> auto plist_to_vec(pPList plist) -> std::vector<T> {
   PList_delete(plist);
   return vec;
 };
+
+auto ModelItem::downcast(pModelItem s_model_item, nb::ref<Model> model)
+    -> nb::ref<ModelItem> {
+  auto s_type = ModelItem_type(s_model_item);
+  switch (s_type) {
+  case Gregion:
+    return {new Region(s_model_item, model)};
+  case Gassembly:
+    return {new Assembly(s_model_item, model)};
+  case GinstantiatedPart:
+    return {new Part(s_model_item, model)};
+  default:
+    throw_exception("Downcast for gType {} not implemented", s_type);
+  }
+}
 
 Group::Group(pModelItemGroup s_group, nb::ref<Model> model)
     : s_group(s_group), model(model) {
@@ -76,7 +92,7 @@ auto Model::require_connection() const -> const Connection & {
   return *this->connection;
 }
 
-auto Entity::related_parts() const -> std::vector<nb::ref<Part>> {
+auto Entity::get_related_parts() const -> std::vector<nb::ref<Part>> {
   const auto &conn = this->model->require_connection();
 
   std::vector<nb::ref<Part>> parts;
@@ -91,6 +107,17 @@ auto Entity::related_parts() const -> std::vector<nb::ref<Part>> {
   return parts;
 }
 
+auto Entity::get_name() const -> std::optional<std::string> {
+  char *name = GEN_nativeName((pGEntity)this->s_model_item);
+  if (name != nullptr) {
+    std::string result(name);
+    Sim_deleteString(name);
+    return result;
+  } else {
+    return std::nullopt;
+  }
+}
+
 auto Part::get_name() const -> std::optional<std::string> {
   char *name = GIP_nativeName((pGIPart)this->s_model_item);
   if (name != nullptr) {
@@ -102,6 +129,27 @@ auto Part::get_name() const -> std::optional<std::string> {
   }
 }
 
+auto Part::get_parent_assembly() const -> std::optional<nb::ref<Assembly>> {
+  auto s_parent_assembly = GIP_parentAssembly((pGIPart)this->s_model_item);
+  return {new Assembly(s_parent_assembly, this->model)};
+}
+
+auto Assembly::get_name() const -> std::optional<std::string> {
+  char *name = GA_nativeName((pGAssembly)this->s_model_item);
+  if (name != nullptr) {
+    std::string result(name);
+    Sim_deleteString(name);
+    return result;
+  } else {
+    return std::nullopt;
+  }
+}
+
+auto Assembly::get_parent_assembly() const -> std::optional<nb::ref<Assembly>> {
+  auto s_parent_assembly = GA_parentAssembly((pGAssembly)this->s_model_item);
+  return {new Assembly(s_parent_assembly, this->model)};
+}
+
 Model::~Model() {
   if (sms_is_initialized())
     GM_release(s_model);
@@ -110,6 +158,19 @@ Model::~Model() {
 
 bool Model::is_assembly_model() const {
   return GM_isAssemblyModel(this->s_model);
+}
+
+auto Model::get_root_items() const -> std::vector<nb::ref<ModelItem>> {
+  std::vector<nb::ref<ModelItem>> root_items;
+  auto s_root_items = GM_rootItems(this->s_model);
+  void *itr = nullptr;
+  while (auto s_model_item =
+             static_cast<pModelItem>(PList_next(s_root_items, &itr))) {
+    root_items.push_back(ModelItem::downcast(
+        s_model_item, nb::ref<Model>(const_cast<Model *>(this))));
+  }
+  PList_delete(s_root_items);
+  return root_items;
 }
 
 bool Model::is_valid() const {
@@ -173,7 +234,7 @@ void Model::mesh(std::string filename, double mesh_size) {
   M_release(s_mesh);
 }
 
-auto Model::regions() const -> std::vector<nb::ref<Region>> {
+auto Model::get_regions() const -> std::vector<nb::ref<Region>> {
   std::vector<nb::ref<Region>> regions;
 
   auto s_model_regions = GM_regionIter(this->s_model);
@@ -190,7 +251,7 @@ auto Model::get_groups() const -> std::vector<nb::ref<Group>> {
   std::vector<nb::ref<Group>> groups;
 
   auto s_groups = GM_groups(this->s_model);
-  void *itr;
+  void *itr = nullptr;
   while (auto s_group =
              static_cast<pModelItemGroup>(PList_next(s_groups, &itr))) {
     groups.push_back({new Group(s_group, {new Model(this->s_model)})});
@@ -270,7 +331,7 @@ void Mesh::write_gmsh(std::string filename) {
   }
   FIter_delete(fitAll);
 
-  for (auto region : this->model->regions()) {
+  for (auto region : this->model->get_regions()) {
     auto s_entity = static_cast<pGEntity>(region->s_model_item);
     auto region_tag = GEN_tag(s_entity);
 
@@ -334,13 +395,16 @@ void Mesh::write_gmsh(std::string filename) {
 
     // Set physical group
     // TODO (akoen): This does not handle duplicate names.
-    auto related_parts = region->related_parts();
+    auto related_parts = region->get_related_parts();
     if (related_parts.size() == 0) {
       spdlog::warn("Region has no related parts");
     } else if (related_parts.size() > 1) {
       spdlog::warn("Region has more than one related part.");
     } else {
       auto name = related_parts.at(0)->get_name();
+      if (!name.has_value()) {
+        name = related_parts.at(0)->get_parent_assembly()->get()->get_name();
+      }
       if (!name.has_value()) {
         spdlog::warn("Related part has no name.");
       } else {
