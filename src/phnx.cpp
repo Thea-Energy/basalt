@@ -41,36 +41,6 @@ auto ModelItem::downcast(pModelItem s_model_item, nb::ref<Model> model)
   }
 }
 
-Group::Group(pModelItemGroup s_group, nb::ref<Model> model)
-    : s_group(s_group), model(model) {
-  this->name = ModelItemGroup_name(s_group);
-}
-
-Group::Group(std::string &name, nb::ref<Model> model)
-    : name(name), model(model) {
-  GM_addGroup(model->s_model, name.c_str());
-};
-
-auto Group::make(std::string &name, nb::ref<Model> model) -> nb::ref<Group> {
-  return {new Group(name, model)};
-}
-
-void Group::add(nb::ref<ModelItem> item) {
-  ModelItemGroup_addItem(this->s_group, item->s_model_item);
-}
-
-auto Group::items() -> std::vector<nb::ref<ModelItem>> {
-  auto s_items = ModelItemGroup_items(this->s_group);
-  std::vector<nb::ref<ModelItem>> items;
-  void *it = 0;
-  std::vector<size_t> face_nodes;
-  while (auto item = static_cast<pModelItem>(PList_next(s_items, &it))) {
-    items.push_back({new ModelItem(item, this->model)});
-  }
-  PList_delete(s_items);
-  return items;
-}
-
 Model::Connection::Connection(nb::ref<Model> parent, pMConnector s_connector)
     : parent(std::move(parent)), s_connector(s_connector) {
   this->s_anm = ANMConnection_new(s_connector);
@@ -246,19 +216,6 @@ auto Model::get_regions() const -> std::vector<nb::ref<Region>> {
   GRIter_delete(s_model_regions);
 
   return regions;
-}
-
-auto Model::get_groups() const -> std::vector<nb::ref<Group>> {
-  std::vector<nb::ref<Group>> groups;
-
-  auto s_groups = GM_groups(this->s_model);
-  void *itr = nullptr;
-  while (auto s_group =
-             static_cast<pModelItemGroup>(PList_next(s_groups, &itr))) {
-    groups.push_back({new Group(s_group, {new Model(this->s_model)})});
-  }
-  PList_delete(s_groups);
-  return groups;
 }
 
 bool Model::has_connection() const { return connection.has_value(); }

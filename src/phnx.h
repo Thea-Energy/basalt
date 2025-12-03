@@ -135,49 +135,6 @@ class Region : public Entity {
 };
 
 /**
- * @class Group
- * @brief Model group
- * @nb extra: 'nb::intrusive_ptr<Group>([](Group* o, PyObject*
- po) noexcept { o->set_self_py(po); })'
- */
-class Group : public nb::intrusive_base {
-public:
-  pModelItemGroup s_group;
-  std::string name;
-  nb::ref<Model> model;
-
-  Group(pModelItemGroup s_group, nb::ref<Model> model);
-  Group(std::string &name, nb::ref<Model> model);
-
-  // TODO(akoen): destructor
-
-  /**
-   * Constructor
-   *
-   * @param name Group name
-   * @param model Group model
-   * @nb new
-   */
-  static auto make(std::string &name, nb::ref<Model> model) -> nb::ref<Group>;
-
-  /**
-   * Add item to group
-   *
-   * @param item Item
-   * @nb
-   */
-  void add(nb::ref<ModelItem> item);
-
-  /**
-   * Return items in group.
-   *
-   * @return item
-   * @nb
-   */
-  auto items() -> std::vector<nb::ref<ModelItem>>;
-};
-
-/**
  * @class Model
  * @brief model
  * @nb extra: 'nb::intrusive_ptr<Model>([](Model* o, PyObject*
@@ -280,14 +237,6 @@ public:
    * @nb prop_r: regions
    */
   auto get_regions() const -> std::vector<nb::ref<Region>>;
-
-  /**
-   * Get groups in this model
-   *
-   * @return Groups
-   * @nb prop_r: groups
-   */
-  auto get_groups() const -> std::vector<nb::ref<Group>>;
 
   bool has_connection() const;
   auto require_connection() const -> const struct Connection &;
