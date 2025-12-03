@@ -11,6 +11,7 @@
 #include "init.h"
 #include "spdlog/spdlog.h"
 #include <cstddef>
+#include <map>
 #include <optional>
 #include <stdexcept>
 
@@ -331,6 +332,8 @@ void Mesh::write_gmsh(std::string filename) {
   }
   FIter_delete(fitAll);
 
+  std::map<std::string, std::vector<int>> region_physical_name_map;
+
   for (auto region : this->model->get_regions()) {
     auto s_entity = static_cast<pGEntity>(region->s_model_item);
     auto region_tag = GEN_tag(s_entity);
@@ -350,7 +353,6 @@ void Mesh::write_gmsh(std::string filename) {
       std::vector<size_t> node_tags;
       std::vector<double> node_coords;
 
-      // REVIEW(akoen): M_numClassifiedVertices seems to give 0 sometimes.
       auto s_face_verts = M_classifiedVertexIter(this->s_mesh, s_face, 1);
       while (auto s_vertex = VIter_next(s_face_verts)) {
         auto s_vertex_id = EN_id(s_vertex);
@@ -393,8 +395,6 @@ void Mesh::write_gmsh(std::string filename) {
 
     gmsh::model::addDiscreteEntity(3, region_tag, region_boundary_tags);
 
-    // Set physical group
-    // TODO (akoen): This does not handle duplicate names.
     auto related_parts = region->get_related_parts();
     if (related_parts.size() == 0) {
       spdlog::warn("Region has no related parts");
@@ -408,11 +408,14 @@ void Mesh::write_gmsh(std::string filename) {
       if (!name.has_value()) {
         spdlog::warn("Related part has no name.");
       } else {
-        auto physical_tag =
-            gmsh::model::addPhysicalGroup(3, std::vector<int>{region_tag});
-        gmsh::model::setPhysicalName(3, physical_tag, "mat:" + name.value());
+        region_physical_name_map[name.value()].push_back(region_tag);
       }
     }
+  }
+
+  for (const auto &[name, region_tags] : region_physical_name_map) {
+    auto physical_tag = gmsh::model::addPhysicalGroup(3, region_tags);
+    gmsh::model::setPhysicalName(3, physical_tag, "mat:" + name);
   }
 
   gmsh::option::setNumber("Mesh.SaveAll", 1);
