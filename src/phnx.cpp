@@ -273,8 +273,9 @@ void MeshCase::set_proximity_refinement(
 
 void Mesh::write_gmsh(std::string filename) {
   gmsh::initialize();
-  gmsh::model::add("sms");
+  gmsh::model::add("phnx");
 
+  // Iterate through nodes and faces to assign IDs
   auto vit = M_vertexIter(this->s_mesh);
   size_t vid = 1;
   while (auto v = VIter_next(vit)) {
@@ -282,27 +283,28 @@ void Mesh::write_gmsh(std::string filename) {
   }
   VIter_delete(vit);
 
-  auto fitAll = M_faceIter(this->s_mesh);
+  auto fit = M_faceIter(this->s_mesh);
   size_t fid = 1;
-  while (auto f = FIter_next(fitAll)) {
+  while (auto f = FIter_next(fit)) {
     EN_setID((pEntity)f, fid++);
   }
-  FIter_delete(fitAll);
+  FIter_delete(fit);
 
   std::map<std::string, std::vector<int>> region_physical_name_map;
 
   for (auto region : this->model->get_regions()) {
-    auto s_entity = static_cast<pGEntity>(region->s_model_item);
-    auto region_tag = GEN_tag(s_entity);
+    auto s_region_model_item = static_cast<pGEntity>(region->s_model_item);
+    auto region_tag = GEN_tag(s_region_model_item);
 
+    // Iterate through topologically faces of current region
     std::vector<int> region_boundary_tags;
-    auto s_faces = GEN_faces(s_entity);
-    void *iter = 0;
-    while (auto s_face = (pGFace)(PList_next(s_faces, &iter))) {
-      auto tag = GEN_tag(s_face);
-      region_boundary_tags.push_back(tag);
+    auto s_faces = GEN_faces(s_region_model_item);
+    void *itr = 0;
+    while (auto s_face = (pGFace)(PList_next(s_faces, &itr))) {
+      auto current_face_tag = GEN_tag(s_face);
+      region_boundary_tags.push_back(current_face_tag);
       try {
-        gmsh::model::addDiscreteEntity(2, tag);
+        gmsh::model::addDiscreteEntity(2, current_face_tag);
       } catch (const std::runtime_error &) {
         continue;
       }
@@ -320,13 +322,14 @@ void Mesh::write_gmsh(std::string filename) {
         node_coords.push_back(coord[1]);
         node_coords.push_back(coord[2]);
       }
-      gmsh::model::mesh::addNodes(2, tag, node_tags, node_coords);
+      gmsh::model::mesh::addNodes(2, current_face_tag, node_tags, node_coords);
       VIter_delete(s_face_verts);
 
       std::vector<int> element_types(1, 2);
       std::vector<std::vector<size_t>> element_tags(1);
       std::vector<std::vector<size_t>> element_nodes(1);
 
+      // Iterate through mesh faces(Gmsh elements)
       auto s_mesh_faces = M_classifiedFaceIter(this->s_mesh, s_face, 1);
       while (auto s_mesh_face = FIter_next(s_mesh_faces)) {
         auto s_mesh_face_tag = EN_id(s_mesh_face);
@@ -344,14 +347,15 @@ void Mesh::write_gmsh(std::string filename) {
         element_nodes[0].insert(element_nodes[0].end(), face_nodes.begin(),
                                 face_nodes.end());
       }
-      gmsh::model::mesh::addElements(2, tag, element_types, element_tags,
-                                     element_nodes);
+      gmsh::model::mesh::addElements(2, current_face_tag, element_types,
+                                     element_tags, element_nodes);
       FIter_delete(s_mesh_faces);
     }
     PList_delete(s_faces);
 
     gmsh::model::addDiscreteEntity(3, region_tag, region_boundary_tags);
 
+    // Create physical groups for part/component names
     auto related_parts = region->get_related_parts();
     if (related_parts.size() == 0) {
       spdlog::warn("Region has no related parts");
