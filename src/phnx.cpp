@@ -379,6 +379,10 @@ void Mesh::write_gmsh(std::string filename) {
     gmsh::model::setPhysicalName(3, physical_tag, "mat:" + name);
   }
 
+  spdlog::debug("Started node deduplication");
+  gmsh::model::mesh::removeDuplicateNodes();
+  spdlog::debug("Finished node deduplication");
+
   gmsh::option::setNumber("Mesh.SaveAll", 1);
   gmsh::write(filename);
   gmsh::finalize();
