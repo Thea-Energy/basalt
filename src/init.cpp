@@ -1,5 +1,6 @@
 #include "init.h"
 #include "MeshSim.h"
+#include "SimLicense.h"
 #include "SimMessages.h"
 #include "SimParasolidKrnl.h"
 #include "SimPartitionedMesh.h"
@@ -18,7 +19,9 @@ void init() {
   SimPartitionedMesh_start(nullptr, nullptr);
   Sim_logOn("sms.log");
   MS_init();
-  Sim_readLicenseFile("TheaEnergyTemp");
+  SimLicense_start(
+      "geomsim_core,geomsim_parasolid,meshsim_surface,meshsim_volume", nullptr);
+
   SimParasolid_start(1);
   Sim_setMessageHandler(messageHandler);
   g_sms_initialized.store(true, std::memory_order_release);
@@ -27,7 +30,7 @@ void init() {
 void terminate() {
   g_sms_initialized.store(false, std::memory_order_release);
   SimParasolid_stop(1);
-  Sim_unregisterAllKeys();
+  SimLicense_stop();
   MS_exit();
   Sim_logOff();
   SimPartitionedMesh_start(nullptr, nullptr);

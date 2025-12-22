@@ -39,7 +39,10 @@ target_link_directories(sms INTERFACE lib/mscore)
 target_include_directories(sms INTERFACE include/pskrnl)
 target_link_directories(sms INTERFACE lib/pskrnl lib/pskrnl/psKrnl)
 
-target_link_libraries(sms INTERFACE SimParasolid371 SimPartitionedMesh SimPartitionWrapper SimMeshing SimMeshTools SimModel pskernel tirpc)
+target_include_directories(sms INTERFACE include/license)
+target_link_directories(sms INTERFACE lib/license)
+
+target_link_libraries(sms INTERFACE SimParasolid371 SimPartitionedMesh SimPartitionWrapper SimMeshing SimMeshTools SimModel pskernel tirpc SimLicense)
 
 # ===============================================================================
 # Gmsh
