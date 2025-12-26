@@ -275,7 +275,7 @@ void Mesh::write_gmsh(std::string filename) {
   gmsh::initialize();
   gmsh::model::add("phnx");
 
-  // Iterate through nodes and faces to assign IDs
+  // Assign node IDs
   auto vit = M_vertexIter(this->s_mesh);
   size_t vid = 1;
   while (auto v = VIter_next(vit)) {
@@ -283,6 +283,7 @@ void Mesh::write_gmsh(std::string filename) {
   }
   VIter_delete(vit);
 
+  // Assign face IDs
   auto fit = M_faceIter(this->s_mesh);
   size_t fid = 1;
   while (auto f = FIter_next(fit)) {
@@ -312,7 +313,7 @@ void Mesh::write_gmsh(std::string filename) {
       std::vector<size_t> node_tags;
       std::vector<double> node_coords;
 
-      auto s_face_verts = M_classifiedVertexIter(this->s_mesh, s_face, 1);
+      auto s_face_verts = M_classifiedVertexIter(this->s_mesh, s_face, 0);
       while (auto s_vertex = VIter_next(s_face_verts)) {
         auto s_vertex_id = EN_id(s_vertex);
         node_tags.push_back(s_vertex_id);
@@ -330,7 +331,7 @@ void Mesh::write_gmsh(std::string filename) {
       std::vector<std::vector<size_t>> element_nodes(1);
 
       // Iterate through mesh faces(Gmsh elements)
-      auto s_mesh_faces = M_classifiedFaceIter(this->s_mesh, s_face, 1);
+      auto s_mesh_faces = M_classifiedFaceIter(this->s_mesh, s_face, 0);
       while (auto s_mesh_face = FIter_next(s_mesh_faces)) {
         auto s_mesh_face_tag = EN_id(s_mesh_face);
         element_tags[0].push_back(s_mesh_face_tag);
@@ -379,9 +380,9 @@ void Mesh::write_gmsh(std::string filename) {
     gmsh::model::setPhysicalName(3, physical_tag, "mat:" + name);
   }
 
-  spdlog::debug("Started node deduplication");
-  gmsh::model::mesh::removeDuplicateNodes();
-  spdlog::debug("Finished node deduplication");
+  // spdlog::debug("Started node deduplication");
+  // gmsh::model::mesh::removeDuplicateNodes();
+  // spdlog::debug("Finished node deduplication");
 
   gmsh::option::setNumber("Mesh.SaveAll", 1);
   gmsh::write(filename);
