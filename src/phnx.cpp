@@ -205,6 +205,41 @@ void Model::mesh(std::string filename, double mesh_size) {
   M_release(s_mesh);
 }
 
+auto Model::get_vertices() const -> std::vector<nb::ref<Vertex>> {
+  std::vector<nb::ref<Vertex>> vertices;
+  auto s_model_vertices = GM_vertexIter(this->s_model);
+  while (auto s_model_vertex = GVIter_next(s_model_vertices)) {
+    vertices.push_back({new Vertex(s_model_vertex,
+                                   nb::ref<Model>(const_cast<Model *>(this)))});
+  }
+  GVIter_delete(s_model_vertices);
+  return vertices;
+}
+
+auto Model::get_edges() const -> std::vector<nb::ref<Edge>> {
+  std::vector<nb::ref<Edge>> edges;
+  auto s_model_edges = GM_edgeIter(this->s_model);
+  while (auto s_model_edge = GEIter_next(s_model_edges)) {
+    edges.push_back(
+        {new Edge(s_model_edge, nb::ref<Model>(const_cast<Model *>(this)))});
+  }
+  GEIter_delete(s_model_edges);
+  return edges;
+}
+
+auto Model::get_faces() const -> std::vector<nb::ref<Face>> {
+  std::vector<nb::ref<Face>> faces;
+
+  auto s_model_faces = GM_faceIter(this->s_model);
+  while (auto s_model_face = GFIter_next(s_model_faces)) {
+    faces.push_back(
+        {new Face(s_model_face, nb::ref<Model>(const_cast<Model *>(this)))});
+  }
+  GFIter_delete(s_model_faces);
+
+  return faces;
+}
+
 auto Model::get_regions() const -> std::vector<nb::ref<Region>> {
   std::vector<nb::ref<Region>> regions;
 
