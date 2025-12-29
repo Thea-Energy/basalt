@@ -310,7 +310,15 @@ void Mesh::write_gmsh(std::string filename) {
   gmsh::initialize();
   gmsh::model::add("phnx");
 
-  // Assign node IDs
+  unsigned int dim;
+  unsigned int gmsh_element_type;
+
+  // Note(akoen): Add regions for tet/hex meshing
+
+  // Gmsh Point / GeomSim Vertex
+  dim = 0;
+  gmsh_element_type = 15;
+
   auto vit = M_vertexIter(this->s_mesh);
   size_t vid = 1;
   while (auto v = VIter_next(vit)) {
@@ -318,16 +326,148 @@ void Mesh::write_gmsh(std::string filename) {
   }
   VIter_delete(vit);
 
-  // Assign face IDs
+  for (auto entity : this->model->get_vertices()) {
+    auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
+    auto s_classified_verts =
+        M_classifiedVertexIter(this->s_mesh, sg_entity, 0);
+
+    std::vector<size_t> node_tags;
+    std::vector<double> node_coords;
+    while (auto s_vertex = VIter_next(s_classified_verts)) {
+      auto s_vertex_id = EN_id(s_vertex);
+      node_tags.push_back(s_vertex_id);
+      double coord[3];
+      V_coord(s_vertex, coord);
+      node_coords.push_back(coord[0]);
+      node_coords.push_back(coord[1]);
+      node_coords.push_back(coord[2]);
+    }
+
+    auto sg_tag = GEN_tag(sg_entity);
+    gmsh::model::addDiscreteEntity(dim, sg_tag);
+    gmsh::model::mesh::addNodes(dim, sg_tag, node_tags, node_coords);
+
+    std::vector<int> element_types(1, gmsh_element_type);
+    std::vector<std::vector<size_t>> element_tags(1);
+    std::vector<std::vector<size_t>> element_nodes(1);
+    auto sm_elements = M_classifiedVertexIter(this->s_mesh, sg_entity, 0);
+    while (auto sm_element = VIter_next(sm_elements)) {
+      // Node ID is same as point ID
+      // TODO(akoen): We shouldn't need to iterate
+      auto sm_tag = EN_id(sm_element);
+      element_tags[0].push_back(sm_tag);
+      element_nodes[0].push_back(sm_tag);
+    }
+    gmsh::model::mesh::addElements(dim, sg_tag, element_types, element_tags,
+                                   element_nodes);
+    VIter_delete(sm_elements);
+  }
+
+  // Edge
+  dim = 1;
+  gmsh_element_type = 1;
+  auto eit = M_edgeIter(this->s_mesh);
+  size_t eid = 1;
+  while (auto e = EIter_next(eit)) {
+    EN_setID((pEntity)e, eid++);
+  }
+  VIter_delete(vit);
+
+  for (auto entity : this->model->get_edges()) {
+    auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
+    auto s_classified_verts =
+        M_classifiedVertexIter(this->s_mesh, sg_entity, 0);
+
+    std::vector<size_t> node_tags;
+    std::vector<double> node_coords;
+    while (auto s_vertex = VIter_next(s_classified_verts)) {
+      auto s_vertex_id = EN_id(s_vertex);
+      node_tags.push_back(s_vertex_id);
+      double coord[3];
+      V_coord(s_vertex, coord);
+      node_coords.push_back(coord[0]);
+      node_coords.push_back(coord[1]);
+      node_coords.push_back(coord[2]);
+    }
+
+    auto sg_tag = GEN_tag(sg_entity);
+    gmsh::model::addDiscreteEntity(dim, sg_tag);
+    gmsh::model::mesh::addNodes(dim, sg_tag, node_tags, node_coords);
+
+    std::vector<int> element_types(1, gmsh_element_type);
+    std::vector<std::vector<size_t>> element_tags(1);
+    std::vector<std::vector<size_t>> element_nodes(1);
+    auto sm_elements = M_classifiedEdgeIter(this->s_mesh, sg_entity, 0);
+    while (auto sm_element = EIter_next(sm_elements)) {
+      auto sm_tag = EN_id(sm_element);
+      element_tags[0].push_back(sm_tag);
+
+      element_nodes[0].push_back(EN_id(E_vertex(sm_element, 0)));
+      element_nodes[0].push_back(EN_id(E_vertex(sm_element, 1)));
+    }
+    gmsh::model::mesh::addElements(dim, sg_tag, element_types, element_tags,
+                                   element_nodes);
+    EIter_delete(sm_elements);
+  }
+
+  // Face
+  dim = 2;
+  gmsh_element_type = 2;
+
   auto fit = M_faceIter(this->s_mesh);
   size_t fid = 1;
   while (auto f = FIter_next(fit)) {
     EN_setID((pEntity)f, fid++);
   }
-  FIter_delete(fit);
+
+  for (auto entity : this->model->get_faces()) {
+    auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
+    auto s_classified_verts =
+        M_classifiedVertexIter(this->s_mesh, sg_entity, 0);
+
+    std::vector<size_t> node_tags;
+    std::vector<double> node_coords;
+    while (auto s_vertex = VIter_next(s_classified_verts)) {
+      auto s_vertex_id = EN_id(s_vertex);
+      node_tags.push_back(s_vertex_id);
+      double coord[3];
+      V_coord(s_vertex, coord);
+      node_coords.push_back(coord[0]);
+      node_coords.push_back(coord[1]);
+      node_coords.push_back(coord[2]);
+    }
+
+    auto sg_tag = GEN_tag(sg_entity);
+    gmsh::model::addDiscreteEntity(2, sg_tag);
+    gmsh::model::mesh::addNodes(2, sg_tag, node_tags, node_coords);
+
+    std::vector<int> element_types(1, gmsh_element_type);
+    std::vector<std::vector<size_t>> element_tags(1);
+    std::vector<std::vector<size_t>> element_nodes(1);
+    auto sm_elements = M_classifiedFaceIter(this->s_mesh, sg_entity, 0);
+    while (auto sm_element = FIter_next(sm_elements)) {
+      auto s_mesh_face_tag = EN_id(sm_element);
+      element_tags[0].push_back(s_mesh_face_tag);
+
+      auto s_face_verts = F_vertices(sm_element, 1);
+      void *it2 = 0;
+      std::vector<size_t> face_nodes;
+      while (auto s_vertex = (pVertex)PList_next(s_face_verts, &it2)) {
+        auto s_vertex_tag = EN_id(s_vertex);
+        face_nodes.push_back(s_vertex_tag);
+      }
+      PList_delete(s_face_verts);
+
+      element_nodes[0].insert(element_nodes[0].end(), face_nodes.begin(),
+                              face_nodes.end());
+    }
+    gmsh::model::mesh::addElements(dim, sg_tag, element_types, element_tags,
+                                   element_nodes);
+
+    FIter_delete(sm_elements);
+  }
 
   std::map<std::string, std::vector<int>> region_physical_name_map;
-
   for (auto region : this->model->get_regions()) {
     auto s_region_model_item = static_cast<pGEntity>(region->s_model_item);
     auto region_tag = GEN_tag(s_region_model_item);
@@ -339,56 +479,10 @@ void Mesh::write_gmsh(std::string filename) {
     while (auto s_face = (pGFace)(PList_next(s_faces, &itr))) {
       auto current_face_tag = GEN_tag(s_face);
       region_boundary_tags.push_back(current_face_tag);
-      try {
-        gmsh::model::addDiscreteEntity(2, current_face_tag);
-      } catch (const std::runtime_error &) {
-        continue;
-      }
-
-      std::vector<size_t> node_tags;
-      std::vector<double> node_coords;
-
-      auto s_face_verts = M_classifiedVertexIter(this->s_mesh, s_face, 0);
-      while (auto s_vertex = VIter_next(s_face_verts)) {
-        auto s_vertex_id = EN_id(s_vertex);
-        node_tags.push_back(s_vertex_id);
-        double coord[3];
-        V_coord(s_vertex, coord);
-        node_coords.push_back(coord[0]);
-        node_coords.push_back(coord[1]);
-        node_coords.push_back(coord[2]);
-      }
-      gmsh::model::mesh::addNodes(2, current_face_tag, node_tags, node_coords);
-      VIter_delete(s_face_verts);
-
-      std::vector<int> element_types(1, 2);
-      std::vector<std::vector<size_t>> element_tags(1);
-      std::vector<std::vector<size_t>> element_nodes(1);
-
-      // Iterate through mesh faces(Gmsh elements)
-      auto s_mesh_faces = M_classifiedFaceIter(this->s_mesh, s_face, 0);
-      while (auto s_mesh_face = FIter_next(s_mesh_faces)) {
-        auto s_mesh_face_tag = EN_id(s_mesh_face);
-        element_tags[0].push_back(s_mesh_face_tag);
-
-        auto s_face_verts = F_vertices(s_mesh_face, 1);
-        void *it2 = 0;
-        std::vector<size_t> face_nodes;
-        while (auto s_vertex = (pVertex)PList_next(s_face_verts, &it2)) {
-          auto s_vertex_tag = EN_id(s_vertex);
-          face_nodes.push_back(s_vertex_tag);
-        }
-        PList_delete(s_face_verts);
-
-        element_nodes[0].insert(element_nodes[0].end(), face_nodes.begin(),
-                                face_nodes.end());
-      }
-      gmsh::model::mesh::addElements(2, current_face_tag, element_types,
-                                     element_tags, element_nodes);
-      FIter_delete(s_mesh_faces);
     }
     PList_delete(s_faces);
 
+    // TODO (akoen): We should add edge/vertex boundaries
     gmsh::model::addDiscreteEntity(3, region_tag, region_boundary_tags);
 
     // Create physical groups for part/component names
