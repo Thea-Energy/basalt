@@ -320,9 +320,18 @@ void Mesh::write_gmsh(std::string filename) {
   gmsh_element_type = 15;
 
   auto vit = M_vertexIter(this->s_mesh);
-  size_t vid = 1;
+  size_t next_element_tag = 1;
   while (auto v = VIter_next(vit)) {
-    EN_setID((pEntity)v, vid++);
+    EN_setID((pEntity)v, next_element_tag++);
+
+    auto adjacent_faces = V_faces(v);
+
+    auto num_faces = PList_size(adjacent_faces);
+    if (num_faces == 0) {
+      spdlog::warn("Vertex {} is not adjacent to any mesh faces",
+                   next_element_tag, num_faces);
+    }
+    PList_delete(adjacent_faces);
   }
   VIter_delete(vit);
 
@@ -367,11 +376,10 @@ void Mesh::write_gmsh(std::string filename) {
   dim = 1;
   gmsh_element_type = 1;
   auto eit = M_edgeIter(this->s_mesh);
-  size_t eid = 1;
   while (auto e = EIter_next(eit)) {
-    EN_setID((pEntity)e, eid++);
+    EN_setID((pEntity)e, next_element_tag++);
   }
-  VIter_delete(vit);
+  EIter_delete(eit);
 
   for (auto entity : this->model->get_edges()) {
     auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
@@ -391,7 +399,17 @@ void Mesh::write_gmsh(std::string filename) {
     }
 
     auto sg_tag = GEN_tag(sg_entity);
-    gmsh::model::addDiscreteEntity(dim, sg_tag);
+
+    // Add boundary vertices to the discrete edge
+    std::vector<int> boundary_tags;
+    auto s_vertices = GEN_vertices(sg_entity);
+    void *iter = 0;
+    while (auto s_vertex = (pGEntity)PList_next(s_vertices, &iter)) {
+      boundary_tags.push_back(GEN_tag(s_vertex));
+    }
+    PList_delete(s_vertices);
+
+    gmsh::model::addDiscreteEntity(dim, sg_tag, boundary_tags);
     gmsh::model::mesh::addNodes(dim, sg_tag, node_tags, node_coords);
 
     std::vector<int> element_types(1, gmsh_element_type);
@@ -415,10 +433,10 @@ void Mesh::write_gmsh(std::string filename) {
   gmsh_element_type = 2;
 
   auto fit = M_faceIter(this->s_mesh);
-  size_t fid = 1;
   while (auto f = FIter_next(fit)) {
-    EN_setID((pEntity)f, fid++);
+    EN_setID((pEntity)f, next_element_tag++);
   }
+  FIter_delete(fit);
 
   for (auto entity : this->model->get_faces()) {
     auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
@@ -438,7 +456,17 @@ void Mesh::write_gmsh(std::string filename) {
     }
 
     auto sg_tag = GEN_tag(sg_entity);
-    gmsh::model::addDiscreteEntity(2, sg_tag);
+
+    // NEW: Add boundary edges to the discrete face
+    std::vector<int> boundary_tags;
+    auto s_edges = GEN_edges(sg_entity);
+    void *iter = 0;
+    while (auto s_edge = (pGEntity)PList_next(s_edges, &iter)) {
+      boundary_tags.push_back(GEN_tag(s_edge));
+    }
+    PList_delete(s_edges);
+
+    gmsh::model::addDiscreteEntity(2, sg_tag, boundary_tags);
     gmsh::model::mesh::addNodes(2, sg_tag, node_tags, node_coords);
 
     std::vector<int> element_types(1, gmsh_element_type);
@@ -509,9 +537,9 @@ void Mesh::write_gmsh(std::string filename) {
     gmsh::model::setPhysicalName(3, physical_tag, "mat:" + name);
   }
 
-  // spdlog::debug("Started node deduplication");
-  // gmsh::model::mesh::removeDuplicateNodes();
-  // spdlog::debug("Finished node deduplication");
+  spdlog::debug("Started node deduplication");
+  gmsh::model::mesh::removeDuplicateNodes();
+  spdlog::debug("Finished node deduplication");
 
   gmsh::option::setNumber("Mesh.SaveAll", 1);
   gmsh::write(filename);
