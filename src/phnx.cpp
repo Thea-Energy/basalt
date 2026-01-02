@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <map>
 #include <optional>
+#include <sstream>
 #include <stdexcept>
 
 template <typename T> auto plist_to_vec(pPList plist) -> std::vector<T> {
@@ -469,6 +470,25 @@ void Mesh::write_gmsh(std::string filename) {
     gmsh::model::addDiscreteEntity(2, sg_tag, boundary_tags);
     gmsh::model::mesh::addNodes(2, sg_tag, node_tags, node_coords);
 
+    auto sg_forward_volume = GF_region(static_cast<pGFace>(sg_entity), 0);
+    std::string forward_volume =
+        sg_forward_volume == nullptr
+            ? "None"
+            : std::to_string(GEN_tag(sg_forward_volume));
+
+    auto sg_reverse_volume = GF_region(static_cast<pGFace>(sg_entity), 1);
+    std::string reverse_volume =
+        sg_reverse_volume == nullptr
+            ? "None"
+            : std::to_string(GEN_tag(sg_reverse_volume));
+
+    std::stringstream physical_name;
+    physical_name << "tag=" << sg_tag << "&forward_volume=" << forward_volume
+                  << "&reverse_volume" << reverse_volume;
+
+    auto physical_tag = gmsh::model::addPhysicalGroup(dim, {sg_tag}, sg_tag,
+                                                      physical_name.str());
+
     std::vector<int> element_types(1, gmsh_element_type);
     std::vector<std::vector<size_t>> element_tags(1);
     std::vector<std::vector<size_t>> element_nodes(1);
@@ -494,27 +514,26 @@ void Mesh::write_gmsh(std::string filename) {
 
     FIter_delete(sm_elements);
   }
+  // Region
+  dim = 3;
+  gmsh_element_type = 0;
 
-  std::map<std::string, std::vector<int>> region_physical_name_map;
-  for (auto region : this->model->get_regions()) {
-    auto s_region_model_item = static_cast<pGEntity>(region->s_model_item);
-    auto region_tag = GEN_tag(s_region_model_item);
+  for (auto entity : this->model->get_regions()) {
+    auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
+    auto sg_tag = GEN_tag(sg_entity);
 
-    // Iterate through topologically faces of current region
-    std::vector<int> region_boundary_tags;
-    auto s_faces = GEN_faces(s_region_model_item);
-    void *itr = 0;
-    while (auto s_face = (pGFace)(PList_next(s_faces, &itr))) {
-      auto current_face_tag = GEN_tag(s_face);
-      region_boundary_tags.push_back(current_face_tag);
+    std::vector<int> boundary_tags;
+    auto s_faces = GEN_faces(sg_entity);
+    void *iter = 0;
+    while (auto s_edge = (pGEntity)PList_next(s_faces, &iter)) {
+      boundary_tags.push_back(GEN_tag(s_edge));
     }
     PList_delete(s_faces);
 
-    // TODO (akoen): We should add edge/vertex boundaries
-    gmsh::model::addDiscreteEntity(3, region_tag, region_boundary_tags);
+    gmsh::model::addDiscreteEntity(dim, sg_tag, boundary_tags);
 
     // Create physical groups for part/component names
-    auto related_parts = region->get_related_parts();
+    auto related_parts = entity->get_related_parts();
     if (related_parts.size() == 0) {
       spdlog::warn("Region has no related parts");
     } else if (related_parts.size() > 1) {
@@ -527,19 +546,15 @@ void Mesh::write_gmsh(std::string filename) {
       if (!name.has_value()) {
         spdlog::warn("Related part has no name.");
       } else {
-        region_physical_name_map[name.value()].push_back(region_tag);
+        std::stringstream physical_name;
+        physical_name << "tag=" << sg_tag << "&material=" << name.value();
+        auto physical_tag = gmsh::model::addPhysicalGroup(dim, {sg_tag}, sg_tag,
+                                                          physical_name.str());
       }
     }
   }
 
-  for (const auto &[name, region_tags] : region_physical_name_map) {
-    auto physical_tag = gmsh::model::addPhysicalGroup(3, region_tags);
-    gmsh::model::setPhysicalName(3, physical_tag, "mat:" + name);
-  }
-
-  spdlog::debug("Started node deduplication");
   gmsh::model::mesh::removeDuplicateNodes();
-  spdlog::debug("Finished node deduplication");
 
   gmsh::option::setNumber("Mesh.SaveAll", 1);
   gmsh::write(filename);
