@@ -377,7 +377,7 @@ public:
    * @param filename Filename
    * @nb
    */
-  void write_gmsh(std::string filename);
+  void write_gmsh(std::string filename, double scale_factor = 1.0);
 };
 
 /**

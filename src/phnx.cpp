@@ -307,7 +307,7 @@ void MeshCase::set_proximity_refinement(
   }
 }
 
-void Mesh::write_gmsh(std::string filename) {
+void Mesh::write_gmsh(std::string filename, double scale_factor) {
   gmsh::initialize();
   gmsh::model::add("phnx");
 
@@ -348,9 +348,9 @@ void Mesh::write_gmsh(std::string filename) {
       node_tags.push_back(s_vertex_id);
       double coord[3];
       V_coord(s_vertex, coord);
-      node_coords.push_back(coord[0]);
-      node_coords.push_back(coord[1]);
-      node_coords.push_back(coord[2]);
+      node_coords.push_back(coord[0] * scale_factor);
+      node_coords.push_back(coord[1] * scale_factor);
+      node_coords.push_back(coord[2] * scale_factor);
     }
 
     auto sg_tag = GEN_tag(sg_entity);
@@ -394,9 +394,9 @@ void Mesh::write_gmsh(std::string filename) {
       node_tags.push_back(s_vertex_id);
       double coord[3];
       V_coord(s_vertex, coord);
-      node_coords.push_back(coord[0]);
-      node_coords.push_back(coord[1]);
-      node_coords.push_back(coord[2]);
+      node_coords.push_back(coord[0] * scale_factor);
+      node_coords.push_back(coord[1] * scale_factor);
+      node_coords.push_back(coord[2] * scale_factor);
     }
 
     auto sg_tag = GEN_tag(sg_entity);
@@ -451,9 +451,9 @@ void Mesh::write_gmsh(std::string filename) {
       node_tags.push_back(s_vertex_id);
       double coord[3];
       V_coord(s_vertex, coord);
-      node_coords.push_back(coord[0]);
-      node_coords.push_back(coord[1]);
-      node_coords.push_back(coord[2]);
+      node_coords.push_back(coord[0] * scale_factor);
+      node_coords.push_back(coord[1] * scale_factor);
+      node_coords.push_back(coord[2] * scale_factor);
     }
 
     auto sg_tag = GEN_tag(sg_entity);
@@ -484,7 +484,7 @@ void Mesh::write_gmsh(std::string filename) {
 
     std::stringstream physical_name;
     physical_name << "tag=" << sg_tag << "&forward_volume=" << forward_volume
-                  << "&reverse_volume" << reverse_volume;
+                  << "&reverse_volume=" << reverse_volume;
 
     auto physical_tag = gmsh::model::addPhysicalGroup(dim, {sg_tag}, sg_tag,
                                                       physical_name.str());
@@ -553,8 +553,6 @@ void Mesh::write_gmsh(std::string filename) {
       }
     }
   }
-
-  gmsh::model::mesh::removeDuplicateNodes();
 
   gmsh::option::setNumber("Mesh.SaveAll", 1);
   gmsh::write(filename);
