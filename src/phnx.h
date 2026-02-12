@@ -126,6 +126,33 @@ public:
 };
 
 /**
+ * @class Vertex
+ * @brief Model vertex
+ * @nb inherit: Entity
+ */
+class Vertex : public Entity {
+  using Entity::Entity;
+};
+
+/**
+ * @class Edge
+ * @brief Model edge
+ * @nb inherit: Entity
+ */
+class Edge : public Entity {
+  using Entity::Entity;
+};
+
+/**
+ * @class Face
+ * @brief Model face
+ * @nb inherit: Entity
+ */
+class Face : public Entity {
+  using Entity::Entity;
+};
+
+/**
  * @class Region
  * @brief Model region
  * @nb inherit: Entity
@@ -231,12 +258,36 @@ public:
   void mesh(std::string filename, double mesh_size);
 
   /**
+   * Return all the faces in this model.
+   *
+   * @return Faces
+   * @nb prop_r: faces
+   */
+  auto get_faces() const -> std::vector<nb::ref<Face>>;
+
+  /**
    * Return all the regions in this model.
    *
    * @return Regions
    * @nb prop_r: regions
    */
   auto get_regions() const -> std::vector<nb::ref<Region>>;
+
+  /**
+   * Return all the edges in this model.
+   *
+   * @return Edges
+   * @nb prop_r: edges
+   */
+  auto get_edges() const -> std::vector<nb::ref<Edge>>;
+
+  /**
+   * Return all the vertices in this model.
+   *
+   * @return Vertices
+   * @nb prop_r: vertices
+   */
+  auto get_vertices() const -> std::vector<nb::ref<Vertex>>;
 
   bool has_connection() const;
   auto require_connection() const -> const struct Connection &;
@@ -326,7 +377,7 @@ public:
    * @param filename Filename
    * @nb
    */
-  void write_gmsh(std::string filename);
+  void write_gmsh(std::string filename, double scale_factor = 1.0);
 };
 
 /**
