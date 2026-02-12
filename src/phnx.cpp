@@ -441,6 +441,7 @@ void Mesh::write_gmsh(std::string filename, double scale_factor) {
 
   for (auto entity : this->model->get_faces()) {
     auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
+    auto sg_tag = GEN_tag(sg_entity);
     auto s_classified_verts =
         M_classifiedVertexIter(this->s_mesh, sg_entity, 0);
 
@@ -456,8 +457,6 @@ void Mesh::write_gmsh(std::string filename, double scale_factor) {
       node_coords.push_back(coord[2] * scale_factor);
     }
 
-    auto sg_tag = GEN_tag(sg_entity);
-
     // NEW: Add boundary edges to the discrete face
     std::vector<int> boundary_tags;
     auto s_edges = GEN_edges(sg_entity);
@@ -467,8 +466,8 @@ void Mesh::write_gmsh(std::string filename, double scale_factor) {
     }
     PList_delete(s_edges);
 
-    gmsh::model::addDiscreteEntity(2, sg_tag, boundary_tags);
-    gmsh::model::mesh::addNodes(2, sg_tag, node_tags, node_coords);
+    gmsh::model::addDiscreteEntity(dim, sg_tag, boundary_tags);
+    gmsh::model::mesh::addNodes(dim, sg_tag, node_tags, node_coords);
 
     auto sg_forward_volume = GF_region(static_cast<pGFace>(sg_entity), 0);
     std::string forward_volume =
@@ -516,11 +515,28 @@ void Mesh::write_gmsh(std::string filename, double scale_factor) {
   }
   // Region
   dim = 3;
-  gmsh_element_type = 0;
+
+  // TODO(akoen): Support hexahedral meshing
+  gmsh_element_type = 4;
 
   for (auto entity : this->model->get_regions()) {
     auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
     auto sg_tag = GEN_tag(sg_entity);
+
+    auto s_classified_verts =
+        M_classifiedVertexIter(this->s_mesh, sg_entity, 0);
+
+    std::vector<size_t> node_tags;
+    std::vector<double> node_coords;
+    while (auto s_vertex = VIter_next(s_classified_verts)) {
+      auto s_vertex_id = EN_id(s_vertex);
+      node_tags.push_back(s_vertex_id);
+      double coord[3];
+      V_coord(s_vertex, coord);
+      node_coords.push_back(coord[0] * scale_factor);
+      node_coords.push_back(coord[1] * scale_factor);
+      node_coords.push_back(coord[2] * scale_factor);
+    }
 
     std::vector<int> boundary_tags;
     auto s_faces = GEN_faces(sg_entity);
@@ -531,6 +547,7 @@ void Mesh::write_gmsh(std::string filename, double scale_factor) {
     PList_delete(s_faces);
 
     gmsh::model::addDiscreteEntity(dim, sg_tag, boundary_tags);
+    gmsh::model::mesh::addNodes(dim, sg_tag, node_tags, node_coords);
 
     // Create physical groups for part/component names
     auto related_parts = entity->get_related_parts();
@@ -552,6 +569,31 @@ void Mesh::write_gmsh(std::string filename, double scale_factor) {
                                                           physical_name.str());
       }
     }
+
+    std::vector<int> element_types(1, gmsh_element_type);
+    std::vector<std::vector<size_t>> element_tags(1);
+    std::vector<std::vector<size_t>> element_nodes(1);
+    auto sm_elements = M_classifiedRegionIter(this->s_mesh, sg_entity);
+    while (auto sm_element = RIter_next(sm_elements)) {
+      auto s_mesh_face_tag = EN_id(sm_element);
+      element_tags[0].push_back(s_mesh_face_tag);
+
+      auto s_element = R_vertices(sm_element, 1);
+      void *it2 = 0;
+      std::vector<size_t> region_nodes;
+      while (auto s_vertex = (pVertex)PList_next(s_element, &it2)) {
+        auto s_vertex_tag = EN_id(s_vertex);
+        region_nodes.push_back(s_vertex_tag);
+      }
+      PList_delete(s_element);
+
+      element_nodes[0].insert(element_nodes[0].end(), region_nodes.begin(),
+                              region_nodes.end());
+    }
+    gmsh::model::mesh::addElements(dim, sg_tag, element_types, element_tags,
+                                   element_nodes);
+
+    RIter_delete(sm_elements);
   }
 
   gmsh::option::setNumber("Mesh.SaveAll", 1);
@@ -579,7 +621,7 @@ auto VolumeMesh::from_surface_mesh(nb::ref<SurfaceMesh> surface_mesh)
   auto s_volume_mesher =
       VolumeMesher_new(surface_mesh->mesh_case->s_mesh_case, s_new_mesh);
   VolumeMesher_execute(s_volume_mesher, nullptr);
-  M_write(s_new_mesh, "meshv.sms", 0, nullptr);
+  // M_write(s_new_mesh, "meshv.sms", 0, nullptr);
   VolumeMesher_delete(s_volume_mesher);
 
   return {
