@@ -3,6 +3,8 @@ authors = ["akoen <git@koen.ca>"]
 channels = ["conda-forge"]
 name = "simmetrix"
 platforms = ["linux-64"]
+preview = ["pixi-build"]
+
 
 [tasks]
 
@@ -17,3 +19,20 @@ nanobind = ">=2.9.2,<3"
 gmsh = ">=4.13.1,<5"
 stellarmesh = ">=1.0.1,<2"
 openmc = { version = "==0.15.2", build = "dagmc_nompi*" }
+
+
+[package]
+name = "stellarmesh"
+version = "2.0.1"
+description = "Meshing library for nuclear workflows."
+
+[package.build]
+backend = { name = "pixi-build-python", version = "0.4.*" }
+
+[package.host-dependencies]
+setuptools = ">=61"
+
+[package.run-dependencies]
+python = "3.12.*"
+nanobind = ">=2.9.2,<3"
+gmsh = ">=4.13.1,<5"
