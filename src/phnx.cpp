@@ -165,15 +165,22 @@ auto Model::read(std::string filename) -> nb::ref<Model> {
 }
 
 auto Model::from_parasolid_file(std::string filename) -> nb::ref<Model> {
+  spdlog::debug("Creating Parasolid Native Model from file.");
   auto parasolid_native_model = ParasolidNM_createFromFile(filename.c_str(), 0);
   if (!parasolid_native_model) {
     throw std::runtime_error("failed to load Parasolid file: " + filename);
   }
 
+  spdlog::debug("Creating Assembly Model from native model.");
   auto assembly_model =
       GAM_createFromNativeModel(parasolid_native_model, nullptr);
 
-  return {new Model(assembly_model)};
+  auto connector = MC_new();
+  spdlog::debug("Translating model to SMS native");
+  auto s_translated_assembly_model =
+      GM_translateModel(assembly_model, connector, true);
+
+  return {new Model(s_translated_assembly_model)};
 }
 
 auto Model::make_non_manifold_model(std::optional<double> tolerance)
@@ -185,6 +192,7 @@ auto Model::make_non_manifold_model(std::optional<double> tolerance)
   if (tolerance.has_value()) {
     ModelBuilder_setBooleanTolerance(model_builder, tolerance.value());
   }
+  spdlog::debug("Creating Non-Manifold Model.");
   auto s_new_model = ModelBuilder_execute(model_builder, nullptr);
 
   return {new Model(s_new_model, nb::ref<Model>(this), connector)};
