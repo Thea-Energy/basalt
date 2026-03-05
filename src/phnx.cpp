@@ -126,6 +126,46 @@ auto Assembly::get_parent_assembly() const -> std::optional<nb::ref<Assembly>> {
   return {new Assembly(s_parent_assembly, this->model)};
 }
 
+auto Part::get_regions() const -> std::vector<nb::ref<Region>> {
+  std::vector<nb::ref<Region>> regions;
+  auto s_iter = GIP_regionIter((pGIPart)this->s_model_item);
+  while (auto s_region = GRIter_next(s_iter)) {
+    regions.push_back({new Region(s_region, this->model)});
+  }
+  GRIter_delete(s_iter);
+  return regions;
+}
+
+auto Part::get_faces() const -> std::vector<nb::ref<Face>> {
+  std::vector<nb::ref<Face>> faces;
+  auto s_iter = GIP_faceIter((pGIPart)this->s_model_item);
+  while (auto s_face = GFIter_next(s_iter)) {
+    faces.push_back({new Face(s_face, this->model)});
+  }
+  GFIter_delete(s_iter);
+  return faces;
+}
+
+auto Assembly::get_assemblies() const -> std::vector<nb::ref<Assembly>> {
+  std::vector<nb::ref<Assembly>> assemblies;
+  auto s_iter = GA_AIter((pGAssembly)this->s_model_item, 2);
+  while (auto s_assembly = GAIter_next(s_iter)) {
+    assemblies.push_back({new Assembly(s_assembly, this->model)});
+  }
+  GAIter_delete(s_iter);
+  return assemblies;
+}
+
+auto Assembly::get_parts() const -> std::vector<nb::ref<Part>> {
+  std::vector<nb::ref<Part>> parts;
+  auto s_iter = GA_IPIter((pGAssembly)this->s_model_item, 2);
+  while (auto s_part = GIPIter_next(s_iter)) {
+    parts.push_back({new Part(s_part, this->model)});
+  }
+  GIPIter_delete(s_iter);
+  return parts;
+}
+
 auto Face::get_forward_region() const -> std::optional<nb::ref<Region>> {
   auto s_region = GF_region(static_cast<pGFace>(this->s_model_item), 0);
   if (!s_region)

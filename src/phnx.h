@@ -17,6 +17,7 @@ class Model;
 class Part;
 class Assembly;
 class Region;
+class Face;
 
 /**
  * Push pPList to std::vector.
@@ -105,6 +106,22 @@ public:
    * @nb prop_r: parent_assembly
    */
   auto get_parent_assembly() const -> std::optional<nb::ref<Assembly>>;
+
+  /**
+   * Get regions of this part.
+   *
+   * @return Regions
+   * @nb prop_r: regions
+   */
+  auto get_regions() const -> std::vector<nb::ref<Region>>;
+
+  /**
+   * Get faces of this part.
+   *
+   * @return Faces
+   * @nb prop_r: faces
+   */
+  auto get_faces() const -> std::vector<nb::ref<Face>>;
 };
 
 /**
@@ -132,6 +149,22 @@ public:
    * @nb prop_r: parent_assembly
    */
   auto get_parent_assembly() const -> std::optional<nb::ref<Assembly>>;
+
+  /**
+   * Get instantiated parts in this assembly.
+   *
+   * @return Parts
+   * @nb prop_r: parts
+   */
+  auto get_parts() const -> std::vector<nb::ref<Part>>;
+
+  /**
+   * Get sub-assemblies in this assembly.
+   *
+   * @return Sub-assemblies
+   * @nb prop_r: assemblies
+   */
+  auto get_assemblies() const -> std::vector<nb::ref<Assembly>>;
 };
 
 /**
