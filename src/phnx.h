@@ -16,6 +16,7 @@ namespace nb = nanobind;
 class Model;
 class Part;
 class Assembly;
+class Region;
 
 /**
  * Push pPList to std::vector.
@@ -53,6 +54,14 @@ public:
 class Entity : public ModelItem {
 public:
   using ModelItem::ModelItem;
+
+  /**
+   * Get entity tag (GEN_tag)
+   *
+   * @return Tag
+   * @nb prop_r: tag
+   */
+  auto get_tag() const -> int;
 
   /**
    * Get related parts
@@ -150,6 +159,23 @@ class Edge : public Entity {
  */
 class Face : public Entity {
   using Entity::Entity;
+
+public:
+  /**
+   * Get the region on the forward side of this face, if any.
+   *
+   * @return Forward region or None
+   * @nb prop_r: forward_region
+   */
+  auto get_forward_region() const -> std::optional<nb::ref<Region>>;
+
+  /**
+   * Get the region on the reverse side of this face, if any.
+   *
+   * @return Reverse region or None
+   * @nb prop_r: reverse_region
+   */
+  auto get_reverse_region() const -> std::optional<nb::ref<Region>>;
 };
 
 /**
@@ -206,9 +232,10 @@ public:
   auto get_root_items() const -> std::vector<nb::ref<ModelItem>>;
 
   /**
-   * Whether this model is topologically and geometrically valid.
+   * Whether this model is topologically and geometrically valid (GM_isValid).
    *
    * @return True if valid.
+   * @nb
    */
   bool is_valid() const;
 
@@ -230,13 +257,23 @@ public:
   static auto read(std::string filename) -> nb::ref<Model>;
 
   /**
-   * Make assembly model from parasolid file
+   * Load a GAM assembly model from a Parasolid file (stage 1 of 2).
+   * Call translate() on the result to obtain the SMS model needed for meshing.
    *
    * @param filename Filename
-   * @return Assembly model
+   * @return GAM assembly model
    * @nb
    */
   static auto from_parasolid_file(std::string filename) -> nb::ref<Model>;
+
+  /**
+   * Translate this GAM assembly model into an SMS model (stage 2 of 2).
+   * This is where geometry validation occurs; invalid faces will raise here.
+   *
+   * @return Translated SMS model
+   * @nb
+   */
+  auto translate() -> nb::ref<Model>;
 
   /**
    * Make nonmanifold model from assembly model

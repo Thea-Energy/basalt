@@ -64,6 +64,10 @@ auto Model::require_connection() const -> const Connection & {
   return *this->connection;
 }
 
+auto Entity::get_tag() const -> int {
+  return GEN_tag((pGEntity)this->s_model_item);
+}
+
 auto Entity::get_related_parts() const -> std::vector<nb::ref<Part>> {
   const auto &conn = this->model->require_connection();
 
@@ -122,6 +126,20 @@ auto Assembly::get_parent_assembly() const -> std::optional<nb::ref<Assembly>> {
   return {new Assembly(s_parent_assembly, this->model)};
 }
 
+auto Face::get_forward_region() const -> std::optional<nb::ref<Region>> {
+  auto s_region = GF_region(static_cast<pGFace>(this->s_model_item), 0);
+  if (!s_region)
+    return std::nullopt;
+  return {new Region(s_region, this->model)};
+}
+
+auto Face::get_reverse_region() const -> std::optional<nb::ref<Region>> {
+  auto s_region = GF_region(static_cast<pGFace>(this->s_model_item), 1);
+  if (!s_region)
+    return std::nullopt;
+  return {new Region(s_region, this->model)};
+}
+
 Model::~Model() {
   if (sms_is_initialized())
     GM_release(s_model);
@@ -147,7 +165,7 @@ auto Model::get_root_items() const -> std::vector<nb::ref<ModelItem>> {
 
 bool Model::is_valid() const {
   auto error_list{PList_new()};
-  auto is_valid = GM_isValid(this->s_model, 1, error_list);
+  auto is_valid = GM_isValid(this->s_model, 2, error_list);
   PList_delete(error_list);
   return is_valid;
 }
@@ -165,22 +183,21 @@ auto Model::read(std::string filename) -> nb::ref<Model> {
 }
 
 auto Model::from_parasolid_file(std::string filename) -> nb::ref<Model> {
-  spdlog::debug("Creating Parasolid Native Model from file.");
+  spdlog::debug("Loading Parasolid file.");
   auto parasolid_native_model = ParasolidNM_createFromFile(filename.c_str(), 0);
   if (!parasolid_native_model) {
     throw std::runtime_error("failed to load Parasolid file: " + filename);
   }
+  spdlog::debug("Creating GAM assembly model.");
+  auto gam_model = GAM_createFromNativeModel(parasolid_native_model, nullptr);
+  return {new Model(gam_model)};
+}
 
-  spdlog::debug("Creating Assembly Model from native model.");
-  auto assembly_model =
-      GAM_createFromNativeModel(parasolid_native_model, nullptr);
-
+auto Model::translate() -> nb::ref<Model> {
   auto connector = MC_new();
-  spdlog::debug("Translating model to SMS native");
-  auto s_translated_assembly_model =
-      GM_translateModel(assembly_model, connector, true);
-
-  return {new Model(s_translated_assembly_model)};
+  spdlog::debug("Translating GAM model to SMS native.");
+  auto s_translated = GM_translateModel(this->s_model, connector, true);
+  return {new Model(s_translated, nb::ref<Model>(this), connector)};
 }
 
 auto Model::make_non_manifold_model(std::optional<double> tolerance)
