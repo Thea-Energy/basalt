@@ -197,6 +197,7 @@ auto Part::get_native_attributes() const -> nb::dict {
     }
 
     result[name] = values;
+    Sim_deleteString(names[i]);
   }
   return result;
 }
@@ -258,6 +259,7 @@ auto Assembly::get_native_attributes() const -> nb::dict {
     }
 
     result[name] = values;
+    Sim_deleteString(names[i]);
   }
   return result;
 }
