@@ -321,10 +321,14 @@ public:
    * Call translate() on the result to obtain the SMS model needed for meshing.
    *
    * @param filename Filename
+   * @param load_nx_attrs If true, auto-detect <basename>_attrs.json alongside
+   *                      the .x_t and load NX component attributes as native
+   *                      Parasolid attributes on each Part/Assembly.
    * @return GAM assembly model
    * @nb
    */
-  static auto from_parasolid_file(std::string filename) -> nb::ref<Model>;
+  static auto from_parasolid_file(std::string filename,
+                                   bool load_nx_attrs = false) -> nb::ref<Model>;
 
   /**
    * Translate this GAM assembly model into an SMS model (stage 2 of 2).

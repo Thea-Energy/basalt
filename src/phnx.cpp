@@ -11,10 +11,15 @@
 #include "init.h"
 #include "spdlog/spdlog.h"
 #include <cstddef>
+#include <deque>
+#include <filesystem>
+#include <fstream>
 #include <map>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
+#include <unordered_map>
 
 template <typename T> auto plist_to_vec(pPList plist) -> std::vector<T> {
   std::vector<T> vec;
@@ -354,13 +359,67 @@ void Model::write(std::string filename) {
   NM_write(nonManNative, filename.c_str(), nullptr);
 }
 
+using AttrMap = std::unordered_map<std::string, std::deque<nlohmann::json>>;
+
+static void set_part_attrs(pGIPart part, const nlohmann::json &attrs) {
+  for (auto &[key, val] : attrs.items()) {
+    if (val.is_string())
+      GIP_setNativeStringAttribute(part, val.get<std::string>().c_str(),
+                                   key.c_str());
+    else if (val.is_boolean())
+      GIP_setNativeIntAttribute(part, val.get<bool>() ? 1 : 0, key.c_str());
+    else if (val.is_number_integer())
+      GIP_setNativeIntAttribute(part, val.get<int>(), key.c_str());
+    else if (val.is_number_float())
+      GIP_setNativeDoubleAttribute(part, val.get<double>(), key.c_str());
+  }
+}
+
+static void set_assembly_attrs(pGAssembly assem, const nlohmann::json &attrs) {
+  for (auto &[key, val] : attrs.items()) {
+    if (val.is_string())
+      GA_setNativeStringAttribute(assem, val.get<std::string>().c_str(),
+                                  key.c_str());
+    else if (val.is_boolean())
+      GA_setNativeIntAttribute(assem, val.get<bool>() ? 1 : 0, key.c_str());
+    else if (val.is_number_integer())
+      GA_setNativeIntAttribute(assem, val.get<int>(), key.c_str());
+    else if (val.is_number_float())
+      GA_setNativeDoubleAttribute(assem, val.get<double>(), key.c_str());
+  }
+}
+
+static void apply_nx_attrs(pGAssembly assem, AttrMap &attr_map) {
+  char *name = GA_nativeName(assem);
+  if (name) {
+    auto it = attr_map.find(name);
+    if (it != attr_map.end() && !it->second.empty()) {
+      const auto &attrs = it->second.front();
+      set_assembly_attrs(assem, attrs);
+      // Propagate to anonymous pGIPart bodies owned by this assembly
+      auto p_iter = GA_IPIter(assem, 2);
+      while (auto part = GIPIter_next(p_iter))
+        set_part_attrs(part, attrs);
+      GIPIter_delete(p_iter);
+      it->second.pop_front();
+    }
+    Sim_deleteString(name);
+  }
+
+  auto a_iter = GA_AIter(assem, 2);
+  while (auto child = GAIter_next(a_iter))
+    apply_nx_attrs(child, attr_map);
+  GAIter_delete(a_iter);
+}
+
 auto Model::read(std::string filename) -> nb::ref<Model> {
   auto model = GM_load(filename.c_str(), nullptr, nullptr);
 
   return {new Model(model)};
 }
 
-auto Model::from_parasolid_file(std::string filename) -> nb::ref<Model> {
+auto Model::from_parasolid_file(std::string filename, bool load_nx_attrs)
+    -> nb::ref<Model> {
   spdlog::debug("Loading Parasolid file.");
   auto parasolid_native_model = ParasolidNM_createFromFile(filename.c_str(), 0);
   if (!parasolid_native_model) {
@@ -368,6 +427,35 @@ auto Model::from_parasolid_file(std::string filename) -> nb::ref<Model> {
   }
   spdlog::debug("Creating GAM assembly model.");
   auto gam_model = GAM_createFromNativeModel(parasolid_native_model, nullptr);
+
+  if (load_nx_attrs) {
+    namespace fs = std::filesystem;
+    fs::path p(filename);
+    auto attrs_path = p.parent_path() / (p.stem().string() + "_attrs.json");
+    if (!fs::exists(attrs_path)) {
+      spdlog::warn("load_nx_attrs=true but {} not found", attrs_path.string());
+    } else {
+      spdlog::debug("Loading NX attributes from {}", attrs_path.string());
+      std::ifstream f(attrs_path);
+      auto j = nlohmann::json::parse(f);
+
+      AttrMap attr_map;
+      for (const auto &comp : j["components"])
+        attr_map[comp["name"].get<std::string>()].push_back(comp["attributes"]);
+
+      auto root_items = GM_rootItems(gam_model);
+      void *iter = nullptr;
+      while (auto s_item =
+                 static_cast<pModelItem>(PList_next(root_items, &iter))) {
+        auto type = ModelItem_type(s_item);
+        if (type == Gassembly) {
+          apply_nx_attrs((pGAssembly)s_item, attr_map);
+        }
+      }
+      PList_delete(root_items);
+    }
+  }
+
   return {new Model(gam_model)};
 }
 
@@ -766,8 +854,18 @@ void Mesh::write_gmsh(std::string filename, double scale_factor) {
       if (!name.has_value()) {
         spdlog::warn("Related part has no name.");
       } else {
+        std::string material_name = name.value();
+        auto related_part = (pGIPart)related_parts.at(0)->s_model_item;
+        int ns = GIP_numNativeStringAttribute(related_part, "DB_PART_NAME");
+        if (ns > 0) {
+          std::vector<char *> strs(ns);
+          GIP_nativeStringAttribute(related_part, "DB_PART_NAME", strs.data());
+          material_name = strs[0];
+          for (int j = 0; j < ns; j++)
+            Sim_deleteString(strs[j]);
+        }
         std::stringstream physical_name;
-        physical_name << "tag=" << sg_tag << "&material=" << name.value();
+        physical_name << "tag=" << sg_tag << "&material=" << material_name;
         auto physical_tag = gmsh::model::addPhysicalGroup(dim, {sg_tag}, sg_tag,
                                                           physical_name.str());
       }

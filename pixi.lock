@@ -5,6 +5,8 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
+    options:
+      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
@@ -3115,7 +3117,6 @@ packages:
   - tree-sitter-cpp==0.22.3
   - tree-sitter-jsdoc==0.21.0
   requires_python: '>=3.10'
-  editable: true
 - conda: https://conda.anaconda.org/conda-forge/noarch/ncrystal-4.2.10-pyhf5fbd30_1.conda
   sha256: 962b826b2fa4b0dc7fa03184f7ff1a4389d0b10d6dce8ddfdf8ba40943352d24
   md5: 66c1fdbd91e5a7460780607763d20919
@@ -3538,7 +3539,6 @@ packages:
   version: 1.0.0
   sha256: afb61d9fddb9c3c110d94dbfdcad5cdd51cf4a4fc602238a20a897904eeea712
   requires_python: '>=3.12'
-  editable: true
 - conda: https://conda.anaconda.org/conda-forge/linux-64/pillow-12.0.0-py312h0889fd4_0.conda
   sha256: 29c55b1e08b90ef92976e0715937686bf70e215a80de8f979ed19d4de7b76d45
   md5: 45824eb723a6b4a128d120ad1d07df5e

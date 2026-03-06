@@ -19,6 +19,7 @@ nanobind = ">=2.9.2,<3"
 gmsh = ">=4.13.1,<5"
 stellarmesh = ">=1.0.1,<2"
 openmc = { version = "==0.15.2", build = "dagmc_nompi*" }
+nlohmann_json = ">=3.12.0,<4"
 
 
 [package]
