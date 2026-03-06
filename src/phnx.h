@@ -79,6 +79,17 @@ public:
    * @nb prop_r: name
    */
   auto get_name() const -> std::optional<std::string>;
+
+  /**
+   * Get all native Parasolid attributes stored on this entity.
+   *
+   * Returns a dict mapping each attribute name to a list of its values.
+   * Value types are Python int, float, or str.
+   *
+   * @return Dict of attribute name to list of values
+   * @nb prop_r: native_attributes
+   */
+  auto get_native_attributes() const -> nb::dict;
 };
 
 /**

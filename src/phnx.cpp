@@ -94,6 +94,52 @@ auto Entity::get_name() const -> std::optional<std::string> {
   }
 }
 
+auto Entity::get_native_attributes() const -> nb::dict {
+  nb::dict result;
+  pGEntity ent = (pGEntity)this->s_model_item;
+
+  int n = GEN_numNativeAttributeNames(ent, 0);
+  if (n == 0) return result;
+
+  std::vector<char *> names(n);
+  GEN_nativeAttributeNames(ent, 0, names.data());
+
+  for (int i = 0; i < n; i++) {
+    const char *name = names[i];
+    nb::list values;
+
+    int ns = GEN_numNativeStringAttribute(ent, name);
+    if (ns > 0) {
+      std::vector<char *> strs(ns);
+      GEN_nativeStringAttribute(ent, name, strs.data());
+      for (int j = 0; j < ns; j++) {
+        values.append(nb::str(strs[j]));
+        Sim_deleteString(strs[j]);
+      }
+    }
+
+    int ni = GEN_numNativeIntAttribute(ent, name);
+    if (ni > 0) {
+      std::vector<int> ints(ni);
+      GEN_nativeIntAttribute(ent, name, ints.data());
+      for (int j = 0; j < ni; j++)
+        values.append(nb::int_(ints[j]));
+    }
+
+    int nd = GEN_numNativeDoubleAttribute(ent, name);
+    if (nd > 0) {
+      std::vector<double> dbls(nd);
+      GEN_nativeDoubleAttribute(ent, name, dbls.data());
+      for (int j = 0; j < nd; j++)
+        values.append(nb::float_(dbls[j]));
+    }
+
+    result[name] = values;
+    Sim_deleteString(names[i]);
+  }
+  return result;
+}
+
 auto Part::get_name() const -> std::optional<std::string> {
   char *name = GIP_nativeName((pGIPart)this->s_model_item);
   if (name != nullptr) {
