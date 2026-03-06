@@ -156,6 +156,51 @@ auto Part::get_parent_assembly() const -> std::optional<nb::ref<Assembly>> {
   return {new Assembly(s_parent_assembly, this->model)};
 }
 
+auto Part::get_native_attributes() const -> nb::dict {
+  nb::dict result;
+  pGIPart part = (pGIPart)this->s_model_item;
+
+  int n = GIP_numNativeAttributeNames(part, 0);
+  if (n == 0) return result;
+
+  std::vector<char *> names(n);
+  GIP_nativeAttributeNames(part, 0, names.data());
+
+  for (int i = 0; i < n; i++) {
+    const char *name = names[i];
+    nb::list values;
+
+    int ns = GIP_numNativeStringAttribute(part, name);
+    if (ns > 0) {
+      std::vector<char *> strs(ns);
+      GIP_nativeStringAttribute(part, name, strs.data());
+      for (int j = 0; j < ns; j++) {
+        values.append(nb::str(strs[j]));
+        Sim_deleteString(strs[j]);
+      }
+    }
+
+    int ni = GIP_numNativeIntAttribute(part, name);
+    if (ni > 0) {
+      std::vector<int> ints(ni);
+      GIP_nativeIntAttribute(part, name, ints.data());
+      for (int j = 0; j < ni; j++)
+        values.append(nb::int_(ints[j]));
+    }
+
+    int nd = GIP_numNativeDoubleAttribute(part, name);
+    if (nd > 0) {
+      std::vector<double> dbls(nd);
+      GIP_nativeDoubleAttribute(part, name, dbls.data());
+      for (int j = 0; j < nd; j++)
+        values.append(nb::float_(dbls[j]));
+    }
+
+    result[name] = values;
+  }
+  return result;
+}
+
 auto Assembly::get_name() const -> std::optional<std::string> {
   char *name = GA_nativeName((pGAssembly)this->s_model_item);
   if (name != nullptr) {
@@ -170,6 +215,51 @@ auto Assembly::get_name() const -> std::optional<std::string> {
 auto Assembly::get_parent_assembly() const -> std::optional<nb::ref<Assembly>> {
   auto s_parent_assembly = GA_parentAssembly((pGAssembly)this->s_model_item);
   return {new Assembly(s_parent_assembly, this->model)};
+}
+
+auto Assembly::get_native_attributes() const -> nb::dict {
+  nb::dict result;
+  pGAssembly assem = (pGAssembly)this->s_model_item;
+
+  int n = GA_numNativeAttributeNames(assem, 0);
+  if (n == 0) return result;
+
+  std::vector<char *> names(n);
+  GA_nativeAttributeNames(assem, 0, names.data());
+
+  for (int i = 0; i < n; i++) {
+    const char *name = names[i];
+    nb::list values;
+
+    int ns = GA_numNativeStringAttribute(assem, name);
+    if (ns > 0) {
+      std::vector<char *> strs(ns);
+      GA_nativeStringAttribute(assem, name, strs.data());
+      for (int j = 0; j < ns; j++) {
+        values.append(nb::str(strs[j]));
+        Sim_deleteString(strs[j]);
+      }
+    }
+
+    int ni = GA_numNativeIntAttribute(assem, name);
+    if (ni > 0) {
+      std::vector<int> ints(ni);
+      GA_nativeIntAttribute(assem, name, ints.data());
+      for (int j = 0; j < ni; j++)
+        values.append(nb::int_(ints[j]));
+    }
+
+    int nd = GA_numNativeDoubleAttribute(assem, name);
+    if (nd > 0) {
+      std::vector<double> dbls(nd);
+      GA_nativeDoubleAttribute(assem, name, dbls.data());
+      for (int j = 0; j < nd; j++)
+        values.append(nb::float_(dbls[j]));
+    }
+
+    result[name] = values;
+  }
+  return result;
 }
 
 auto Part::get_regions() const -> std::vector<nb::ref<Region>> {

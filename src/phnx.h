@@ -133,6 +133,14 @@ public:
    * @nb prop_r: faces
    */
   auto get_faces() const -> std::vector<nb::ref<Face>>;
+
+  /**
+   * Get all native Parasolid attributes stored on this part.
+   *
+   * @return Dict of attribute name to list of values
+   * @nb prop_r: native_attributes
+   */
+  auto get_native_attributes() const -> nb::dict;
 };
 
 /**
@@ -176,6 +184,14 @@ public:
    * @nb prop_r: assemblies
    */
   auto get_assemblies() const -> std::vector<nb::ref<Assembly>>;
+
+  /**
+   * Get all native Parasolid attributes stored on this assembly.
+   *
+   * @return Dict of attribute name to list of values
+   * @nb prop_r: native_attributes
+   */
+  auto get_native_attributes() const -> nb::dict;
 };
 
 /**
