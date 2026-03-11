@@ -24,6 +24,10 @@ CLAUDE.md
 *.x_t
 *.x_b
 *.prt
+
+# Allow test data files tracked by Git LFS
+!tests/data/*.x_t
+!tests/data/*.json
 *.brep
 *.log
 *.lic
