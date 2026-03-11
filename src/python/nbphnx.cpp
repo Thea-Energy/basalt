@@ -6,6 +6,7 @@
 #include <nanobind/intrusive/counter.inl> // include only here
 
 #include <nanobind/operators.h>
+#include <nanobind/stl/array.h>
 #include <nanobind/stl/optional.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>

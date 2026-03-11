@@ -4,6 +4,7 @@
 #include "ModelTypes.h"
 #include "SimModel.h"
 #include "nanobind/intrusive/counter.h"
+#include <array>
 #include <optional>
 #include <string>
 
@@ -99,9 +100,8 @@ public:
  */
 class Part : public ModelItem {
 
-  using ModelItem::ModelItem;
-
 public:
+  Part(pModelItem s_model_item, nb::ref<Model> model);
   /**
    * Name
    *
@@ -141,6 +141,14 @@ public:
    * @nb prop_r: native_attributes
    */
   auto get_native_attributes() const -> nb::dict;
+
+  /**
+   * Compute the centroid of this part's region.
+   *
+   * @return Centroid [x, y, z]
+   * @nb prop_r: centroid
+   */
+  auto get_centroid() const -> std::array<double, 3>;
 };
 
 /**
@@ -245,6 +253,15 @@ public:
  */
 class Region : public Entity {
   using Entity::Entity;
+
+public:
+  /**
+   * Compute the centroid of this region.
+   *
+   * @return Centroid [x, y, z]
+   * @nb prop_r: centroid
+   */
+  auto get_centroid() const -> std::array<double, 3>;
 };
 
 /**
@@ -478,7 +495,8 @@ public:
    * @param filename Filename
    * @nb
    */
-  void write_gmsh(std::string filename, double scale_factor = 1.0);
+  void write_gmsh(std::string filename, double scale_factor = 1.0,
+                  nb::object material_namer = nb::none());
 };
 
 /**

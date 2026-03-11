@@ -10,16 +10,21 @@
 #include "gmsh.h"
 #include "init.h"
 #include "spdlog/spdlog.h"
+#include <array>
+#include <cmath>
 #include <cstddef>
 #include <deque>
+#include <limits>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <map>
 #include <nlohmann/json.hpp>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <unordered_map>
+#include <unordered_set>
 
 template <typename T> auto plist_to_vec(pPList plist) -> std::vector<T> {
   std::vector<T> vec;
@@ -269,6 +274,17 @@ auto Assembly::get_native_attributes() const -> nb::dict {
   return result;
 }
 
+Part::Part(pModelItem s_model_item, nb::ref<Model> model)
+    : ModelItem(s_model_item, model) {
+  auto s_iter = GIP_regionIter((pGIPart)s_model_item);
+  int count = 0;
+  while (GRIter_next(s_iter))
+    count++;
+  GRIter_delete(s_iter);
+  if (count != 1)
+    throw_exception("Expected Part to have exactly 1 region, got {}.", count);
+}
+
 auto Part::get_regions() const -> std::vector<nb::ref<Region>> {
   std::vector<nb::ref<Region>> regions;
   auto s_iter = GIP_regionIter((pGIPart)this->s_model_item);
@@ -323,6 +339,17 @@ auto Face::get_reverse_region() const -> std::optional<nb::ref<Region>> {
   return {new Region(s_region, this->model)};
 }
 
+auto Region::get_centroid() const -> std::array<double, 3> {
+  std::array<double, 3> cen;
+  GR_centroid(static_cast<pGRegion>(this->s_model_item), 1.0, cen.data());
+  return cen;
+}
+
+auto Part::get_centroid() const -> std::array<double, 3> {
+  auto regions = this->get_regions();
+  return regions.at(0)->get_centroid();
+}
+
 Model::~Model() {
   if (sms_is_initialized())
     GM_release(s_model);
@@ -361,6 +388,15 @@ void Model::write(std::string filename) {
 
 using AttrMap = std::unordered_map<std::string, std::deque<nlohmann::json>>;
 
+// A body from the sidecar JSON, with its world-space centroid and the
+// component-level attributes that should be applied to the matching pGIPart.
+struct SidecarBody {
+  std::array<double, 3> centroid;
+  nlohmann::json attributes;
+  std::string component_name; // e.g. "0012318_332"
+  bool matched = false;
+};
+
 static void set_part_attrs(pGIPart part, const nlohmann::json &attrs) {
   for (auto &[key, val] : attrs.items()) {
     if (val.is_string())
@@ -389,26 +425,100 @@ static void set_assembly_attrs(pGAssembly assem, const nlohmann::json &attrs) {
   }
 }
 
-static void apply_nx_attrs(pGAssembly assem, AttrMap &attr_map) {
+// Find the nearest unmatched SidecarBody to the given centroid.
+// Returns nullptr if no bodies remain or the nearest distance exceeds a
+// reasonable threshold.
+static SidecarBody *find_nearest_body(std::vector<SidecarBody> &bodies,
+                                      const double cen[3]) {
+  SidecarBody *best = nullptr;
+  double best_dist2 = std::numeric_limits<double>::max();
+  for (auto &b : bodies) {
+    if (b.matched)
+      continue;
+    double dx = b.centroid[0] - cen[0];
+    double dy = b.centroid[1] - cen[1];
+    double dz = b.centroid[2] - cen[2];
+    double d2 = dx * dx + dy * dy + dz * dz;
+    if (d2 < best_dist2) {
+      best_dist2 = d2;
+      best = &b;
+    }
+  }
+  if (best) {
+    spdlog::debug("Matched part at ({:.3f}, {:.3f}, {:.3f}) to component '{}' "
+                  "(dist={:.4f})",
+                  cen[0], cen[1], cen[2], best->component_name,
+                  std::sqrt(best_dist2));
+  }
+  return best;
+}
+
+// Match parts in an assembly to sidecar bodies by centroid proximity.
+// If fallback_attrs is non-null, unmatched parts get those attrs.
+static void match_parts_by_centroid(pGAssembly assem,
+                                    const std::string &assem_name,
+                                    std::vector<SidecarBody> &sidecar_bodies,
+                                    const nlohmann::json *fallback_attrs) {
+  auto p_iter = GA_IPIter(assem, 2);
+  while (auto part = GIPIter_next(p_iter)) {
+    auto r_iter = GIP_regionIter(part);
+    auto region = GRIter_next(r_iter);
+    GRIter_delete(r_iter);
+    if (!region) {
+      spdlog::warn("Part in assembly '{}' has no region, skipping",
+                   assem_name);
+      continue;
+    }
+
+    double cen[3];
+    GR_centroid(region, 1.0, cen);
+
+    auto *match = find_nearest_body(sidecar_bodies, cen);
+    if (match) {
+      set_part_attrs(part, match->attributes);
+      GIP_setNativeStringAttribute(
+          part, match->component_name.c_str(), "NX_COMPONENT_NAME");
+      match->matched = true;
+    } else if (fallback_attrs) {
+      set_part_attrs(part, *fallback_attrs);
+    }
+  }
+  GIPIter_delete(p_iter);
+}
+
+static void apply_nx_attrs(pGAssembly assem, AttrMap &attr_map,
+                           std::vector<SidecarBody> &sidecar_bodies) {
   char *name = GA_nativeName(assem);
+  std::string name_str = name ? name : "<root>";
+  if (name)
+    Sim_deleteString(name);
+
   if (name) {
-    auto it = attr_map.find(name);
+    // Look up assembly in attr_map. If exact name fails (e.g. "0012318_A"),
+    // try stripping the Parasolid "_A" suffix to match the NX part stem.
+    auto it = attr_map.find(name_str);
+    if (it == attr_map.end() || it->second.empty()) {
+      if (name_str.size() > 2 &&
+          name_str.substr(name_str.size() - 2) == "_A") {
+        auto base = name_str.substr(0, name_str.size() - 2);
+        it = attr_map.find(base);
+      }
+    }
+
     if (it != attr_map.end() && !it->second.empty()) {
       const auto &attrs = it->second.front();
       set_assembly_attrs(assem, attrs);
-      // Propagate to anonymous pGIPart bodies owned by this assembly
-      auto p_iter = GA_IPIter(assem, 2);
-      while (auto part = GIPIter_next(p_iter))
-        set_part_attrs(part, attrs);
-      GIPIter_delete(p_iter);
+      match_parts_by_centroid(assem, name_str, sidecar_bodies, &attrs);
       it->second.pop_front();
     }
-    Sim_deleteString(name);
+  } else {
+    // Unnamed root assembly — still try centroid matching for direct parts
+    match_parts_by_centroid(assem, name_str, sidecar_bodies, nullptr);
   }
 
   auto a_iter = GA_AIter(assem, 2);
   while (auto child = GAIter_next(a_iter))
-    apply_nx_attrs(child, attr_map);
+    apply_nx_attrs(child, attr_map, sidecar_bodies);
   GAIter_delete(a_iter);
 }
 
@@ -440,8 +550,71 @@ auto Model::from_parasolid_file(std::string filename, bool load_nx_attrs)
       auto j = nlohmann::json::parse(f);
 
       AttrMap attr_map;
-      for (const auto &comp : j["components"])
-        attr_map[comp["name"].get<std::string>()].push_back(comp["attributes"]);
+      std::vector<SidecarBody> sidecar_bodies;
+      std::unordered_set<std::string> seen_bases;
+
+      // Recursively flatten the sidecar tree into:
+      //  - attr_map: component/assembly name → attributes (for assembly-level)
+      //  - sidecar_bodies: per-body entries with centroids (for part matching)
+      std::function<void(const nlohmann::json &)> collect_from_tree;
+      collect_from_tree = [&](const nlohmann::json &node) {
+        auto name = node["name"].get<std::string>();
+        const auto &attrs = node["attributes"];
+        attr_map[name].push_back(attrs);
+
+        // For collapsed-instance matching: Parasolid collapses all NX
+        // instances of a base part into a single pGAssembly named after the
+        // part_file stem (e.g. "0012318_A"). Index by that stem so the
+        // assembly can match even though instance names are lost.
+        // Note: part_file may be a Windows path (backslashes) when the sidecar
+        // is exported from NX on Windows. std::filesystem::path on Linux
+        // doesn't parse backslashes, so we manually find the last separator.
+        if (node.contains("part_file")) {
+          auto pf = node["part_file"].get<std::string>();
+          auto last_sep = pf.find_last_of("/\\");
+          auto filename =
+              (last_sep != std::string::npos) ? pf.substr(last_sep + 1) : pf;
+          auto dot = filename.rfind('.');
+          auto base = (dot != std::string::npos) ? filename.substr(0, dot)
+                                                 : filename;
+          if (base != name && seen_bases.insert(base).second) {
+            attr_map[base].push_back(attrs);
+          }
+        }
+
+        // Collect per-body centroid entries for centroid matching
+        if (node.contains("bodies")) {
+          for (const auto &body : node["bodies"]) {
+            if (body.contains("centroid")) {
+              auto &c = body["centroid"];
+              SidecarBody entry;
+              entry.centroid = {c[0].get<double>(), c[1].get<double>(),
+                                c[2].get<double>()};
+              entry.attributes = attrs;
+              entry.component_name = name;
+              sidecar_bodies.push_back(std::move(entry));
+            }
+          }
+        }
+
+        if (node.contains("children")) {
+          for (const auto &child : node["children"]) {
+            collect_from_tree(child);
+          }
+        }
+      };
+
+      // Schema v4+: single "root" node. Older v3: "children" array.
+      if (j.contains("root")) {
+        collect_from_tree(j["root"]);
+      } else if (j.contains("children")) {
+        for (const auto &child : j["children"]) {
+          collect_from_tree(child);
+        }
+      }
+
+      spdlog::info("Loaded {} body centroid(s) from sidecar for matching",
+                    sidecar_bodies.size());
 
       auto root_items = GM_rootItems(gam_model);
       void *iter = nullptr;
@@ -449,10 +622,24 @@ auto Model::from_parasolid_file(std::string filename, bool load_nx_attrs)
                  static_cast<pModelItem>(PList_next(root_items, &iter))) {
         auto type = ModelItem_type(s_item);
         if (type == Gassembly) {
-          apply_nx_attrs((pGAssembly)s_item, attr_map);
+          apply_nx_attrs((pGAssembly)s_item, attr_map, sidecar_bodies);
         }
       }
       PList_delete(root_items);
+
+      // Report unmatched sidecar bodies
+      int unmatched = 0;
+      for (const auto &b : sidecar_bodies) {
+        if (!b.matched) {
+          spdlog::warn("Sidecar body from component '{}' at ({:.3f}, {:.3f}, "
+                       "{:.3f}) was not matched to any Part",
+                       b.component_name, b.centroid[0], b.centroid[1],
+                       b.centroid[2]);
+          unmatched++;
+        }
+      }
+      if (unmatched > 0)
+        spdlog::warn("{} sidecar bodies were not matched", unmatched);
     }
   }
 
@@ -598,7 +785,8 @@ void MeshCase::set_proximity_refinement(
   }
 }
 
-void Mesh::write_gmsh(std::string filename, double scale_factor) {
+void Mesh::write_gmsh(std::string filename, double scale_factor,
+                      nb::object material_namer) {
   gmsh::initialize();
   gmsh::model::add("phnx");
 
@@ -810,6 +998,29 @@ void Mesh::write_gmsh(std::string filename, double scale_factor) {
   // TODO(akoen): Support hexahedral meshing
   gmsh_element_type = 4;
 
+  // Pre-scan: count how many regions share each DB_PART_NAME to detect
+  // multi-instance parts
+  std::unordered_map<std::string, int> part_name_counts;
+  for (auto entity : this->model->get_regions()) {
+    auto related_parts = entity->get_related_parts();
+    if (related_parts.size() != 1)
+      continue;
+    auto related_part = (pGIPart)related_parts.at(0)->s_model_item;
+    int ns = GIP_numNativeStringAttribute(related_part, "DB_PART_NAME");
+    if (ns > 0) {
+      std::vector<char *> strs(ns);
+      GIP_nativeStringAttribute(related_part, "DB_PART_NAME", strs.data());
+      std::string db_name = strs[0];
+      for (int j = 0; j < ns; j++)
+        Sim_deleteString(strs[j]);
+      part_name_counts[db_name]++;
+    } else {
+      auto name = related_parts.at(0)->get_name();
+      if (name.has_value())
+        part_name_counts[name.value()]++;
+    }
+  }
+
   for (auto entity : this->model->get_regions()) {
     auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
     auto sg_tag = GEN_tag(sg_entity);
@@ -847,27 +1058,59 @@ void Mesh::write_gmsh(std::string filename, double scale_factor) {
     } else if (related_parts.size() > 1) {
       spdlog::warn("Region has more than one related part.");
     } else {
-      auto name = related_parts.at(0)->get_name();
-      if (!name.has_value()) {
-        name = related_parts.at(0)->get_parent_assembly()->get()->get_name();
+      auto part = related_parts.at(0);
+
+      // Resolve base material name from DB_PART_NAME, falling back to
+      // part name, then parent assembly name
+      std::string base_name;
+      auto related_part = (pGIPart)part->s_model_item;
+      int ns = GIP_numNativeStringAttribute(related_part, "DB_PART_NAME");
+      if (ns > 0) {
+        std::vector<char *> strs(ns);
+        GIP_nativeStringAttribute(related_part, "DB_PART_NAME", strs.data());
+        base_name = strs[0];
+        for (int j = 0; j < ns; j++)
+          Sim_deleteString(strs[j]);
+      } else {
+        auto name = part->get_name();
+        if (!name.has_value()) {
+          auto parent = part->get_parent_assembly();
+          if (parent.has_value())
+            name = parent->get()->get_name();
+        }
+        if (name.has_value())
+          base_name = name.value();
       }
-      if (!name.has_value()) {
+
+      if (base_name.empty()) {
         spdlog::warn("Related part has no name.");
       } else {
-        std::string material_name = name.value();
-        auto related_part = (pGIPart)related_parts.at(0)->s_model_item;
-        int ns = GIP_numNativeStringAttribute(related_part, "DB_PART_NAME");
-        if (ns > 0) {
-          std::vector<char *> strs(ns);
-          GIP_nativeStringAttribute(related_part, "DB_PART_NAME", strs.data());
-          material_name = strs[0];
-          for (int j = 0; j < ns; j++)
-            Sim_deleteString(strs[j]);
+        bool is_multi_instance = part_name_counts[base_name] > 1;
+
+        std::string material_name;
+        if (!material_namer.is_none()) {
+          // User-provided callback: material_namer(part, is_multi_instance)
+          nb::object result =
+              material_namer(nb::cast(part), nb::cast(is_multi_instance));
+          material_name = nb::cast<std::string>(result);
+        } else {
+          // Default: append instance suffix for multi-instance parts
+          material_name = base_name;
+          if (is_multi_instance) {
+            auto part_name = part->get_name();
+            if (part_name.has_value()) {
+              auto pos = part_name->rfind('_');
+              if (pos != std::string::npos) {
+                material_name += "_" + part_name->substr(pos + 1);
+              }
+            }
+          }
         }
+
         std::stringstream physical_name;
         physical_name << "tag=" << sg_tag << "&material=" << material_name;
-        auto physical_tag = gmsh::model::addPhysicalGroup(dim, {sg_tag}, sg_tag,
-                                                          physical_name.str());
+        gmsh::model::addPhysicalGroup(dim, {sg_tag}, sg_tag,
+                                      physical_name.str());
       }
     }
 

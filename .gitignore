@@ -12,6 +12,8 @@ autogen/
 scratch/
 *.lock
 CLAUDE.md
+*.pdf
+*.json
 
 .envrc
 .vscode/

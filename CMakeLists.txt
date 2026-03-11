@@ -61,6 +61,11 @@ include_directories(${GMSH_INC})
 
 
 # ===============================================================================
+# JSON
+# ===============================================================================
+find_package(nlohmann_json REQUIRED)
+
+# ===============================================================================
 # Logging
 # ===============================================================================
 set(SPDLOG_VERSION v1.12.0)
@@ -78,11 +83,12 @@ add_library(
     src/phnx.cpp
 )
 target_include_directories(main PUBLIC ${SRC_DIR})
-target_link_libraries(main PUBLIC 
-nanobind 
-sms 
-spdlog::spdlog 
+target_link_libraries(main PUBLIC
+nanobind
+sms
+spdlog::spdlog
 ${GMSH_LIB}
+nlohmann_json::nlohmann_json
 )
 
 # ===============================================================================
