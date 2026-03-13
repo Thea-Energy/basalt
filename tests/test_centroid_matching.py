@@ -1,20 +1,21 @@
 """Tests for NX → Parasolid → SMS centroid matching pipeline.
 
 These tests verify that loading a Parasolid assembly with its NX sidecar JSON
-correctly matches per-instance body metadata (NX_COMPONENT_NAME) to SMS parts
-via geometric centroid matching.
+correctly matches per-instance body metadata to SMS parts via geometric centroid
+matching, and that structured naming fields (NX_MATERIAL, NX_PATH, NX_COMPONENT,
+NX_INSTANCE, NX_BODY) are set on every part.
 """
 
 import json
+import re
 from pathlib import Path
 
-import phnx
 from phnx import Assembly, Part
 
 DATA_DIR = Path(__file__).parent / "data"
 
 EXPECTED_TOTAL_PARTS = 692
-EXPECTED_UNIQUE_NAMES = 334
+EXPECTED_UNIQUE_MATERIALS = 692
 
 
 def _collect_parts(model):
@@ -35,30 +36,64 @@ def _collect_parts(model):
     return parts
 
 
-def test_all_parts_matched(phyeos_model):
-    """Every SMS part should have NX_COMPONENT_NAME set after centroid matching."""
+def test_all_parts_have_material(phyeos_model):
+    """Every SMS part should have NX_MATERIAL set after centroid matching."""
     parts = _collect_parts(phyeos_model)
     assert len(parts) == EXPECTED_TOTAL_PARTS
 
-    without_attr = [p for p in parts if "NX_COMPONENT_NAME" not in p.native_attributes]
+    without_attr = [p for p in parts if "NX_MATERIAL" not in p.native_attributes]
     assert len(without_attr) == 0, (
-        f"{len(without_attr)}/{len(parts)} parts have no NX_COMPONENT_NAME attribute"
+        f"{len(without_attr)}/{len(parts)} parts have no NX_MATERIAL attribute"
     )
 
 
-def test_unique_component_names(phyeos_model):
-    """The number of unique NX_COMPONENT_NAME values should match expectations.
+def test_unique_material_names(phyeos_model):
+    """Every body should have a globally unique short NX_MATERIAL name.
 
-    The PHYEOS10-120 model has 332 shaping coil instances (each with 2 bodies),
-    plus encircling coils and root bodies, giving 334 unique names.
+    The PHYEOS10-120 model has 692 bodies total, and each should get a distinct
+    short material name ({DB_PART_NO}_{instance}/b{N}) that fits within
+    MOAB's 32-byte NAME tag limit (28 usable chars after 'mat:' prefix).
     """
     parts = _collect_parts(phyeos_model)
-    names = {
-        str(p.native_attributes["NX_COMPONENT_NAME"])
+    materials = [
+        p.native_attributes["NX_MATERIAL"][0]
         for p in parts
-        if p.native_attributes.get("NX_COMPONENT_NAME")
-    }
-    assert len(names) == EXPECTED_UNIQUE_NAMES
+        if p.native_attributes.get("NX_MATERIAL")
+    ]
+    assert len(materials) == EXPECTED_TOTAL_PARTS
+    assert len(set(materials)) == EXPECTED_UNIQUE_MATERIALS, (
+        f"Expected {EXPECTED_UNIQUE_MATERIALS} unique materials, "
+        f"got {len(set(materials))}"
+    )
+
+    # Every short name must fit within MOAB's 28-char limit
+    for mat in materials:
+        assert len(mat) <= 28, (
+            f"Material name exceeds 28 chars ({len(mat)}): {mat}"
+        )
+
+
+def test_structured_fields_present(phyeos_model):
+    """Every part should have all structured naming fields set."""
+    parts = _collect_parts(phyeos_model)
+    required_attrs = ["NX_MATERIAL", "NX_COMPONENT", "NX_INSTANCE", "NX_BODY"]
+    for p in parts:
+        attrs = p.native_attributes
+        for attr in required_attrs:
+            assert attr in attrs, (
+                f"Part missing {attr} attribute"
+            )
+
+
+def test_material_slug_format(phyeos_model):
+    """NX_MATERIAL should follow the {DB_PART_NO}_{instance}.b{N} format."""
+    pattern = re.compile(r"^[A-Za-z0-9]+_\d+\.b\d+$")
+    parts = _collect_parts(phyeos_model)
+    for p in parts:
+        material = p.native_attributes["NX_MATERIAL"][0]
+        assert pattern.match(material), (
+            f"Material '{material}' doesn't match '{{DB_PART_NO}}_{{instance}}.b{{N}}'"
+        )
 
 
 def test_sidecar_body_count_matches_sms(phyeos_model):

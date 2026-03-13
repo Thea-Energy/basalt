@@ -5,6 +5,7 @@
 #include "SimModel.h"
 #include "nanobind/intrusive/counter.h"
 #include <array>
+#include <functional>
 #include <optional>
 #include <string>
 
@@ -19,6 +20,9 @@ class Part;
 class Assembly;
 class Region;
 class Face;
+
+/// Callback that maps a Part to its material name for Gmsh export.
+using MaterialNamer = std::function<std::string(nb::ref<Part>)>;
 
 /**
  * Push pPList to std::vector.
@@ -496,7 +500,7 @@ public:
    * @nb
    */
   void write_gmsh(std::string filename, double scale_factor = 1.0,
-                  nb::object material_namer = nb::none());
+                  std::optional<MaterialNamer> material_namer = std::nullopt);
 };
 
 /**
