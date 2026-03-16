@@ -51,7 +51,7 @@ def test_unique_material_names(phyeos_model):
     """Every body should have a globally unique short NX_MATERIAL name.
 
     The PHYEOS10-120 model has 692 bodies total, and each should get a distinct
-    short material name ({DB_PART_NO}_{instance}/b{N}) that fits within
+    short material name ({DB_PART_NO}_{instance}.b{N}) that fits within
     MOAB's 32-byte NAME tag limit (28 usable chars after 'mat:' prefix).
     """
     parts = _collect_parts(phyeos_model)
@@ -102,13 +102,17 @@ def test_sidecar_body_count_matches_sms(phyeos_model):
     with open(sidecar_path) as f:
         sidecar = json.load(f)
 
-    def count_bodies(node):
-        n = len([b for b in node.get("bodies", []) if "centroid" in b])
-        for child in node.get("children", []):
-            n += count_bodies(child)
-        return n
+    assert sidecar["schema_version"] == 6
+    components = sidecar["components"]
+    bodies = sidecar["bodies"]
 
-    sidecar_count = count_bodies(sidecar["root"])
+    # Every body must reference a valid component
+    for body in bodies:
+        assert body["component"] in components, (
+            f"Body references unknown component: {body['component']}"
+        )
+
+    sidecar_count = len(bodies)
     sms_count = len(_collect_parts(phyeos_model))
     assert sidecar_count == sms_count, (
         f"Sidecar has {sidecar_count} bodies but SMS has {sms_count} parts"
