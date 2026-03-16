@@ -10,78 +10,19 @@
 #include "gmsh.h"
 #include "init.h"
 #include "spdlog/spdlog.h"
-#include <algorithm>
 #include <array>
-#include <cctype>
 #include <cmath>
 #include <cstddef>
 #include <deque>
 #include <limits>
 #include <filesystem>
 #include <fstream>
-#include <functional>
-#include <map>
 #include <nlohmann/json.hpp>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <unordered_map>
 #include <unordered_set>
-
-// Slugify a string: lowercase, spaces/underscores → hyphens, strip
-// special chars, collapse consecutive hyphens, trim leading/trailing hyphens.
-static std::string slugify(const std::string &input) {
-  std::string result;
-  result.reserve(input.size());
-  for (char c : input) {
-    if (c == ' ' || c == '_') {
-      result += '-';
-    } else if (c == '(' || c == ')' || c == '[' || c == ']' || c == '{' ||
-               c == '}' || c == ':' || c == ';') {
-      result += '-';
-    } else {
-      result += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-    }
-  }
-  // Collapse consecutive hyphens
-  std::string collapsed;
-  collapsed.reserve(result.size());
-  bool prev_hyphen = false;
-  for (char c : result) {
-    if (c == '-') {
-      if (!prev_hyphen)
-        collapsed += c;
-      prev_hyphen = true;
-    } else {
-      collapsed += c;
-      prev_hyphen = false;
-    }
-  }
-  // Trim leading/trailing hyphens
-  size_t start = collapsed.find_first_not_of('-');
-  if (start == std::string::npos)
-    return "";
-  size_t end = collapsed.find_last_not_of('-');
-  return collapsed.substr(start, end - start + 1);
-}
-
-// Extract instance number from an NX component name.
-// "0012318_332" → "332", "0012142_A" → "1", "" → "1"
-static std::string extract_instance(const std::string &name) {
-  if (name.empty())
-    return "1";
-  auto pos = name.rfind('_');
-  if (pos != std::string::npos && pos + 1 < name.size()) {
-    auto suffix = name.substr(pos + 1);
-    bool all_digits =
-        !suffix.empty() &&
-        std::all_of(suffix.begin(), suffix.end(),
-                    [](char c) { return std::isdigit(static_cast<unsigned char>(c)); });
-    if (all_digits)
-      return suffix;
-  }
-  return "1";
-}
 
 template <typename T> auto plist_to_vec(pPList plist) -> std::vector<T> {
   std::vector<T> vec;
@@ -451,14 +392,13 @@ struct SidecarBody {
   std::array<double, 3> centroid;
   nlohmann::json attributes;
   std::string component_name; // e.g. "0012318_332"
-  std::string material;       // short DAGMC name: {db_part_no}_{instance}/b{N}
+  std::string material;       // short DAGMC name: {db_part_no}_{instance}.b{N}
   std::string path;           // ancestor DB_PART_NOs joined by "/"
-  std::string component;      // slugified DB_PART_NAME
   std::string instance;       // instance number as string
-  std::string body;           // slugified journal_id
+  std::string body;           // body name from NX journal
   std::string db_part_name;   // human-readable part name
   std::string db_part_no;     // part number
-  int body_index;             // 1-based position in sidecar bodies array
+  int body_index;             // 1-based position in component's body list
   bool matched = false;
 };
 
@@ -546,7 +486,7 @@ static void match_parts_by_centroid(pGAssembly assem,
       GIP_setNativeStringAttribute(
           part, match->path.c_str(), "NX_PATH");
       GIP_setNativeStringAttribute(
-          part, match->component.c_str(), "NX_COMPONENT");
+          part, match->component_name.c_str(), "NX_COMPONENT");
       GIP_setNativeStringAttribute(
           part, match->instance.c_str(), "NX_INSTANCE");
       GIP_setNativeStringAttribute(
@@ -622,106 +562,57 @@ auto Model::from_parasolid_file(std::string filename, bool load_nx_attrs)
       std::ifstream f(attrs_path);
       auto j = nlohmann::json::parse(f);
 
+      auto version = j.value("schema_version", 0);
+      if (version != 6) {
+        throw std::runtime_error(
+            "Sidecar schema version " + std::to_string(version) +
+            " is not supported; re-export with the updated NX journal"
+            " (expected version 6)");
+      }
+
       AttrMap attr_map;
       std::vector<SidecarBody> sidecar_bodies;
       std::unordered_set<std::string> seen_bases;
 
-      // Recursively flatten the sidecar tree into:
-      //  - attr_map: component/assembly name → attributes (for assembly-level)
-      //  - sidecar_bodies: per-body entries with centroids (for part matching)
-      std::function<void(const nlohmann::json &, const std::string &)>
-          collect_from_tree;
-      collect_from_tree = [&](const nlohmann::json &node,
-                              const std::string &parent_path) {
-        auto name = node["name"].get<std::string>();
-        const auto &attrs = node["attributes"];
-        attr_map[name].push_back(attrs);
+      // Parse components dict and build attr_map.
+      // Each component key is unique in the dict, so no deduplication needed
+      // for component_name. Only seen_bases is needed because multiple
+      // component keys can share the same part_file_stem (e.g. 332 instances
+      // of "nnnnnnn" all map to stem "0012318_A").
+      auto &components = j["components"];
+      for (auto &[comp_key, comp_node] : components.items()) {
+        auto comp_name = comp_node["component_name"].get<std::string>();
+        attr_map[comp_name].push_back(comp_node["attributes"]);
+        auto stem = comp_node["part_file_stem"].get<std::string>();
+        if (stem != comp_name && seen_bases.insert(stem).second)
+          attr_map[stem].push_back(comp_node["attributes"]);
+      }
 
-        // For collapsed-instance matching: Parasolid collapses all NX
-        // instances of a base part into a single pGAssembly named after the
-        // part_file stem (e.g. "0012318_A"). Index by that stem so the
-        // assembly can match even though instance names are lost.
-        // Note: part_file may be a Windows path (backslashes) when the sidecar
-        // is exported from NX on Windows. std::filesystem::path on Linux
-        // doesn't parse backslashes, so we manually find the last separator.
-        if (node.contains("part_file")) {
-          auto pf = node["part_file"].get<std::string>();
-          auto last_sep = pf.find_last_of("/\\");
-          auto filename =
-              (last_sep != std::string::npos) ? pf.substr(last_sep + 1) : pf;
-          auto dot = filename.rfind('.');
-          auto base = (dot != std::string::npos) ? filename.substr(0, dot)
-                                                 : filename;
-          if (base != name && seen_bases.insert(base).second) {
-            attr_map[base].push_back(attrs);
-          }
-        }
+      // Parse bodies, resolving component references
+      for (const auto &body_node : j["bodies"]) {
+        auto comp_key = body_node["component"].get<std::string>();
+        auto &comp_node = components.at(comp_key);
 
-        // Build structured naming fields
-        auto db_part_name =
-            attrs.contains("DB_PART_NAME")
-                ? attrs["DB_PART_NAME"].get<std::string>()
-                : name;
-        auto db_part_no =
-            attrs.contains("DB_PART_NO")
-                ? attrs["DB_PART_NO"].get<std::string>()
-                : name;
-        auto component_slug = slugify(db_part_name);
-        auto instance_str = extract_instance(name);
+        SidecarBody entry;
+        auto &c = body_node["centroid"];
+        entry.centroid = {c[0].get<double>(), c[1].get<double>(),
+                          c[2].get<double>()};
+        entry.body_index = body_node["body_index"].get<int>();
+        entry.body = body_node["body_name"].get<std::string>();
 
-        // This node's full path includes its own DB_PART_NO
-        std::string node_path;
-        if (parent_path.empty())
-          node_path = db_part_no;
-        else
-          node_path = parent_path + "/" + db_part_no;
+        // Derive material_slug: component_key + ".b" + body_index
+        entry.material = comp_key + ".b" + std::to_string(entry.body_index);
 
-        // Collect per-body centroid entries for centroid matching
-        if (node.contains("bodies")) {
-          int body_idx = 0;
-          for (const auto &body_node : node["bodies"]) {
-            if (body_node.contains("centroid")) {
-              body_idx++;
-              auto &c = body_node["centroid"];
-              SidecarBody entry;
-              entry.centroid = {c[0].get<double>(), c[1].get<double>(),
-                                c[2].get<double>()};
-              entry.attributes = attrs;
-              entry.component_name = name;
-              entry.path = node_path;
-              entry.component = component_slug;
-              entry.instance = instance_str;
-              entry.body = slugify(
-                  body_node.contains("journal_id")
-                      ? body_node["journal_id"].get<std::string>()
-                      : "body");
-              entry.db_part_name = db_part_name;
-              entry.db_part_no = db_part_no;
-              entry.body_index = body_idx;
-              // Short DAGMC-compatible name: {db_part_no}_{instance}.b{N}
-              // Uses '.' not '/' — DAGMC reserves '/' as a delimiter
-              // (e.g. mat:name/rho:density).
-              entry.material = db_part_no + "_" + instance_str +
-                  ".b" + std::to_string(body_idx);
-              sidecar_bodies.push_back(std::move(entry));
-            }
-          }
-        }
+        // Component-level fields
+        entry.component_name =
+            comp_node["component_name"].get<std::string>();
+        entry.path = comp_node["path"].get<std::string>();
+        entry.db_part_name = comp_node["db_part_name"].get<std::string>();
+        entry.db_part_no = comp_node["db_part_no"].get<std::string>();
+        entry.instance = comp_node["instance"].get<std::string>();
+        entry.attributes = comp_node["attributes"];
 
-        if (node.contains("children")) {
-          for (const auto &child : node["children"]) {
-            collect_from_tree(child, node_path);
-          }
-        }
-      };
-
-      // Schema v4+: single "root" node. Older v3: "children" array.
-      if (j.contains("root")) {
-        collect_from_tree(j["root"], "");
-      } else if (j.contains("children")) {
-        for (const auto &child : j["children"]) {
-          collect_from_tree(child, "");
-        }
+        sidecar_bodies.push_back(std::move(entry));
       }
 
       spdlog::info("Loaded {} body centroid(s) from sidecar for matching",
@@ -908,34 +799,7 @@ static std::string get_native_string_attr(pGIPart part, const char *attr_name) {
   return result;
 }
 
-static std::string default_material_name(const nb::ref<Part> &part, int tag) {
-  auto s_part = (pGIPart)part->s_model_item;
-
-  // Prefer NX_MATERIAL (unique structured slug from centroid matching)
-  auto material = get_native_string_attr(s_part, "NX_MATERIAL");
-  if (!material.empty())
-    return material;
-
-  // Fall back to DB_PART_NAME + tag for uniqueness
-  auto db_name = get_native_string_attr(s_part, "DB_PART_NAME");
-  if (!db_name.empty())
-    return db_name + "_" + std::to_string(tag);
-
-  // Fall back to part name or parent assembly name + tag
-  auto name = part->get_name();
-  if (!name.has_value()) {
-    auto parent = part->get_parent_assembly();
-    if (parent.has_value())
-      name = parent->get()->get_name();
-  }
-  if (name.has_value())
-    return name.value() + "_" + std::to_string(tag);
-
-  return "unknown_" + std::to_string(tag);
-}
-
-void Mesh::write_gmsh(std::string filename, double scale_factor,
-                      std::optional<MaterialNamer> material_namer) {
+void Mesh::write_gmsh(std::string filename, double scale_factor) {
   gmsh::initialize();
   gmsh::model::add("phnx");
 
@@ -1185,9 +1049,19 @@ void Mesh::write_gmsh(std::string filename, double scale_factor,
       spdlog::warn("Region {} has more than one related part", sg_tag);
     } else {
       auto part = related_parts.at(0);
-      std::string material_name = material_namer.has_value()
-                                      ? (*material_namer)(part)
-                                      : default_material_name(part, sg_tag);
+      auto s_part = (pGIPart)part->s_model_item;
+      auto material_name = get_native_string_attr(s_part, "NX_MATERIAL");
+      if (material_name.empty()) {
+        // Non-NX fallback: leaf assembly name + region tag
+        auto parent = part->get_parent_assembly();
+        if (parent.has_value()) {
+          auto aname = parent->get()->get_name();
+          if (aname.has_value())
+            material_name = aname.value() + ".b" + std::to_string(sg_tag);
+        }
+        if (material_name.empty())
+          material_name = "unknown_" + std::to_string(sg_tag);
+      }
 
       std::stringstream physical_name;
       physical_name << "tag=" << sg_tag << "&material=" << material_name;
@@ -1224,55 +1098,6 @@ void Mesh::write_gmsh(std::string filename, double scale_factor,
   gmsh::option::setNumber("Mesh.SaveAll", 1);
   gmsh::write(filename);
   gmsh::finalize();
-
-  // Write companion materials sidecar JSON: output.msh -> output_materials.json
-  namespace fs = std::filesystem;
-  fs::path msh_path(filename);
-  auto sidecar_path = msh_path.parent_path() /
-      (msh_path.stem().string() + "_materials.json");
-
-  nlohmann::json sidecar = nlohmann::json::object();
-  for (auto &entity : this->model->get_regions()) {
-    auto related_parts = entity->get_related_parts();
-    if (related_parts.size() != 1)
-      continue;
-    auto part = related_parts.at(0);
-    auto s_part = (pGIPart)part->s_model_item;
-
-    auto nx_material = get_native_string_attr(s_part, "NX_MATERIAL");
-    if (nx_material.empty())
-      continue;
-
-    // Only write each material key once
-    if (sidecar.contains(nx_material))
-      continue;
-
-    nlohmann::json entry;
-    entry["path"] = get_native_string_attr(s_part, "NX_PATH");
-    entry["component"] = get_native_string_attr(s_part, "NX_COMPONENT");
-    entry["instance"] = get_native_string_attr(s_part, "NX_INSTANCE");
-    entry["body"] = get_native_string_attr(s_part, "NX_BODY");
-    entry["db_part_name"] = get_native_string_attr(s_part, "DB_PART_NAME");
-
-    auto db_part_no = get_native_string_attr(s_part, "DB_PART_NO");
-    if (db_part_no.empty()) {
-      // Extract from the short material name: {db_part_no}_{instance}/b{N}
-      auto slash_pos = nx_material.find('/');
-      auto underscore_pos = nx_material.rfind('_', slash_pos);
-      if (underscore_pos != std::string::npos)
-        db_part_no = nx_material.substr(0, underscore_pos);
-    }
-    entry["db_part_no"] = db_part_no;
-
-    sidecar[nx_material] = entry;
-  }
-
-  if (!sidecar.empty()) {
-    std::ofstream f(sidecar_path);
-    f << sidecar.dump(2) << "\n";
-    spdlog::info("Wrote materials sidecar: {} ({} entries)",
-                 sidecar_path.string(), sidecar.size());
-  }
 }
 
 auto SurfaceMesh::from_model(nb::ref<Model> model, nb::ref<MeshCase> mesh_case)
