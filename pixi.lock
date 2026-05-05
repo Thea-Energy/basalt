@@ -3140,8 +3140,8 @@ packages:
   timestamp: 1759386961224
 - pypi: ../nanobindgen
   name: nanobindgen
-  version: 0.1.0
-  sha256: ef073b93eddf3ccaf08f3b36d82d067358497659cb684613649d40af8b89ef32
+  version: 0.2.0
+  sha256: 63273fefb5068b29e0f21a0180d64a847702c6f561bd31d54a32bd153a22cdce
   requires_dist:
   - pytest>=8.4.2
   - tree-sitter==0.21.3
