@@ -2,6 +2,7 @@
 Usage
 =====
 .. module:: phnx
+   :no-index:
 
 PHNX transforms a Parasolid CAD assembly into a Gmsh mesh annotated
 for downstream DAGMC conversion. The pipeline has five distinct
