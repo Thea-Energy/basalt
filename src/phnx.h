@@ -34,8 +34,8 @@ template <typename T> auto plist_to_vec(pPList plist) -> std::vector<T>;
 /**
  * @class ModelItem
  * @brief Model entity
- * @nb extra: 'nb::intrusive_ptr<ModelItem>([](ModelItem* o, PyObject*
- po) noexcept { o->set_self_py(po); })'
+ * @nb
+ * @nb_intrusive_ptr
  */
 class ModelItem : public nb::intrusive_base {
 public:
@@ -51,7 +51,8 @@ public:
 
 /**
  * @class Entity
- * @nb inherit: ModelItem
+ * @nb
+ * @nb_inherit ModelItem
  */
 class Entity : public ModelItem {
 public:
@@ -61,7 +62,8 @@ public:
    * Get entity tag (GEN_tag)
    *
    * @return Tag
-   * @nb prop_r: tag
+   * @nb
+   * @nb_prop_ro tag
    */
   auto get_tag() const -> int;
 
@@ -69,7 +71,8 @@ public:
    * Get related parts
    *
    * @return Related parts
-   * @nb prop_r: related_parts
+   * @nb
+   * @nb_prop_ro related_parts
    */
   auto get_related_parts() const -> std::vector<nb::ref<Part>>;
 
@@ -77,7 +80,8 @@ public:
    * Name
    *
    * @return Name or None
-   * @nb prop_r: name
+   * @nb
+   * @nb_prop_ro name
    */
   auto get_name() const -> std::optional<std::string>;
 
@@ -88,7 +92,8 @@ public:
    * Value types are Python int, float, or str.
    *
    * @return Dict of attribute name to list of values
-   * @nb prop_r: native_attributes
+   * @nb
+   * @nb_prop_ro native_attributes
    */
   auto get_native_attributes() const -> nb::dict;
 };
@@ -96,7 +101,8 @@ public:
 /**
  * @class Part
  * @brief Model part
- * @nb inherit: ModelItem
+ * @nb
+ * @nb_inherit ModelItem
  */
 class Part : public ModelItem {
 
@@ -106,7 +112,8 @@ public:
    * Name
    *
    * @return Name or None
-   * @nb prop_r: name
+   * @nb
+   * @nb_prop_ro name
    */
   auto get_name() const -> std::optional<std::string>;
 
@@ -114,7 +121,8 @@ public:
    * Get the parent assembly
    *
    * @return Assembly or none
-   * @nb prop_r: parent_assembly
+   * @nb
+   * @nb_prop_ro parent_assembly
    */
   auto get_parent_assembly() const -> std::optional<nb::ref<Assembly>>;
 
@@ -122,7 +130,8 @@ public:
    * Get regions of this part.
    *
    * @return Regions
-   * @nb prop_r: regions
+   * @nb
+   * @nb_prop_ro regions
    */
   auto get_regions() const -> std::vector<nb::ref<Region>>;
 
@@ -130,7 +139,8 @@ public:
    * Get faces of this part.
    *
    * @return Faces
-   * @nb prop_r: faces
+   * @nb
+   * @nb_prop_ro faces
    */
   auto get_faces() const -> std::vector<nb::ref<Face>>;
 
@@ -138,7 +148,8 @@ public:
    * Get all native Parasolid attributes stored on this part.
    *
    * @return Dict of attribute name to list of values
-   * @nb prop_r: native_attributes
+   * @nb
+   * @nb_prop_ro native_attributes
    */
   auto get_native_attributes() const -> nb::dict;
 
@@ -146,7 +157,8 @@ public:
    * Compute the centroid of this part's region.
    *
    * @return Centroid [x, y, z]
-   * @nb prop_r: centroid
+   * @nb
+   * @nb_prop_ro centroid
    */
   auto get_centroid() const -> std::array<double, 3>;
 };
@@ -154,7 +166,8 @@ public:
 /**
  * @class Assembly
  * @brief Model assembly
- * @nb inherit: ModelItem
+ * @nb
+ * @nb_inherit ModelItem
  */
 class Assembly : public ModelItem {
 
@@ -165,7 +178,8 @@ public:
    * Get the name
    *
    * @return Name or None
-   * @nb prop_r: name
+   * @nb
+   * @nb_prop_ro name
    */
   auto get_name() const -> std::optional<std::string>;
 
@@ -173,7 +187,8 @@ public:
    * Get the parent assembly
    *
    * @return Assembly or None
-   * @nb prop_r: parent_assembly
+   * @nb
+   * @nb_prop_ro parent_assembly
    */
   auto get_parent_assembly() const -> std::optional<nb::ref<Assembly>>;
 
@@ -181,7 +196,8 @@ public:
    * Get instantiated parts in this assembly.
    *
    * @return Parts
-   * @nb prop_r: parts
+   * @nb
+   * @nb_prop_ro parts
    */
   auto get_parts() const -> std::vector<nb::ref<Part>>;
 
@@ -189,7 +205,8 @@ public:
    * Get sub-assemblies in this assembly.
    *
    * @return Sub-assemblies
-   * @nb prop_r: assemblies
+   * @nb
+   * @nb_prop_ro assemblies
    */
   auto get_assemblies() const -> std::vector<nb::ref<Assembly>>;
 
@@ -197,7 +214,8 @@ public:
    * Get all native Parasolid attributes stored on this assembly.
    *
    * @return Dict of attribute name to list of values
-   * @nb prop_r: native_attributes
+   * @nb
+   * @nb_prop_ro native_attributes
    */
   auto get_native_attributes() const -> nb::dict;
 };
@@ -205,7 +223,8 @@ public:
 /**
  * @class Vertex
  * @brief Model vertex
- * @nb inherit: Entity
+ * @nb
+ * @nb_inherit Entity
  */
 class Vertex : public Entity {
   using Entity::Entity;
@@ -214,7 +233,8 @@ class Vertex : public Entity {
 /**
  * @class Edge
  * @brief Model edge
- * @nb inherit: Entity
+ * @nb
+ * @nb_inherit Entity
  */
 class Edge : public Entity {
   using Entity::Entity;
@@ -223,7 +243,8 @@ class Edge : public Entity {
 /**
  * @class Face
  * @brief Model face
- * @nb inherit: Entity
+ * @nb
+ * @nb_inherit Entity
  */
 class Face : public Entity {
   using Entity::Entity;
@@ -233,7 +254,8 @@ public:
    * Get the region on the forward side of this face, if any.
    *
    * @return Forward region or None
-   * @nb prop_r: forward_region
+   * @nb
+   * @nb_prop_ro forward_region
    */
   auto get_forward_region() const -> std::optional<nb::ref<Region>>;
 
@@ -241,7 +263,8 @@ public:
    * Get the region on the reverse side of this face, if any.
    *
    * @return Reverse region or None
-   * @nb prop_r: reverse_region
+   * @nb
+   * @nb_prop_ro reverse_region
    */
   auto get_reverse_region() const -> std::optional<nb::ref<Region>>;
 };
@@ -249,7 +272,8 @@ public:
 /**
  * @class Region
  * @brief Model region
- * @nb inherit: Entity
+ * @nb
+ * @nb_inherit Entity
  */
 class Region : public Entity {
   using Entity::Entity;
@@ -259,7 +283,8 @@ public:
    * Compute the centroid of this region.
    *
    * @return Centroid [x, y, z]
-   * @nb prop_r: centroid
+   * @nb
+   * @nb_prop_ro centroid
    */
   auto get_centroid() const -> std::array<double, 3>;
 };
@@ -267,8 +292,8 @@ public:
 /**
  * @class Model
  * @brief model
- * @nb extra: 'nb::intrusive_ptr<Model>([](Model* o, PyObject*
- po) noexcept { o->set_self_py(po); })'
+ * @nb
+ * @nb_intrusive_ptr
  */
 class Model : public nb::intrusive_base {
   struct Connection {
@@ -304,7 +329,8 @@ public:
    * @brief Get model root items.
    *
    * @return Root items.
-   * @nb prop_r: root_items
+   * @nb
+   * @nb_prop_ro root_items
    */
   auto get_root_items() const -> std::vector<nb::ref<ModelItem>>;
 
@@ -379,7 +405,8 @@ public:
    * Return all the faces in this model.
    *
    * @return Faces
-   * @nb prop_r: faces
+   * @nb
+   * @nb_prop_ro faces
    */
   auto get_faces() const -> std::vector<nb::ref<Face>>;
 
@@ -387,7 +414,8 @@ public:
    * Return all the regions in this model.
    *
    * @return Regions
-   * @nb prop_r: regions
+   * @nb
+   * @nb_prop_ro regions
    */
   auto get_regions() const -> std::vector<nb::ref<Region>>;
 
@@ -395,7 +423,8 @@ public:
    * Return all the edges in this model.
    *
    * @return Edges
-   * @nb prop_r: edges
+   * @nb
+   * @nb_prop_ro edges
    */
   auto get_edges() const -> std::vector<nb::ref<Edge>>;
 
@@ -403,7 +432,8 @@ public:
    * Return all the vertices in this model.
    *
    * @return Vertices
-   * @nb prop_r: vertices
+   * @nb
+   * @nb_prop_ro vertices
    */
   auto get_vertices() const -> std::vector<nb::ref<Vertex>>;
 
@@ -414,8 +444,8 @@ public:
 /**
  * @class MeshCase
  * @brief Mesh attributes
- * @nb extra: 'nb::intrusive_ptr<MeshCase>([](MeshCase* o, PyObject*
- po) noexcept { o->set_self_py(po); })'
+ * @nb
+ * @nb_intrusive_ptr
  */
 class MeshCase : public nb::intrusive_base {
   nb::ref<Model> model;
@@ -429,7 +459,8 @@ public:
    *
    * @param model Model
    * @return Mesh case
-   * @nb new
+   * @nb
+   * @nb_new
    */
   static auto make(nb::ref<Model> model) -> nb::ref<MeshCase>;
 
@@ -477,8 +508,8 @@ public:
 /**
  * @class Mesh
  * @brief Mesh attributes
- * @nb extra: 'nb::intrusive_ptr<Mesh>([](Mesh* o, PyObject*
- po) noexcept { o->set_self_py(po); })'
+ * @nb
+ * @nb_intrusive_ptr
  */
 class Mesh : public nb::intrusive_base {
 public:
@@ -501,7 +532,8 @@ public:
 /**
  * @class SurfaceMesh
  * @brief Surface Mesh
- * @nb inherit: Mesh
+ * @nb
+ * @nb_inherit Mesh
  */
 class SurfaceMesh : public Mesh {
 public:
@@ -522,7 +554,8 @@ public:
 /**
  * @class VolumeMesh
  * @brief Volume Mesh
- * @nb inherit: Mesh
+ * @nb
+ * @nb_inherit Mesh
  */
 class VolumeMesh : public Mesh {
 public:
