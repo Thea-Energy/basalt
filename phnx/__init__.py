@@ -2,11 +2,16 @@ from ._core._core import (
     Mesh,
     MeshCase,
     Model,
+    ModelItem,
+    Entity,
     Assembly,
     Part,
+    Region,
+    Face,
+    Edge,
+    Vertex,
     SurfaceMesh,
     VolumeMesh,
-    Region,
 )  # noqa: F401
 
 
