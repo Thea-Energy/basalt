@@ -1,5 +1,6 @@
 doc/
-docs/
+docs/_build/
+docs/api/generated/
 include/
 lib/
 dist/
