@@ -1,5 +1,9 @@
-====
-PHNX
-====
+.. toctree::
+   :maxdepth: 1
+   :hidden:
 
-Documentation under construction.
+   install
+   usage
+   api
+
+.. include:: ../README.rst
