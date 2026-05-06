@@ -24,8 +24,17 @@ void init() {
   SimPartitionedMesh_start(nullptr, nullptr);
   Sim_logOn("sms.log");
   MS_init();
+  const char *license_file = std::getenv("SimModSuite_licenseFile");
+  if (license_file == nullptr || license_file[0] == '\0') {
+    throw_exception(
+        "SimModSuite_licenseFile environment variable is not set or is empty. "
+        "phnx requires a Simmetrix license file path. Set the variable "
+        "(case-sensitive) to either a license file path or a 'port@host' "
+        "string before importing phnx. See docs/install.rst.");
+  }
   SimLicense_start(
-      "geomsim_core,geomsim_parasolid,meshsim_surface,meshsim_volume", nullptr);
+      "geomsim_core,geomsim_parasolid,meshsim_surface,meshsim_volume",
+      license_file);
 
   SimParasolid_start(1);
   Sim_setMessageHandler(messageHandler);
