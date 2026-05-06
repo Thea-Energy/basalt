@@ -109,6 +109,7 @@ find_library(GMSH_LIB gmsh)
 if(NOT GMSH_LIB)
   message(FATAL_ERROR "Could not find libgmsh")
 endif()
+get_filename_component(GMSH_LIBDIR "${GMSH_LIB}" DIRECTORY)
 
 find_path(GMSH_INC gmsh.h)
 if(NOT GMSH_INC)
@@ -163,7 +164,7 @@ set_property(
         TARGET _core
         APPEND
         PROPERTY INSTALL_RPATH
-        "${CMAKE_INSTALL_PREFIX}:${SIMMODSUITE_LIB}/psKrnl")
+        "${CMAKE_INSTALL_PREFIX}:${GMSH_LIBDIR}:${SIMMODSUITE_LIB}/psKrnl")
 
 nanobind_add_stub(
         _core_stub
