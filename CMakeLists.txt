@@ -97,6 +97,11 @@ endif()
 
 target_link_libraries(sms INTERFACE ${SMS_LINK_LIBS})
 
+# Compile-time default schema dir; init.cpp setenvs P_SCHEMA from this with
+# overwrite=0 (preserves customer override).
+target_compile_definitions(sms INTERFACE
+    PSKRNL_SCHEMA_DIR="${SIMMODSUITE_LIB}/psKrnl/schema")
+
 # ===============================================================================
 # Gmsh
 # ===============================================================================
@@ -153,12 +158,12 @@ nanobind_add_module(_core NB_SHARED # STATIC is the default
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/phnx/_core)
 
-# Inspect RPATH with readelf -d phnx/_core/_core.cpython-312-x86_64-linux-gnu.so | grep RUNPATH
+# Inspect RPATH with: readelf -d phnx/_core/_core.cpython-*.so | grep RUNPATH
 set_property(
         TARGET _core
         APPEND
-        PROPERTY INSTALL_RPATH 
-        "${CMAKE_INSTALL_PREFIX}:${CMAKE_CURRENT_SOURCE_DIR}/.pixi/envs/default/lib:${SIMMODSUITE_LIB}/psKrnl")
+        PROPERTY INSTALL_RPATH
+        "${CMAKE_INSTALL_PREFIX}:${SIMMODSUITE_LIB}/psKrnl")
 
 nanobind_add_stub(
         _core_stub
