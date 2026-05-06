@@ -23,6 +23,21 @@ nlohmann_json = ">=3.12.0,<4"
 pytest = ">=8,<9"
 
 
+[feature.docs.pypi-dependencies]
+sphinx = ">=8.2.3,<9"
+sphinx-github-style = ">=1.2.2,<2"
+sphinx-autobuild = ">=2025.8.25,<2026"
+shibuya = "==2026.1.9"
+sphinx-tabs = ">=3.4.7,<4"
+
+[feature.docs.tasks]
+docs = "sphinx-build -b html docs docs/_build/html"
+docs-watch = "sphinx-autobuild docs docs/_build/html"
+
+[environments]
+docs = ["docs"]
+
+
 [package]
 name = "stellarmesh"
 version = "2.0.1"

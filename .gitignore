@@ -1,5 +1,7 @@
 doc/
-docs/
+docs/_build/
+docs/api/generated/
+docs/generated/
 include/
 lib/
 dist/
@@ -87,6 +89,7 @@ CMakeFiles
 CMakeScripts
 Testing
 Makefile
+!docs/Makefile
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
