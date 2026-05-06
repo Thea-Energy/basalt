@@ -6,6 +6,19 @@ import xml.parsers.expat  # noqa: F401 — must be imported before phnx to preve
 from importlib.metadata import version as get_version
 
 sys.path.append(os.path.abspath("../"))
+
+# Allow doc builds without the compiled _core extension (CI runners don't
+# have Simmetrix installed, so _core.so is never built there). Mock the
+# native module if it isn't present; when the real one is available it is
+# preferred so signatures and types come from the actual bindings.
+try:
+    import phnx._core
+except ImportError:
+    from unittest.mock import MagicMock
+
+    sys.modules["phnx._core"] = MagicMock()
+    sys.modules["phnx._core._core"] = MagicMock()
+
 import phnx  # noqa: F401
 
 project = "PHNX"
