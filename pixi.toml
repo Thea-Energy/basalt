@@ -12,7 +12,7 @@ build = "cmake --build build -j 8 -t install"
 clean = "rm -rf build phnx/_core _deps"
 
 [pypi-dependencies]
-nanobindgen = { path = "../nanobindgen", editable = true }
+nanobindgen = ">=0.2.0,<1"
 phnx = { path = ".", editable = true }
 ipykernel = ">=7.1.0, <8"
 
