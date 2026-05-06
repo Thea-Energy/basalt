@@ -35,6 +35,7 @@ CLAUDE.md
 *.brep
 *.log
 *.lic
+TheaEnergy*
 *.step
 *.stl
 *.conda
