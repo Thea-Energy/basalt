@@ -6,5 +6,6 @@
    usage
    api
    contributing
+   changelog
 
 .. include:: ../README.rst
