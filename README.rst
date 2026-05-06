@@ -10,6 +10,14 @@ meshes, and exports them as Gmsh ``.msh`` files annotated for use
 with `Stellarmesh <https://github.com/Thea-Energy/stellarmesh>`__
 and DAGMC.
 
+.. note::
+
+   PHNX requires a valid `Simmetrix SimModSuite
+   <https://www.simmetrix.com/>`__ license and the corresponding
+   module distribution (``gmcore``, ``mscore``, ``pskrnl``,
+   ``simlicense``). The library cannot be built or run without
+   these. See `Installation <install.html>`__ for details.
+
 **Features**
 
 * Parasolid (``.x_t``) assembly import via Simmetrix
@@ -48,4 +56,8 @@ Example
 Acknowledgements
 ----------------
 
-PHNX is a project of `Thea Energy <https://thea.energy/>`__.
+PHNX is originally a project of Thea Energy, who are building the
+world's first planar coil stellarator.
+
+.. figure:: https://github.com/user-attachments/assets/37b9ba1c-b22c-4837-b226-a6212854127e
+   :width: 200px
