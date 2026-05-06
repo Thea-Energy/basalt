@@ -24,8 +24,7 @@ def _collect_parts(model):
         if isinstance(item, Assembly):
             for sub in item.assemblies:
                 walk(sub)
-            for p in item.parts:
-                parts.append(p)
+            parts.extend(item.parts)
         elif isinstance(item, Part):
             parts.append(item)
 
@@ -86,9 +85,7 @@ def test_all_parts_have_nx_material(port_plug_model):
     """After centroid matching, every Part carries NX_MATERIAL."""
     parts = _collect_parts(port_plug_model)
     without = [p for p in parts if "NX_MATERIAL" not in p.native_attributes]
-    assert not without, (
-        f"{len(without)}/{len(parts)} Parts missing NX_MATERIAL"
-    )
+    assert not without, f"{len(without)}/{len(parts)} Parts missing NX_MATERIAL"
 
 
 def test_material_slug_format(port_plug_model):
@@ -97,9 +94,7 @@ def test_material_slug_format(port_plug_model):
     parts = _collect_parts(port_plug_model)
     for p in parts:
         material = p.native_attributes["NX_MATERIAL"][0]
-        assert pattern.match(material), (
-            f"Material {material!r} does not match format"
-        )
+        assert pattern.match(material), f"Material {material!r} does not match format"
 
 
 def test_material_slugs_unique_and_within_moab_limit(port_plug_model):

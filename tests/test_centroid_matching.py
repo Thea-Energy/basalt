@@ -26,8 +26,7 @@ def _collect_parts(model):
         if isinstance(item, Assembly):
             for sub in item.assemblies:
                 walk(sub)
-            for p in item.parts:
-                parts.append(p)
+            parts.extend(item.parts)
         elif isinstance(item, Part):
             parts.append(item)
 
@@ -68,9 +67,7 @@ def test_unique_material_names(phyeos_model):
 
     # Every short name must fit within MOAB's 28-char limit
     for mat in materials:
-        assert len(mat) <= 28, (
-            f"Material name exceeds 28 chars ({len(mat)}): {mat}"
-        )
+        assert len(mat) <= 28, f"Material name exceeds 28 chars ({len(mat)}): {mat}"
 
 
 def test_structured_fields_present(phyeos_model):
@@ -80,9 +77,7 @@ def test_structured_fields_present(phyeos_model):
     for p in parts:
         attrs = p.native_attributes
         for attr in required_attrs:
-            assert attr in attrs, (
-                f"Part missing {attr} attribute"
-            )
+            assert attr in attrs, f"Part missing {attr} attribute"
 
 
 def test_material_slug_format(phyeos_model):
@@ -121,6 +116,7 @@ def test_sidecar_body_count_matches_sms(phyeos_model):
 
 def test_assemblies_have_attributes(phyeos_model):
     """Named assemblies should have NX attributes applied."""
+
     def find_assembly(items, name):
         for item in items:
             if isinstance(item, Assembly):

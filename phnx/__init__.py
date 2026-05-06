@@ -1,18 +1,51 @@
+"""phnx: Python meshing library wrapping Simmetrix SimModSuite.
+
+Re-exports the C-extension classes from the compiled `_core` module and
+provides a few pure-Python helpers (sidecar metadata loader, hierarchy
+pretty-printer).
+"""
+
+import json
+
 from ._core._core import (
-    Mesh,
-    MeshCase,
-    Model,
-    ModelItem,
-    Entity,
-    Assembly,
-    Part,
-    Region,
-    Face,
-    Edge,
-    Vertex,
-    SurfaceMesh,
-    VolumeMesh,
-)  # noqa: F401
+    Assembly as Assembly,
+)
+from ._core._core import (
+    Edge as Edge,
+)
+from ._core._core import (
+    Entity as Entity,
+)
+from ._core._core import (
+    Face as Face,
+)
+from ._core._core import (
+    Mesh as Mesh,
+)
+from ._core._core import (
+    MeshCase as MeshCase,
+)
+from ._core._core import (
+    Model as Model,
+)
+from ._core._core import (
+    ModelItem as ModelItem,
+)
+from ._core._core import (
+    Part as Part,
+)
+from ._core._core import (
+    Region as Region,
+)
+from ._core._core import (
+    SurfaceMesh as SurfaceMesh,
+)
+from ._core._core import (
+    Vertex as Vertex,
+)
+from ._core._core import (
+    VolumeMesh as VolumeMesh,
+)
 
 
 def load_material_metadata(attrs_path: str) -> dict[str, dict]:
@@ -23,8 +56,6 @@ def load_material_metadata(attrs_path: str) -> dict[str, dict]:
     etc.) so the caller sees a flat dict per body -- same shape as the former v5
     API.
     """
-    import json
-
     with open(attrs_path) as f:
         data = json.load(f)
 
