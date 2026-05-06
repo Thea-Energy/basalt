@@ -26,23 +26,76 @@ find_package(nanobind CONFIG REQUIRED)
 
 
 # ===============================================================================
-# Simmetrix SimModSuite
+# Simmetrix SimModSuite (bring-your-own)
 # ===============================================================================
+if(NOT DEFINED ENV{SIMMODSUITE_ROOT})
+    message(FATAL_ERROR
+        "SIMMODSUITE_ROOT environment variable is not set.\n"
+        "phnx does not bundle Simmetrix SimModSuite. Download the gmcore, mscore, pskrnl, "
+        "and simlicense tarballs from Simmetrix's customer portal (all at the same "
+        "version-datestamp), extract them into one parent directory, and set "
+        "SIMMODSUITE_ROOT to the resulting <version>-<datestamp>/ directory.\n"
+        "See docs/install.rst for full instructions.")
+endif()
+
+set(SIMMODSUITE_ROOT "$ENV{SIMMODSUITE_ROOT}" CACHE PATH "Simmetrix SimModSuite install root")
+
+if(DEFINED ENV{SIMMODSUITE_ABI})
+    set(SIMMODSUITE_ABI "$ENV{SIMMODSUITE_ABI}" CACHE STRING "Simmetrix ABI subdirectory")
+else()
+    set(SIMMODSUITE_ABI "x64_rhel9_gcc11" CACHE STRING "Simmetrix ABI subdirectory (default)")
+endif()
+
+set(SIMMODSUITE_INCLUDE "${SIMMODSUITE_ROOT}/include")
+set(SIMMODSUITE_LIB "${SIMMODSUITE_ROOT}/lib/${SIMMODSUITE_ABI}")
+
+if(NOT EXISTS "${SIMMODSUITE_INCLUDE}/SimUtil.h")
+    message(FATAL_ERROR
+        "Simmetrix headers not found at ${SIMMODSUITE_INCLUDE}/SimUtil.h. "
+        "Check SIMMODSUITE_ROOT and that all four module tarballs are extracted "
+        "into a unified install tree.")
+endif()
+
+if(NOT IS_DIRECTORY "${SIMMODSUITE_LIB}")
+    message(FATAL_ERROR
+        "Simmetrix library directory not found at ${SIMMODSUITE_LIB}. "
+        "Set SIMMODSUITE_ABI to your install's ABI subdirectory "
+        "(default: x64_rhel9_gcc11; alternatives: x64_rhel8_gcc83).")
+endif()
+
+# Glob-detect SimParasolid so version bumps (SimParasolid380 -> SimParasolid390 -> ...)
+# do not require build changes.
+file(GLOB SIM_PARASOLID_LIBS "${SIMMODSUITE_LIB}/libSimParasolid*.a")
+list(LENGTH SIM_PARASOLID_LIBS SIM_PARASOLID_COUNT)
+if(NOT SIM_PARASOLID_COUNT EQUAL 1)
+    message(FATAL_ERROR
+        "Expected exactly one libSimParasolid*.a in ${SIMMODSUITE_LIB}, "
+        "found ${SIM_PARASOLID_COUNT}: ${SIM_PARASOLID_LIBS}")
+endif()
+get_filename_component(SIM_PARASOLID_NAME "${SIM_PARASOLID_LIBS}" NAME_WE)
+string(REGEX REPLACE "^lib" "" SIM_PARASOLID_LIBNAME "${SIM_PARASOLID_NAME}")
+
 add_library(sms INTERFACE)
+target_include_directories(sms INTERFACE "${SIMMODSUITE_INCLUDE}")
+target_link_directories(sms INTERFACE
+    "${SIMMODSUITE_LIB}"
+    "${SIMMODSUITE_LIB}/psKrnl")
 
-target_include_directories(sms INTERFACE include/gmcore)
-target_link_directories(sms INTERFACE lib/gmcore)
+set(SMS_LINK_LIBS
+    ${SIM_PARASOLID_LIBNAME}
+    SimPartitionedMesh
+    SimPartitionWrapper
+    SimMeshing
+    SimMeshTools
+    SimModel
+    pskernel
+    SimLicense)
 
-target_include_directories(sms INTERFACE include/mscore)
-target_link_directories(sms INTERFACE lib/mscore)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    list(APPEND SMS_LINK_LIBS tirpc)
+endif()
 
-target_include_directories(sms INTERFACE include/pskrnl)
-target_link_directories(sms INTERFACE lib/pskrnl lib/pskrnl/psKrnl)
-
-target_include_directories(sms INTERFACE include/license)
-target_link_directories(sms INTERFACE lib/license)
-
-target_link_libraries(sms INTERFACE SimParasolid380 SimPartitionedMesh SimPartitionWrapper SimMeshing SimMeshTools SimModel pskernel tirpc SimLicense)
+target_link_libraries(sms INTERFACE ${SMS_LINK_LIBS})
 
 # ===============================================================================
 # Gmsh
@@ -115,7 +168,7 @@ set_property(
         TARGET _core
         APPEND
         PROPERTY INSTALL_RPATH 
-        "${CMAKE_INSTALL_PREFIX}:${CMAKE_CURRENT_SOURCE_DIR}/.pixi/envs/default/lib:${CMAKE_CURRENT_SOURCE_DIR}/lib/pskrnl/psKrnl")
+        "${CMAKE_INSTALL_PREFIX}:${CMAKE_CURRENT_SOURCE_DIR}/.pixi/envs/default/lib:${SIMMODSUITE_LIB}/psKrnl")
 
 nanobind_add_stub(
         _core_stub
