@@ -5,5 +5,6 @@
    install
    usage
    api
+   contributing
 
 .. include:: ../README.rst
