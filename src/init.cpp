@@ -7,6 +7,7 @@
 #include "SimUtil.h"
 #include "spdlog/spdlog.h"
 #include <atomic>
+#include <cstdlib>
 #include <iostream>
 
 void messageHandler(int type, const char *msg);
@@ -16,6 +17,10 @@ void progressHandler(const char *what, int level, int startVal, int endVal,
 static std::atomic<bool> g_sms_initialized{false};
 
 void init() {
+  // Bake-time default; setenv with overwrite=0 preserves any customer override
+  // already in the environment.
+  setenv("P_SCHEMA", PSKRNL_SCHEMA_DIR, 0);
+
   SimPartitionedMesh_start(nullptr, nullptr);
   Sim_logOn("sms.log");
   MS_init();
