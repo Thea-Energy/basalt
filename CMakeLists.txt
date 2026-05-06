@@ -211,16 +211,3 @@ add_dependencies(_core generate_bindings)
 # ===============================================================================
 install(TARGETS _core nanobind DESTINATION ".")
 install(FILES build/_core.pyi DESTINATION ".")
-
-# ===============================================================================
-# Post-build commands
-# ===============================================================================
-add_custom_command(
-        TARGET main
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/TheaEnergyEval2025"
-        ${CMAKE_BINARY_DIR}
-        COMMENT
-        "Copying License file to build directory")
-
-# TODO(akoen): We should copy libpskernel to _core directory
