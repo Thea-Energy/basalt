@@ -7,19 +7,16 @@ from importlib.metadata import version as get_version
 
 sys.path.append(os.path.abspath("../"))
 
-# Allow doc builds without the compiled _core extension (CI runners don't
-# have Simmetrix installed, so _core.so is never built there). Mock the
-# native module if it isn't present; when the real one is available it is
-# preferred so signatures and types come from the actual bindings.
-try:
-    import phnx._core
-except ImportError:
-    from unittest.mock import MagicMock
+# Always mock the compiled _core extension during docs build. Importing the
+# real _core.so triggers SMS init, which requires a valid Simmetrix license
+# and a reachable license file — CI runners do not have either. Docs only
+# cover the public Python API.
+from unittest.mock import MagicMock
 
-    sys.modules["phnx._core"] = MagicMock()
-    sys.modules["phnx._core._core"] = MagicMock()
+sys.modules["phnx._core"] = MagicMock()
+sys.modules["phnx._core._core"] = MagicMock()
 
-import phnx  # noqa: F401
+import phnx  # noqa: E402, F401
 
 project = "PHNX"
 copyright = "2026, Thea Energy"  # noqa: A001
