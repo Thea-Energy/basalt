@@ -51,11 +51,11 @@ unified tree:
    tar xzf /path/to/pskrnl-linux64.tgz
    tar xzf /path/to/simlicense-linux64.tgz
 
-The result is a version-stamped directory:
+The result is a version-stamped directory (e.g. ``2026.0-260502``):
 
 .. code:: text
 
-   ~/sms/install/<version>-<datestamp>/
+   ~/sms/install/<version>-<datestamp>/      # e.g. 2026.0-260502
        include/
            SimUtil.h
            ...
@@ -93,11 +93,18 @@ and exports it on import. Customers who need an override may still export
 Install with pip
 ----------------
 
+phnx ships as a source distribution, so ``pip`` builds the C++ extension at
+install time against the SMS install at ``$SIMMODSUITE_ROOT``. ``scikit-build-core``
+pulls ``nanobind`` and ``nanobindgen`` into the build environment automatically,
+but **gmsh** must be available on the host (typically from conda-forge or the
+``gmsh`` PyPI wheel) — both at build time (for headers and ``find_library``) and
+at runtime.
+
 .. code:: sh
 
+   pip install gmsh    # if you do not already have it
    pip install phnx
 
-This builds the C++ extension against the SMS install at ``$SIMMODSUITE_ROOT``.
 Build output appears in ``build/``; the compiled module lands at
 ``<site-packages>/phnx/_core/_core.cpython-<...>.so``.
 
