@@ -1,6 +1,7 @@
 """Trivial import-and-init smoke test (requires SMS license)."""
 
 import ctypes
+import ctypes.util
 import os
 
 
@@ -24,7 +25,7 @@ def test_p_schema_set_after_import() -> None:
     """
     import phnx  # noqa: F401, PLC0415  — triggers init() which calls setenv
 
-    libc = ctypes.CDLL("libc.so.6")
+    libc = ctypes.CDLL(ctypes.util.find_library("c") or "libc.so.6")
     libc.getenv.restype = ctypes.c_char_p
     libc.getenv.argtypes = [ctypes.c_char_p]
     raw = libc.getenv(b"P_SCHEMA")
