@@ -1,6 +1,10 @@
 [build-system]
-requires = ["uv_build>=0.9.6,<0.10.0"]
-build-backend = "uv_build"
+requires = [
+    "scikit-build-core>=0.10",
+    "nanobind>=2.9.2,<3",
+    "nanobindgen>=0.2.0,<1",
+]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "phnx"
@@ -13,9 +17,37 @@ license-files = ["LICENSE"]
 readme = "README.rst"
 requires-python = ">=3.12"
 
-[tool.uv.build-backend]
-module-name = "phnx"
-module-root = ""
+[tool.scikit-build]
+minimum-version = "0.10"
+cmake.version = ">=3.15"
+cmake.build-type = "Release"
+build-dir = "build/{wheel_tag}"
+wheel.packages = ["phnx"]
+# nanobind installs its own CMake config under <site-packages>/nanobind/cmake; the
+# top-level CMakeLists.txt finds it via execute_process(... -m nanobind --cmake_dir).
+
+[tool.scikit-build.sdist]
+# scikit-build-core walks the filesystem and respects only `.gitignore` /
+# `.git/info/exclude` (not the user's global gitignore), so we explicitly
+# exclude proprietary content and developer-only artifacts that may be
+# untracked-but-present (Claude Code worktrees, local-only design specs, etc.).
+exclude = [
+    "include/**",
+    "lib/**",
+    "TheaEnergy*",
+    "*.lic",
+    "simmodsuite.lic",
+    "tests/data/*.x_t",
+    "tests/data/*.json",
+    ".envrc",
+    ".claude/**",
+    "docs/superpowers/**",
+    ".pixi/**",
+    "_deps/**",
+    "wheelhouse/**",
+    "dist/**",
+    "scratch/**",
+]
 
 
 [tool.ruff]

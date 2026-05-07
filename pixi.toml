@@ -7,9 +7,19 @@ preview = ["pixi-build"]
 
 
 [tasks]
-conf = 'cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="$CONDA_PREFIX" -DCMAKE_EXPORT_COMPILE_COMMANDS=TRUE'
-build = "cmake --build build -j 8 -t install"
-clean = "rm -rf build phnx/_core _deps"
+conf = 'cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="$CONDA_PREFIX" -DCMAKE_INSTALL_PREFIX="$PWD" -DCMAKE_EXPORT_COMPILE_COMMANDS=TRUE'
+build = "cmake --build build -j 8 && cmake --install build"
+# Preserve `phnx/_core/__init__.py` (a source-tracked package marker that
+# scikit-build-core's editable install registers as a module).
+clean = "rm -rf build _deps && find phnx/_core -mindepth 1 -not -name __init__.py -delete 2>/dev/null; true"
+
+# Make the conda env discoverable to CMake during the scikit-build-core
+# editable install (`pixi install` triggers it; the build subprocess inherits
+# this env var). Without it, find_library(gmsh) and friends fail because the
+# build env's CMAKE_PREFIX_PATH only points at scikit-build-core's bootstrap
+# site-packages, not the activated conda env.
+[activation.env]
+CMAKE_PREFIX_PATH = "$CONDA_PREFIX"
 
 [pypi-dependencies]
 nanobindgen = ">=0.2.0,<1"
@@ -50,7 +60,12 @@ description = "Meshing library for nuclear workflows."
 backend = { name = "pixi-build-python", version = "0.4.*" }
 
 [package.host-dependencies]
-setuptools = ">=61"
+python = "3.12.*"
+nanobind = ">=2.9.2,<3"
+cmake = ">=3.15"
+ninja = ">=1.11"
+# scikit-build-core and nanobindgen come from build-system.requires in
+# pyproject.toml (PyPI). pixi-build-python honors that list.
 
 [package.run-dependencies]
 python = "3.12.*"

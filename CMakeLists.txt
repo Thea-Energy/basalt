@@ -157,14 +157,19 @@ file(GLOB PYTHON_SOURCES ${SRC_DIR}/python/*.cpp)
 nanobind_add_module(_core NB_SHARED # STATIC is the default
         ${PYTHON_SOURCES})
 
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/phnx/_core)
+# Each consumer sets CMAKE_INSTALL_PREFIX itself:
+#   - dev pixi `build` task installs with --prefix .
+#   - scikit-build-core installs into its temporary prefix and collects from there
+#   - pixi-build-python (which routes through scikit-build-core) likewise
+# $ORIGIN keeps _core.so finding sibling .so files inside phnx/_core/ regardless
+# of where the wheel is installed.
 
 # Inspect RPATH with: readelf -d phnx/_core/_core.cpython-*.so | grep RUNPATH
 set_property(
         TARGET _core
         APPEND
         PROPERTY INSTALL_RPATH
-        "${CMAKE_INSTALL_PREFIX}:${GMSH_LIBDIR}:${SIMMODSUITE_LIB}/psKrnl")
+        "$ORIGIN:${GMSH_LIBDIR}:${SIMMODSUITE_LIB}/psKrnl")
 
 nanobind_add_stub(
         _core_stub
@@ -191,6 +196,11 @@ foreach (SOURCE_FILE ${GEN_FILES})
     set (OUTPUT_FILE "${OUTPUT_DIR}/bind_${FILE_NAME}.h")
     list(APPEND GENERATED_FILES ${OUTPUT_FILE})
 
+    # nanobindgen does not create its output directory itself, and the sdist
+    # excludes the gitignored `src/autogen/` tree, so make sure the directory
+    # exists before invoking the generator.
+    file(MAKE_DIRECTORY ${OUTPUT_DIR})
+
     add_custom_command(
             OUTPUT ${OUTPUT_FILE}
             COMMAND python -m nanobindgen -o ${OUTPUT_DIR}
@@ -205,5 +215,5 @@ add_dependencies(_core generate_bindings)
 # ===============================================================================
 # Install
 # ===============================================================================
-install(TARGETS _core nanobind DESTINATION ".")
-install(FILES build/_core.pyi DESTINATION ".")
+install(TARGETS _core nanobind DESTINATION "phnx/_core")
+install(FILES ${CMAKE_BINARY_DIR}/_core.pyi DESTINATION "phnx/_core" OPTIONAL)
