@@ -2,7 +2,7 @@
 
 import os
 import sys
-import xml.parsers.expat  # noqa: F401 — must be imported before phnx to prevent SMS libexpat from shadowing pyexpat
+import xml.parsers.expat  # noqa: F401 — must be imported before basalt to prevent SMS libexpat from shadowing pyexpat
 from importlib.metadata import version as get_version
 
 sys.path.append(os.path.abspath("../"))
@@ -13,15 +13,15 @@ sys.path.append(os.path.abspath("../"))
 # cover the public Python API.
 from unittest.mock import MagicMock
 
-sys.modules["phnx._core"] = MagicMock()
-sys.modules["phnx._core._core"] = MagicMock()
+sys.modules["basalt._core"] = MagicMock()
+sys.modules["basalt._core._core"] = MagicMock()
 
-import phnx  # noqa: E402, F401
+import basalt  # noqa: E402, F401
 
-project = "PHNX"
+project = "Basalt"
 copyright = "2026, Thea Energy"  # noqa: A001
 author = "Thea Energy"
-release: str = get_version("phnx")
+release: str = get_version("basalt-mesh")
 
 extensions = [
     "sphinx_github_style",
@@ -29,9 +29,9 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx_tabs.tabs",
 ]
-top_level = "phnx"
+top_level = "basalt"
 linkcode_blob = "head"
-linkcode_url = "https://github.com/Thea-Energy/phnx"
+linkcode_url = "https://github.com/Thea-Energy/basalt"
 linkcode_link_text = "Source"
 add_module_names = False
 templates_path = ["_templates"]
@@ -41,3 +41,8 @@ pygments_style = "sphinx"
 html_theme = "shibuya"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
+html_logo = "_static/logo.svg"
+html_favicon = "_static/logo.svg"
+html_theme_options = {
+    "logo_target": "/",
+}

@@ -1,7 +1,7 @@
 ====
 API
 ====
-.. module:: phnx
+.. module:: basalt
 
 Model and geometry
 ------------------

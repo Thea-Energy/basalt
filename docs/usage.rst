@@ -1,15 +1,15 @@
 =====
 Usage
 =====
-.. module:: phnx
+.. module:: basalt
    :no-index:
 
-PHNX transforms a Parasolid CAD assembly into a Gmsh mesh annotated
+basalt transforms a Parasolid CAD assembly into a Gmsh mesh annotated
 for downstream DAGMC conversion. The pipeline has five distinct
 stages, each modelled by a small set of classes.
 
 ==================  ==========================================
-Stage               PHNX entry point
+Stage               Basalt entry point
 ==================  ==========================================
 Parasolid → GAM     :py:meth:`Model.from_parasolid_file`
 GAM → SMS           :py:meth:`Model.translate`
@@ -25,7 +25,9 @@ Loading a Parasolid file
 
 .. code:: python
 
-   model = phnx.Model.from_parasolid_file("geometry.x_t")
+   import basalt as bslt
+
+   model = bslt.Model.from_parasolid_file("geometry.x_t")
 
 Pass ``load_nx_attrs=True`` to auto-detect a sibling ``*_attrs.json``
 sidecar (produced by the NX export journal) and apply its component
@@ -35,7 +37,7 @@ name — to each :py:class:`Part` and :py:class:`Assembly`.
 NX exports collapse all instances of the same base part into a single
 GAM assembly. A part referenced 332 times in NX appears as one
 :py:class:`Assembly` containing 332 anonymous child :py:class:`Part`
-objects in PHNX. Per-instance NX names are not preserved.
+objects in basalt. Per-instance NX names are not preserved.
 
 --------------------------
 Translating and imprinting
@@ -45,6 +47,8 @@ GAM is the assembly model; SMS is the model SimModSuite can mesh.
 Two calls bridge them:
 
 .. code:: python
+
+   import basalt as bslt
 
    sms_model = model.translate()
    nm_model = sms_model.make_non_manifold_model()
@@ -60,13 +64,15 @@ Meshing
 
 .. code:: python
 
-   mesh_case = phnx.MeshCase(nm_model)
+   import basalt as bslt
+
+   mesh_case = bslt.MeshCase(nm_model)
    mesh_case.set_size(0.1)
    mesh_case.set_curvature_refinement(0.5, relative=True)
    mesh_case.set_proximity_refinement(2.0)
 
-   surface_mesh = phnx.SurfaceMesh.from_model(nm_model, mesh_case)
-   volume_mesh = phnx.VolumeMesh.from_surface_mesh(surface_mesh)
+   surface_mesh = bslt.SurfaceMesh.from_model(nm_model, mesh_case)
+   volume_mesh = bslt.VolumeMesh.from_surface_mesh(surface_mesh)
 
 Each refinement method accepts an optional ``model_item`` argument to
 apply the setting to a single :py:class:`Part`, :py:class:`Region`, or
@@ -77,6 +83,8 @@ Writing for DAGMC
 ------------------
 
 .. code:: python
+
+   import basalt as bslt
 
    volume_mesh.write_gmsh("output.msh")
 
@@ -104,7 +112,9 @@ assembly/part/region tree:
 
 .. code:: python
 
-   phnx.print_hierarchy(model)
+   import basalt as bslt
+
+   bslt.print_hierarchy(model)
 
 :py:func:`load_material_metadata` reads a v6 ``_attrs.json`` sidecar
 and returns ``{material_slug: body_record}`` for use when wiring up
@@ -112,4 +122,6 @@ materials downstream:
 
 .. code:: python
 
-   metadata = phnx.load_material_metadata("geometry_attrs.json")
+   import basalt as bslt
+
+   metadata = bslt.load_material_metadata("geometry_attrs.json")

@@ -2,7 +2,7 @@
 Contributing
 ============
 
-Thank you for your interest in contributing to phnx. This page covers the
+Thank you for your interest in contributing to basalt. This page covers the
 practical details of submitting bug reports, feature requests, and pull
 requests.
 
@@ -12,7 +12,7 @@ Bug reports
 
 File issues at the project's GitHub issue tracker. Please include:
 
-* The phnx version (``python -c "import phnx; print(phnx.__version__)"``)
+* The basalt version (``python -c "import basalt; print(basalt.__version__)"``)
 * The Simmetrix SimModSuite version you have installed
 * A minimal reproducing example
 * The full error traceback or unexpected output

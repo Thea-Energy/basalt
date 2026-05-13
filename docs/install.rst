@@ -2,9 +2,9 @@
 Installation
 ============
 
-phnx is a Python wrapper for `Simmetrix SimModSuite`_ that you build from source
-against your own SMS install. phnx itself is MIT-licensed; SMS is proprietary
-and is not bundled, redistributed, or accessible through phnx's wheel.
+basalt is a Python wrapper for `Simmetrix SimModSuite`_ that you build from source
+against your own SMS install. basalt itself is MIT-licensed; SMS is proprietary
+and is not bundled, redistributed, or accessible through basalt's wheel.
 
 .. _Simmetrix SimModSuite: https://www.simmetrix.com/
 
@@ -24,7 +24,7 @@ Requirements
 Acquire SimModSuite
 ------------------------
 
-phnx links against four Simmetrix module tarballs. All four must be at the
+basalt links against four Simmetrix module tarballs. All four must be at the
 **same version-datestamp**:
 
 * ``gmcore`` — geometric model core
@@ -85,7 +85,7 @@ Set environment variables
    ``SimModSuite_licenseFile`` is **case-sensitive** (Simmetrix convention).
    ``SIMMODSUITE_LICENSEFILE`` will not be picked up.
 
-``P_SCHEMA`` is **not** required: phnx bakes the schema directory at build time
+``P_SCHEMA`` is **not** required: basalt bakes the schema directory at build time
 and exports it on import. Customers who need an override may still export
 ``P_SCHEMA`` and it will take precedence.
 
@@ -93,7 +93,7 @@ and exports it on import. Customers who need an override may still export
 Install with pip
 ----------------
 
-phnx ships as a source distribution, so ``pip`` builds the C++ extension at
+basalt ships as a source distribution, so ``pip`` builds the C++ extension at
 install time against the SMS install at ``$SIMMODSUITE_ROOT``. ``scikit-build-core``
 pulls ``nanobind`` and ``nanobindgen`` into the build environment automatically,
 but **gmsh** must be available on the host (typically from conda-forge or the
@@ -103,10 +103,10 @@ at runtime.
 .. code:: sh
 
    pip install gmsh    # if you do not already have it
-   pip install phnx
+   pip install basalt-mesh
 
 Build output appears in ``build/``; the compiled module lands at
-``<site-packages>/phnx/_core/_core.cpython-<...>.so``.
+``<site-packages>/basalt/_core/_core.cpython-<...>.so``.
 
 -----------------
 Install with pixi
@@ -120,7 +120,7 @@ Install with pixi
 
       .. code:: toml
 
-         phnx = { git = "https://github.com/akoen/phnx.git", branch = "main", editable = false }
+         basalt-mesh = { git = "https://github.com/Thea-Energy/basalt.git", branch = "main", editable = false }
 
       Then ``pixi install``. ``$SIMMODSUITE_ROOT`` and
       ``$SimModSuite_licenseFile`` must be exported in the shell that runs
@@ -132,7 +132,7 @@ Install with pixi
 
       .. code:: toml
 
-         phnx = { path = "/path/to/phnx", editable = true }
+         basalt-mesh = { path = "/path/to/basalt", editable = true }
 
       Then ``pixi install``.
 
@@ -142,13 +142,13 @@ Verify
 
 .. code:: sh
 
-   python -c "import phnx; print(phnx.Model)"
+   python -c "import basalt; print(basalt.Model)"
 
 Expected output:
 
 .. code:: text
 
-   <class 'phnx._core._core.Model'>
+   <class 'basalt._core._core.Model'>
 
 If import succeeds, the build linked correctly and the license loaded.
 
@@ -184,4 +184,4 @@ Troubleshooting
     The RPATH baked into ``_core.so`` points at
     ``$SIMMODSUITE_ROOT/lib/<abi>/psKrnl``. If you moved or renamed the SMS
     install after building, you will need to rebuild (``pip install
-    --force-reinstall --no-deps phnx``).
+    --force-reinstall --no-deps basalt-mesh``).

@@ -1,0 +1,10 @@
+<svg width="240" height="200" viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+  <title>Basalt columns logo - four hexagon cluster</title>
+  <desc>Top-down view of four pointy-top basalt columns arranged in a parallelogram cluster, upper two shifted to the right, lower-right hexagon rendered darkest as the visual anchor.</desc>
+  <g stroke="#1a1a1a" stroke-width="1.25" fill="#1a1a1a" stroke-linejoin="miter">
+    <polygon points="107,47 133,62 133,92 107,107 81,92 81,62" fill-opacity="0.22"/>
+    <polygon points="159,47 185,62 185,92 159,107 133,92 133,62" fill-opacity="0.22"/>
+    <polygon points="81,92 107,107 107,137 81,152 55,137 55,107" fill-opacity="0.22"/>
+    <polygon points="133,92 159,107 159,137 133,152 107,137 107,107" fill-opacity="0.5"/>
+  </g>
+</svg>
