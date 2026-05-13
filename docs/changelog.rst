@@ -10,10 +10,10 @@ and this project follows `Semantic Versioning <https://semver.org>`__.
 Unreleased
 -------------
 
-* **Renamed project from ``phnx`` to ``basalt``.** The PyPI distribution is now
-  ``basalt-mesh`` and the Python import is ``basalt``. No compatibility shim:
-  ``import phnx`` raises ``ModuleNotFoundError``. The C extension module name
-  ``_core`` is unchanged. The NX journal environment variable changed from
+* **Renamed project.** Previously ``phnx``, now ``basalt``. The PyPI distribution
+  is now ``basalt-mesh`` and the Python import is ``basalt``. No compatibility
+  shim: ``import phnx`` raises ``ModuleNotFoundError``. The C extension module
+  name ``_core`` is unchanged. The NX journal environment variable changed from
   ``PHNX_NX_EXPORT_DIR`` to ``BASALT_NX_EXPORT_DIR``. See NE-11.
 
 -------------
