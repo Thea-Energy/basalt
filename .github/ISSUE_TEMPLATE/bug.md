@@ -14,7 +14,7 @@ A clear description of the bug.
 Minimal, self-contained example. Include the input geometry if possible.
 
 ```python
-import phnx
+import basalt
 # ...
 ```
 
@@ -28,7 +28,7 @@ What actually happened. Include the full traceback or error output.
 
 ## Environment
 
-- phnx version: <!-- python -c "import phnx; print(phnx.__version__)" -->
+- basalt version: <!-- python -c "import basalt; print(basalt.__version__)" -->
 - Simmetrix SimModSuite version: <!-- e.g. 2025.0-250920 -->
 - Python version: <!-- python --version -->
 - OS / glibc: <!-- e.g. Ubuntu 24.04, glibc 2.39 -->
