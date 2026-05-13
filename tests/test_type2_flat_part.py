@@ -10,7 +10,7 @@ import json
 import re
 from pathlib import Path
 
-from phnx import Assembly, Part
+from basalt import Assembly, Part
 
 DATA_DIR = Path(__file__).parent / "data"
 SIDECAR_PATH = DATA_DIR / "0012808_attrs.json"

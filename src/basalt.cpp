@@ -1,4 +1,4 @@
-#include "phnx.h"
+#include "basalt.h"
 #include "AttributeTypes.h"
 #include "MeshSim.h"
 #include "MeshTypes.h"
@@ -801,7 +801,7 @@ static std::string get_native_string_attr(pGIPart part, const char *attr_name) {
 
 void Mesh::write_gmsh(std::string filename, double scale_factor) {
   gmsh::initialize();
-  gmsh::model::add("phnx");
+  gmsh::model::add("basalt");
 
   unsigned int dim;
   unsigned int gmsh_element_type;

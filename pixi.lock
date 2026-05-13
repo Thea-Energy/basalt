@@ -910,6 +910,11 @@ packages:
   - pytz ; extra == 'dev'
   - setuptools ; extra == 'dev'
   requires_python: '>=3.8'
+- pypi: ./
+  name: basalt-mesh
+  version: 1.0.0
+  sha256: 6ab6833a9a62706e644ea8cff47e6ab257643308e8951cf4f10e2f4559e13d2c
+  requires_python: '>=3.12'
 - conda: https://conda.anaconda.org/conda-forge/linux-64/blosc-1.21.6-he440d0b_1.conda
   sha256: e7af5d1183b06a206192ff440e08db1c4e8b2ca1f8376ee45fb2f3a85d4ee45d
   md5: 2c2fae981fd2afd00812c92ac47d023d
@@ -6004,11 +6009,6 @@ packages:
   - pkg:pypi/pexpect?source=hash-mapping
   size: 53561
   timestamp: 1733302019362
-- pypi: ./
-  name: phnx
-  version: 1.0.0
-  sha256: 6575efe918798e29a4ec7b37743126fdf26d2536fdb0abe59a5b55d98d8b1c1c
-  requires_python: '>=3.12'
 - conda: https://conda.anaconda.org/conda-forge/linux-64/pillow-12.0.0-py312h0889fd4_0.conda
   sha256: 29c55b1e08b90ef92976e0715937686bf70e215a80de8f979ed19d4de7b76d45
   md5: 45824eb723a6b4a128d120ad1d07df5e

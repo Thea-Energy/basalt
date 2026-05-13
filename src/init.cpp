@@ -28,9 +28,9 @@ void init() {
   if (license_file == nullptr || license_file[0] == '\0') {
     throw_exception(
         "SimModSuite_licenseFile environment variable is not set or is empty. "
-        "phnx requires a Simmetrix license file path. Set the variable "
+        "basalt requires a Simmetrix license file path. Set the variable "
         "(case-sensitive) to either a license file path or a 'port@host' "
-        "string before importing phnx. See docs/install.rst.");
+        "string before importing basalt. See docs/install.rst.");
   }
   SimLicense_start(
       "geomsim_core,geomsim_parasolid,meshsim_surface,meshsim_volume",

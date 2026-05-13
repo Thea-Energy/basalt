@@ -5,16 +5,16 @@ import ctypes.util
 import os
 
 
-def test_phnx_imports() -> None:
-    """Import phnx and access a top-level class.
+def test_basalt_imports() -> None:
+    """Import basalt and access a top-level class.
 
     Exercises the full init path: P_SCHEMA setenv (Task 4),
     SimModSuite_licenseFile read (Task 5), SimLicense_start, and
     SMS module bring-up.
     """
-    import phnx  # noqa: PLC0415
+    import basalt  # noqa: PLC0415
 
-    assert phnx.Model is not None
+    assert basalt.Model is not None
 
 
 def test_p_schema_set_after_import() -> None:
@@ -23,7 +23,7 @@ def test_p_schema_set_after_import() -> None:
     Probes the C-level environment (not Python's os.environ snapshot,
     which is captured at interpreter startup before init.cpp runs).
     """
-    import phnx  # noqa: F401, PLC0415  — triggers init() which calls setenv
+    import basalt  # noqa: F401, PLC0415  — triggers init() which calls setenv
 
     libc = ctypes.CDLL(ctypes.util.find_library("c") or "libc.so.6")
     libc.getenv.restype = ctypes.c_char_p

@@ -1,4 +1,4 @@
-"""phnx: Python meshing library wrapping Simmetrix SimModSuite.
+"""basalt: Python meshing library wrapping Simmetrix SimModSuite.
 
 Re-exports the C-extension classes from the compiled `_core` module and
 provides a few pure-Python helpers (sidecar metadata loader, hierarchy

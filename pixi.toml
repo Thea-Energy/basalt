@@ -1,7 +1,7 @@
 [workspace]
 authors = ["akoen <git@koen.ca>"]
 channels = ["conda-forge"]
-name = "simmetrix"
+name = "basalt"
 platforms = ["linux-64"]
 preview = ["pixi-build"]
 
@@ -9,9 +9,9 @@ preview = ["pixi-build"]
 [tasks]
 conf = 'cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="$CONDA_PREFIX" -DCMAKE_INSTALL_PREFIX="$PWD" -DCMAKE_EXPORT_COMPILE_COMMANDS=TRUE'
 build = "cmake --build build -j 8 && cmake --install build"
-# Preserve `phnx/_core/__init__.py` (a source-tracked package marker that
+# Preserve `basalt/_core/__init__.py` (a source-tracked package marker that
 # scikit-build-core's editable install registers as a module).
-clean = "rm -rf build _deps && find phnx/_core -mindepth 1 -not -name __init__.py -delete 2>/dev/null; true"
+clean = "rm -rf build _deps && find basalt/_core -mindepth 1 -not -name __init__.py -delete 2>/dev/null; true"
 
 # Make the conda env discoverable to CMake during the scikit-build-core
 # editable install (`pixi install` triggers it; the build subprocess inherits
@@ -23,7 +23,7 @@ CMAKE_PREFIX_PATH = "$CONDA_PREFIX"
 
 [pypi-dependencies]
 nanobindgen = ">=0.2.0,<1"
-phnx = { path = ".", editable = true }
+basalt-mesh = { path = ".", editable = true }
 ipykernel = ">=7.1.0, <8"
 
 [dependencies]
@@ -52,7 +52,7 @@ docs = ["docs"]
 
 
 [package]
-name = "stellarmesh"
+name = "basalt-mesh"
 version = "2.0.1"
 description = "Meshing library for nuclear workflows."
 

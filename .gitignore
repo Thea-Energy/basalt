@@ -9,11 +9,11 @@ wheelhouse/
 .cache/
 _deps/
 build/
-# Ignore CMake-generated artifacts in phnx/_core/, but keep the __init__.py
+# Ignore CMake-generated artifacts in basalt/_core/, but keep the __init__.py
 # package marker (committed so scikit-build-core's editable install can register
-# `phnx._core` as a known module).
-phnx/_core/*
-!phnx/_core/__init__.py
+# `basalt._core` as a known module).
+basalt/_core/*
+!basalt/_core/__init__.py
 autogen/
 scratch/
 *.lock

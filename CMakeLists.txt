@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(phnx)
+project(basalt)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -31,7 +31,7 @@ find_package(nanobind CONFIG REQUIRED)
 if(NOT DEFINED ENV{SIMMODSUITE_ROOT})
     message(FATAL_ERROR
         "SIMMODSUITE_ROOT environment variable is not set.\n"
-        "phnx does not bundle Simmetrix SimModSuite. Download the gmcore, mscore, pskrnl, "
+        "basalt does not bundle Simmetrix SimModSuite. Download the gmcore, mscore, pskrnl, "
         "and simlicense tarballs from Simmetrix's customer portal (all at the same "
         "version-datestamp), extract them into one parent directory, and set "
         "SIMMODSUITE_ROOT to the resulting <version>-<datestamp>/ directory.\n"
@@ -139,7 +139,7 @@ FetchContent_MakeAvailable(spdlog)
 add_library(
     main
     src/init.cpp
-    src/phnx.cpp
+    src/basalt.cpp
 )
 target_include_directories(main PUBLIC ${SRC_DIR})
 target_link_libraries(main PUBLIC
@@ -161,10 +161,10 @@ nanobind_add_module(_core NB_SHARED # STATIC is the default
 #   - dev pixi `build` task installs with --prefix .
 #   - scikit-build-core installs into its temporary prefix and collects from there
 #   - pixi-build-python (which routes through scikit-build-core) likewise
-# $ORIGIN keeps _core.so finding sibling .so files inside phnx/_core/ regardless
+# $ORIGIN keeps _core.so finding sibling .so files inside basalt/_core/ regardless
 # of where the wheel is installed.
 
-# Inspect RPATH with: readelf -d phnx/_core/_core.cpython-*.so | grep RUNPATH
+# Inspect RPATH with: readelf -d basalt/_core/_core.cpython-*.so | grep RUNPATH
 set_property(
         TARGET _core
         APPEND
@@ -187,7 +187,7 @@ target_include_directories(_core PRIVATE ${SRC_DIR}/python)
 target_include_directories(_core PRIVATE ${SRC_DIR}/autogen)
 
 set(GEN_FILES
-phnx.h
+basalt.h
 )
 foreach (SOURCE_FILE ${GEN_FILES})
     get_filename_component(FILE_NAME ${SOURCE_FILE} NAME_WE)
@@ -215,5 +215,5 @@ add_dependencies(_core generate_bindings)
 # ===============================================================================
 # Install
 # ===============================================================================
-install(TARGETS _core nanobind DESTINATION "phnx/_core")
-install(FILES ${CMAKE_BINARY_DIR}/_core.pyi DESTINATION "phnx/_core" OPTIONAL)
+install(TARGETS _core nanobind DESTINATION "basalt/_core")
+install(FILES ${CMAKE_BINARY_DIR}/_core.pyi DESTINATION "basalt/_core" OPTIONAL)

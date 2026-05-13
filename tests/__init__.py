@@ -1,1 +1,1 @@
-"""Test suite for the phnx Python package."""
+"""Test suite for the basalt Python package."""

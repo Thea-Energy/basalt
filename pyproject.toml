@@ -7,7 +7,7 @@ requires = [
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "phnx"
+name = "basalt-mesh"
 authors = [{ name = "Alex Koen" }]
 # dynamic = ["version"]
 version = "1.0.0"
@@ -22,7 +22,7 @@ minimum-version = "0.10"
 cmake.version = ">=3.15"
 cmake.build-type = "Release"
 build-dir = "build/{wheel_tag}"
-wheel.packages = ["phnx"]
+wheel.packages = ["basalt"]
 # nanobind installs its own CMake config under <site-packages>/nanobind/cmake; the
 # top-level CMakeLists.txt finds it via execute_process(... -m nanobind --cmake_dir).
 
