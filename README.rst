@@ -1,8 +1,12 @@
-====
-PHNX
-====
+.. image:: docs/_static/logo.svg
+   :alt: Basalt logo (top-down hexagonal cluster of basalt columns)
+   :width: 120px
 
-PHNX is a Python meshing library for nuclear workflows. It wraps the
+======
+Basalt
+======
+
+Basalt is a Python meshing library for nuclear workflows. It wraps the
 commercial `Simmetrix SimModSuite <https://www.simmetrix.com/>`__
 library through C++ bindings, ingests Parasolid CAD assemblies,
 performs non-manifold imprinting, generates surface and volume
@@ -12,7 +16,7 @@ and DAGMC.
 
 .. note::
 
-   PHNX requires a valid `Simmetrix SimModSuite
+   Basalt requires a valid `Simmetrix SimModSuite
    <https://www.simmetrix.com/>`__ license and the corresponding
    module distribution (``gmcore``, ``mscore``, ``pskrnl``,
    ``simlicense``). The library cannot be built or run without
@@ -40,23 +44,21 @@ Example
 
 .. code:: python
 
-   import phnx
+   import basalt as bslt
 
-   model = phnx.Model.from_parasolid_file("geometry.x_t")
-   nm_model = model.translate().make_non_manifold_model()
-
-   mesh_case = phnx.MeshCase(nm_model)
+   model = bslt.Model.from_parasolid_file("geometry.x_t")
+   nm_model = model.make_non_manifold_model()
+   mesh_case = bslt.MeshCase(nm_model)
    mesh_case.set_size(0.1)
-
-   surface_mesh = phnx.SurfaceMesh.from_model(nm_model, mesh_case)
-   volume_mesh = phnx.VolumeMesh.from_surface_mesh(surface_mesh)
+   surface_mesh = bslt.SurfaceMesh.from_model(nm_model, mesh_case)
+   volume_mesh = bslt.VolumeMesh.from_surface_mesh(surface_mesh)
    volume_mesh.write_gmsh("output.msh")
 
 ----------------
 Acknowledgements
 ----------------
 
-PHNX is originally a project of Thea Energy, who are building the
+basalt is originally a project of Thea Energy, who are building the
 world's first planar coil stellarator.
 
 .. figure:: https://github.com/user-attachments/assets/37b9ba1c-b22c-4837-b226-a6212854127e
