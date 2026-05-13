@@ -35,6 +35,7 @@ CLAUDE.md
 # Allow test data files tracked by Git LFS
 !tests/data/*.x_t
 !tests/data/*.json
+!tests/data/*.step
 *.brep
 *.log
 *.lic
