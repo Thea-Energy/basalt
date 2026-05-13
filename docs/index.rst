@@ -9,3 +9,4 @@
    changelog
 
 .. include:: ../README.rst
+   :start-after: .. logo-end

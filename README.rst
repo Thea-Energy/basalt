@@ -2,6 +2,8 @@
    :alt: Basalt logo (top-down hexagonal cluster of basalt columns)
    :width: 120px
 
+.. logo-end
+
 ======
 Basalt
 ======
