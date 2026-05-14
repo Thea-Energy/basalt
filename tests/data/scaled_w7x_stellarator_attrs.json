@@ -1,0 +1,1434 @@
+{
+  "schema_version": 6,
+  "source_part": "C:\\Users\\AlexanderKoen\\Downloads\\scaled_w7x_stellarator.prt",
+  "exported_at": "2026-05-14T13:04:08",
+  "components": {
+    "_1": {
+      "component_name": "",
+      "part_file_stem": "scaled_w7x_stellarator",
+      "path": "",
+      "db_part_name": "",
+      "db_part_no": "",
+      "instance": "1",
+      "reference_set": "Entire Part",
+      "attributes": {
+      "NX_Arrangement": "Arrangement 1",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "INTEROP_FEATURE_PART_NAME": "Simplified Stellarator based on reactor scaled W7X. Model made by Proxima Fusion",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:44",
+      "INTEROP_FEATURE_ID": "Simplified Stellarator based on reactor scaled W7X. Model made by Proxima Fusion",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "BLANKET_MODULE_1": {
+      "component_name": "BLANKET_MODULE",
+      "part_file_stem": "blanket_module",
+      "path": "BLANKET_MODULE",
+      "db_part_name": "BLANKET_MODULE",
+      "db_part_no": "BLANKET_MODULE",
+      "instance": "1",
+      "reference_set": "Entire Part",
+      "attributes": {
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "FALSE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "FIRSTWALL_1": {
+      "component_name": "FIRSTWALL",
+      "part_file_stem": "firstwall_step",
+      "path": "BLANKET_MODULE/FIRSTWALL",
+      "db_part_name": "FIRSTWALL",
+      "db_part_no": "FIRSTWALL",
+      "instance": "1",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "firstwall",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "firstwall",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "BLANKET_1": {
+      "component_name": "BLANKET",
+      "part_file_stem": "blanket_step",
+      "path": "BLANKET_MODULE/BLANKET",
+      "db_part_name": "BLANKET",
+      "db_part_no": "BLANKET",
+      "instance": "1",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "blanket",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "blanket",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "VESSEL_1": {
+      "component_name": "VESSEL",
+      "part_file_stem": "vessel_step",
+      "path": "BLANKET_MODULE/VESSEL",
+      "db_part_name": "VESSEL",
+      "db_part_no": "VESSEL",
+      "instance": "1",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "vessel",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "vessel",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COILS_1": {
+      "component_name": "COILS",
+      "part_file_stem": "coils",
+      "path": "COILS",
+      "db_part_name": "COILS",
+      "db_part_no": "COILS",
+      "instance": "1",
+      "reference_set": "Entire Part",
+      "attributes": {
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "FALSE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_49_49": {
+      "component_name": "COIL_49",
+      "part_file_stem": "coil_49_step",
+      "path": "COILS/COIL_49",
+      "db_part_name": "COIL_49",
+      "db_part_no": "COIL_49",
+      "instance": "49",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_49",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "coil_49",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_48_48": {
+      "component_name": "COIL_48",
+      "part_file_stem": "coil_48_step",
+      "path": "COILS/COIL_48",
+      "db_part_name": "COIL_48",
+      "db_part_no": "COIL_48",
+      "instance": "48",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_48",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "coil_48",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_47_47": {
+      "component_name": "COIL_47",
+      "part_file_stem": "coil_47_step",
+      "path": "COILS/COIL_47",
+      "db_part_name": "COIL_47",
+      "db_part_no": "COIL_47",
+      "instance": "47",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_47",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "coil_47",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_46_46": {
+      "component_name": "COIL_46",
+      "part_file_stem": "coil_46_step",
+      "path": "COILS/COIL_46",
+      "db_part_name": "COIL_46",
+      "db_part_no": "COIL_46",
+      "instance": "46",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_46",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "coil_46",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_45_45": {
+      "component_name": "COIL_45",
+      "part_file_stem": "coil_45_step",
+      "path": "COILS/COIL_45",
+      "db_part_name": "COIL_45",
+      "db_part_no": "COIL_45",
+      "instance": "45",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_45",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "coil_45",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_44_44": {
+      "component_name": "COIL_44",
+      "part_file_stem": "coil_44_step",
+      "path": "COILS/COIL_44",
+      "db_part_name": "COIL_44",
+      "db_part_no": "COIL_44",
+      "instance": "44",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_44",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "coil_44",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_43_43": {
+      "component_name": "COIL_43",
+      "part_file_stem": "coil_43_step",
+      "path": "COILS/COIL_43",
+      "db_part_name": "COIL_43",
+      "db_part_no": "COIL_43",
+      "instance": "43",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_43",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "coil_43",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_42_42": {
+      "component_name": "COIL_42",
+      "part_file_stem": "coil_42_step",
+      "path": "COILS/COIL_42",
+      "db_part_name": "COIL_42",
+      "db_part_no": "COIL_42",
+      "instance": "42",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_42",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "coil_42",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_41_41": {
+      "component_name": "COIL_41",
+      "part_file_stem": "coil_41_step",
+      "path": "COILS/COIL_41",
+      "db_part_name": "COIL_41",
+      "db_part_no": "COIL_41",
+      "instance": "41",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_41",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "coil_41",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_40_40": {
+      "component_name": "COIL_40",
+      "part_file_stem": "coil_40_step",
+      "path": "COILS/COIL_40",
+      "db_part_name": "COIL_40",
+      "db_part_no": "COIL_40",
+      "instance": "40",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_40",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_40",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_39_39": {
+      "component_name": "COIL_39",
+      "part_file_stem": "coil_39_step",
+      "path": "COILS/COIL_39",
+      "db_part_name": "COIL_39",
+      "db_part_no": "COIL_39",
+      "instance": "39",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_39",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_39",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_38_38": {
+      "component_name": "COIL_38",
+      "part_file_stem": "coil_38_step",
+      "path": "COILS/COIL_38",
+      "db_part_name": "COIL_38",
+      "db_part_no": "COIL_38",
+      "instance": "38",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_38",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_38",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_37_37": {
+      "component_name": "COIL_37",
+      "part_file_stem": "coil_37_step",
+      "path": "COILS/COIL_37",
+      "db_part_name": "COIL_37",
+      "db_part_no": "COIL_37",
+      "instance": "37",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_37",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_37",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_36_36": {
+      "component_name": "COIL_36",
+      "part_file_stem": "coil_36_step",
+      "path": "COILS/COIL_36",
+      "db_part_name": "COIL_36",
+      "db_part_no": "COIL_36",
+      "instance": "36",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_36",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_36",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_35_35": {
+      "component_name": "COIL_35",
+      "part_file_stem": "coil_35_step",
+      "path": "COILS/COIL_35",
+      "db_part_name": "COIL_35",
+      "db_part_no": "COIL_35",
+      "instance": "35",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_35",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_35",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_34_34": {
+      "component_name": "COIL_34",
+      "part_file_stem": "coil_34_step",
+      "path": "COILS/COIL_34",
+      "db_part_name": "COIL_34",
+      "db_part_no": "COIL_34",
+      "instance": "34",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_34",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_34",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_33_33": {
+      "component_name": "COIL_33",
+      "part_file_stem": "coil_33_step",
+      "path": "COILS/COIL_33",
+      "db_part_name": "COIL_33",
+      "db_part_no": "COIL_33",
+      "instance": "33",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_33",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_33",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_32_32": {
+      "component_name": "COIL_32",
+      "part_file_stem": "coil_32_step",
+      "path": "COILS/COIL_32",
+      "db_part_name": "COIL_32",
+      "db_part_no": "COIL_32",
+      "instance": "32",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_32",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_32",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_31_31": {
+      "component_name": "COIL_31",
+      "part_file_stem": "coil_31_step",
+      "path": "COILS/COIL_31",
+      "db_part_name": "COIL_31",
+      "db_part_no": "COIL_31",
+      "instance": "31",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_31",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_31",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_30_30": {
+      "component_name": "COIL_30",
+      "part_file_stem": "coil_30_step",
+      "path": "COILS/COIL_30",
+      "db_part_name": "COIL_30",
+      "db_part_no": "COIL_30",
+      "instance": "30",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_30",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_30",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_29_29": {
+      "component_name": "COIL_29",
+      "part_file_stem": "coil_29_step",
+      "path": "COILS/COIL_29",
+      "db_part_name": "COIL_29",
+      "db_part_no": "COIL_29",
+      "instance": "29",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_29",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_29",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_28_28": {
+      "component_name": "COIL_28",
+      "part_file_stem": "coil_28_step",
+      "path": "COILS/COIL_28",
+      "db_part_name": "COIL_28",
+      "db_part_no": "COIL_28",
+      "instance": "28",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_28",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_28",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_27_27": {
+      "component_name": "COIL_27",
+      "part_file_stem": "coil_27_step",
+      "path": "COILS/COIL_27",
+      "db_part_name": "COIL_27",
+      "db_part_no": "COIL_27",
+      "instance": "27",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_27",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_27",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_26_26": {
+      "component_name": "COIL_26",
+      "part_file_stem": "coil_26_step",
+      "path": "COILS/COIL_26",
+      "db_part_name": "COIL_26",
+      "db_part_no": "COIL_26",
+      "instance": "26",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_26",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_26",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_25_25": {
+      "component_name": "COIL_25",
+      "part_file_stem": "coil_25_step",
+      "path": "COILS/COIL_25",
+      "db_part_name": "COIL_25",
+      "db_part_no": "COIL_25",
+      "instance": "25",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_25",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_25",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_24_24": {
+      "component_name": "COIL_24",
+      "part_file_stem": "coil_24_step",
+      "path": "COILS/COIL_24",
+      "db_part_name": "COIL_24",
+      "db_part_no": "COIL_24",
+      "instance": "24",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_24",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_24",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_23_23": {
+      "component_name": "COIL_23",
+      "part_file_stem": "coil_23_step",
+      "path": "COILS/COIL_23",
+      "db_part_name": "COIL_23",
+      "db_part_no": "COIL_23",
+      "instance": "23",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_23",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_23",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_22_22": {
+      "component_name": "COIL_22",
+      "part_file_stem": "coil_22_step",
+      "path": "COILS/COIL_22",
+      "db_part_name": "COIL_22",
+      "db_part_no": "COIL_22",
+      "instance": "22",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_22",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_22",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_21_21": {
+      "component_name": "COIL_21",
+      "part_file_stem": "coil_21_step",
+      "path": "COILS/COIL_21",
+      "db_part_name": "COIL_21",
+      "db_part_no": "COIL_21",
+      "instance": "21",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_21",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_21",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_20_20": {
+      "component_name": "COIL_20",
+      "part_file_stem": "coil_20_step",
+      "path": "COILS/COIL_20",
+      "db_part_name": "COIL_20",
+      "db_part_no": "COIL_20",
+      "instance": "20",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_20",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_20",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_19_19": {
+      "component_name": "COIL_19",
+      "part_file_stem": "coil_19_step",
+      "path": "COILS/COIL_19",
+      "db_part_name": "COIL_19",
+      "db_part_no": "COIL_19",
+      "instance": "19",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_19",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_19",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_18_18": {
+      "component_name": "COIL_18",
+      "part_file_stem": "coil_18_step",
+      "path": "COILS/COIL_18",
+      "db_part_name": "COIL_18",
+      "db_part_no": "COIL_18",
+      "instance": "18",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_18",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_18",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_17_17": {
+      "component_name": "COIL_17",
+      "part_file_stem": "coil_17_step",
+      "path": "COILS/COIL_17",
+      "db_part_name": "COIL_17",
+      "db_part_no": "COIL_17",
+      "instance": "17",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_17",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_17",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_16_16": {
+      "component_name": "COIL_16",
+      "part_file_stem": "coil_16_step",
+      "path": "COILS/COIL_16",
+      "db_part_name": "COIL_16",
+      "db_part_no": "COIL_16",
+      "instance": "16",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_16",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_16",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_15_15": {
+      "component_name": "COIL_15",
+      "part_file_stem": "coil_15_step",
+      "path": "COILS/COIL_15",
+      "db_part_name": "COIL_15",
+      "db_part_no": "COIL_15",
+      "instance": "15",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_15",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_15",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_14_14": {
+      "component_name": "COIL_14",
+      "part_file_stem": "coil_14_step",
+      "path": "COILS/COIL_14",
+      "db_part_name": "COIL_14",
+      "db_part_no": "COIL_14",
+      "instance": "14",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_14",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_14",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_13_13": {
+      "component_name": "COIL_13",
+      "part_file_stem": "coil_13_step",
+      "path": "COILS/COIL_13",
+      "db_part_name": "COIL_13",
+      "db_part_no": "COIL_13",
+      "instance": "13",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_13",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_13",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_12_12": {
+      "component_name": "COIL_12",
+      "part_file_stem": "coil_12_step",
+      "path": "COILS/COIL_12",
+      "db_part_name": "COIL_12",
+      "db_part_no": "COIL_12",
+      "instance": "12",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_12",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_12",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_11_11": {
+      "component_name": "COIL_11",
+      "part_file_stem": "coil_11_step",
+      "path": "COILS/COIL_11",
+      "db_part_name": "COIL_11",
+      "db_part_no": "COIL_11",
+      "instance": "11",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_11",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_11",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_10_10": {
+      "component_name": "COIL_10",
+      "part_file_stem": "coil_10_step",
+      "path": "COILS/COIL_10",
+      "db_part_name": "COIL_10",
+      "db_part_no": "COIL_10",
+      "instance": "10",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_10",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_10",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_9_9": {
+      "component_name": "COIL_9",
+      "part_file_stem": "coil_9_step",
+      "path": "COILS/COIL_9",
+      "db_part_name": "COIL_9",
+      "db_part_no": "COIL_9",
+      "instance": "9",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_9",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_9",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_8_8": {
+      "component_name": "COIL_8",
+      "part_file_stem": "coil_8_step",
+      "path": "COILS/COIL_8",
+      "db_part_name": "COIL_8",
+      "db_part_no": "COIL_8",
+      "instance": "8",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_8",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_8",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_7_7": {
+      "component_name": "COIL_7",
+      "part_file_stem": "coil_7_step",
+      "path": "COILS/COIL_7",
+      "db_part_name": "COIL_7",
+      "db_part_no": "COIL_7",
+      "instance": "7",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_7",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_7",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_6_6": {
+      "component_name": "COIL_6",
+      "part_file_stem": "coil_6_step",
+      "path": "COILS/COIL_6",
+      "db_part_name": "COIL_6",
+      "db_part_no": "COIL_6",
+      "instance": "6",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_6",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_6",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_5_5": {
+      "component_name": "COIL_5",
+      "part_file_stem": "coil_5_step",
+      "path": "COILS/COIL_5",
+      "db_part_name": "COIL_5",
+      "db_part_no": "COIL_5",
+      "instance": "5",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_5",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_5",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_4_4": {
+      "component_name": "COIL_4",
+      "part_file_stem": "coil_4_step",
+      "path": "COILS/COIL_4",
+      "db_part_name": "COIL_4",
+      "db_part_no": "COIL_4",
+      "instance": "4",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_4",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_4",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_3_3": {
+      "component_name": "COIL_3",
+      "part_file_stem": "coil_3_step",
+      "path": "COILS/COIL_3",
+      "db_part_name": "COIL_3",
+      "db_part_no": "COIL_3",
+      "instance": "3",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_3",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:45",
+      "INTEROP_FEATURE_ID": "coil_3",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_2_2": {
+      "component_name": "COIL_2",
+      "part_file_stem": "coil_2_step",
+      "path": "COILS/COIL_2",
+      "db_part_name": "COIL_2",
+      "db_part_no": "COIL_2",
+      "instance": "2",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_2",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:44",
+      "INTEROP_FEATURE_ID": "coil_2",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_1_1": {
+      "component_name": "COIL_1",
+      "part_file_stem": "coil_1_step",
+      "path": "COILS/COIL_1",
+      "db_part_name": "COIL_1",
+      "db_part_no": "COIL_1",
+      "instance": "1",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_1",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:44",
+      "INTEROP_FEATURE_ID": "coil_1",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "COIL_0_0": {
+      "component_name": "COIL_0",
+      "part_file_stem": "coil_0_step",
+      "path": "COILS/COIL_0",
+      "db_part_name": "COIL_0",
+      "db_part_no": "COIL_0",
+      "instance": "0",
+      "reference_set": "MODEL",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "coil_0",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:44",
+      "INTEROP_FEATURE_ID": "coil_0",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "GAP_1": {
+      "component_name": "GAP",
+      "part_file_stem": "gap_step",
+      "path": "GAP",
+      "db_part_name": "GAP",
+      "db_part_no": "GAP",
+      "instance": "1",
+      "reference_set": "Entire Part",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "gap",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "gap",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    },
+    "PLASMA_1": {
+      "component_name": "PLASMA",
+      "part_file_stem": "plasma_step",
+      "path": "PLASMA",
+      "db_part_name": "PLASMA",
+      "db_part_no": "PLASMA",
+      "instance": "1",
+      "reference_set": "Entire Part",
+      "attributes": {
+      "INTEROP_FEATURE_PART_NAME": "plasma",
+      "INTEROP_FEATURE_LAST_UPDATE_GMT": " 8-May-2026 19:11:46",
+      "INTEROP_FEATURE_ID": "plasma",
+      "INTEROP_FEATURE_AUTHOR": "Step",
+      "NX_ComponentGroup": "AllComponents",
+      "NX_ReferenceSet": "Empty",
+      "NX_MaterialMissingAssignments": "TRUE",
+      "NX_MaterialMultipleAssigned": "FALSE"
+    }
+    }
+  },
+  "bodies": [
+    {
+      "centroid": [-2.494774133388547E-05, 8.7503645939631941E-06, 1.67603160781711E-06],
+      "component": "FIRSTWALL_1",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-3.5675924572444821E-07, 9.04004924617418E-07, 2.90244174872194E-07],
+      "component": "BLANKET_1",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-5.665944496165173E-06, 6.7658255111511788E-06, 2.5403480279510565E-07],
+      "component": "VESSEL_1",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.01460298282108596, -0.0008507895411003914, -0.00015483615167048083],
+      "component": "COIL_49_49",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.014219747177732434, -0.0024794205311250389, -0.00040025122087325774],
+      "component": "COIL_48_48",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.013494866070255318, -0.004048145105828271, -0.00050797293462987488],
+      "component": "COIL_47_47",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.01250584210148107, -0.0055994265362683234, -0.00041373326787886135],
+      "component": "COIL_46_46",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.011375250996051712, -0.0071125571341048221, -0.00017486127437365377],
+      "component": "COIL_45_45",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.010273291308415148, -0.008611481385970586, 0.00018579688692302039],
+      "component": "COIL_44_44",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.00917802987786773, -0.010149326654264773, 0.00043270865230401453],
+      "component": "COIL_43_43",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.0080092934175797527, -0.011571339758314474, 0.00053117195829707341],
+      "component": "COIL_42_42",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.00674580062844491, -0.012749458308025329, 0.00042369765748929484],
+      "component": "COIL_41_41",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.0053133194007797136, -0.013624292203922795, 0.00018652646077005916],
+      "component": "COIL_40_40",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.0037034782836832449, -0.014150471677711567, -0.00015511024869710783],
+      "component": "COIL_39_39",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.002035868324530299, -0.014290472896142386, -0.00040013645227044434],
+      "component": "COIL_38_38",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.00031986951720284454, -0.014085763503569488, -0.000507664603165392],
+      "component": "COIL_37_37",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.00146129726338121, -0.013624316526139326, -0.0004141309869592838],
+      "component": "COIL_36_36",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.0032494134545202834, -0.013016381873866292, -0.00017487066942175383],
+      "component": "COIL_35_35",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.0050161378559043582, -0.012430931098468365, 0.00018478329110109578],
+      "component": "COIL_34_34",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.0068163947333161907, -0.011865168009632603, 0.00043270337348018384],
+      "component": "COIL_33_33",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.0085298477842610226, -0.011192791560172466, 0.00053084922276708821],
+      "component": "COIL_32_32",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.010040973957660872, -0.010354606559085032, 0.00042434486425885285],
+      "component": "COIL_31_31",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.011315717514366, -0.00926344551847766, 0.00018583801344216106],
+      "component": "COIL_30_30",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.012313425350379293, -0.0078945809193631689, -0.0001548391388046516],
+      "component": "COIL_29_29",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.012962540731108085, -0.0063522461480881431, -0.00040006229778774077],
+      "component": "COIL_28_28",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.013297608489749297, -0.0046567338659574782, -0.00050732485481677831],
+      "component": "COIL_27_27",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.013409128841284187, -0.0028203522975932139, -0.00041418951849433132],
+      "component": "COIL_26_26",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.013383465752912304, -0.00093192802886597021, -0.00017487531855809457],
+      "component": "COIL_25_25",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.013372724627580362, 0.000929369848074079, 0.00018481981568008941],
+      "component": "COIL_24_24",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.0133908064841969, 0.002816187648113823, 0.00043273062977327925],
+      "component": "COIL_23_23",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.013281191228344792, 0.0046534893025477319, 0.00053075335983297973],
+      "component": "COIL_22_22",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.012951615239618129, 0.0063490015863792194, 0.0004246176221421334],
+      "component": "COIL_21_21",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.012306837068249567, 0.0078989226423958146, 0.00018552408203749608],
+      "component": "COIL_20_20",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.011313299894868937, 0.0092716904485329356, -0.00015447935316076144],
+      "component": "COIL_19_19",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.010046811715433802, 0.010364565715806316, -0.00040018933085231187],
+      "component": "COIL_18_18",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.0085380956366363434, 0.011207269232123722, -0.00050788043128666669],
+      "component": "COIL_17_17",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.0068261682495028876, 0.011880831561089026, -0.00041383121677086767],
+      "component": "COIL_16_16",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.0050221114624837788, 0.012440348911827884, -0.00017485394935594427],
+      "component": "COIL_15_15",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.0032492088774519097, 0.013005509879066752, 0.00018544190309821337],
+      "component": "COIL_14_14",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-0.0014595857099152991, 0.013605631532447236, 0.00043274010283555564],
+      "component": "COIL_13_13",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.00032161410565550194, 0.01406910111950874, 0.00053083414151656918],
+      "component": "COIL_12_12",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.0020363000742461015, 0.014279442361143688, 0.00042484576178794883],
+      "component": "COIL_11_11",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.003708777329500949, 0.01414521517318597, 0.00018593228810222069],
+      "component": "COIL_10_10",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.0053222197722317, 0.013625141463154184, -0.000154367451163023],
+      "component": "COIL_9_9",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.0067521986423542, 0.012757599313349058, -0.00040027323627404621],
+      "component": "COIL_8_8",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.008020262691448914, 0.011583470076699416, -0.000507941445437733],
+      "component": "COIL_7_7",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.0091899152499994811, 0.010163451788555046, -0.00041378768819500894],
+      "component": "COIL_6_6",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.010279637139989193, 0.0086206373383206289, -0.00017487369931779424],
+      "component": "COIL_5_5",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.011364665381348603, 0.00710936813547406, 0.00018575653306824355],
+      "component": "COIL_4_4",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.012488741266259745, 0.005592523934380509, 0.00043273536153734776],
+      "component": "COIL_3_3",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.013480063039422842, 0.0040416222108510562, 0.00053126493688592728],
+      "component": "COIL_2_2",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.014209651054037041, 0.0024756871790169834, 0.00042471665922926],
+      "component": "COIL_1_1",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [0.014598998789673077, 0.0008435513596285342, 0.000186725503462667],
+      "component": "COIL_0_0",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [-2.8773584604194617E-05, 2.425538443489666E-07, -1.0094044809244919E-05],
+      "component": "GAP_1",
+      "body_name": "Body9",
+      "body_index": 1
+    },
+    {
+      "centroid": [2.0757653476472338E-06, 1.5481100006578188E-06, 1.0979105943210769E-07],
+      "component": "PLASMA_1",
+      "body_name": "Body9",
+      "body_index": 1
+    }
+  ]
+}

@@ -31,6 +31,7 @@ CLAUDE.md
 *.x_t
 *.x_b
 *.prt
+*.step
 
 # Allow test data files tracked by Git LFS
 !tests/data/*.x_t
@@ -40,7 +41,6 @@ CLAUDE.md
 *.log
 *.lic
 TheaEnergy*
-*.step
 *.stl
 *.conda
 *.so
