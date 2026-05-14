@@ -799,7 +799,7 @@ static std::string get_native_string_attr(pGIPart part, const char *attr_name) {
   return result;
 }
 
-void Mesh::write_gmsh(std::string filename, double scale_factor) {
+void Mesh::write_msh(std::string filename, double scale_factor) {
   gmsh::initialize();
   gmsh::model::add("basalt");
 

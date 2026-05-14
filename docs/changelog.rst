@@ -15,6 +15,9 @@ Unreleased
   shim: ``import phnx`` raises ``ModuleNotFoundError``. The C extension module
   name ``_core`` is unchanged. The NX journal environment variable changed from
   ``PHNX_NX_EXPORT_DIR`` to ``BASALT_NX_EXPORT_DIR``. See NE-11.
+* **Renamed** ``Mesh.write_gmsh`` to ``Mesh.write_msh``. The file format
+  (Gmsh ``.msh``) is unchanged. No deprecation shim — callers must
+  update. See NE-11 sub-project D.
 
 -------------
 1.0.0 (TBD)

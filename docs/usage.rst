@@ -16,7 +16,7 @@ GAM → SMS           :py:meth:`Model.translate`
 SMS → non-manifold  :py:meth:`Model.make_non_manifold_model`
 Mesh                :py:class:`MeshCase`, :py:class:`SurfaceMesh`,
                     :py:class:`VolumeMesh`
-Export              :py:meth:`Mesh.write_gmsh`
+Export              :py:meth:`Mesh.write_msh`
 ==================  ==========================================
 
 ------------------------
@@ -86,7 +86,7 @@ Writing for DAGMC
 
    import basalt as bslt
 
-   volume_mesh.write_gmsh("output.msh")
+   volume_mesh.write_msh("output.msh")
 
 The exporter writes one Gmsh discrete entity per SMS mesh entity and
 encodes per-entity metadata in URL-style physical-group names:

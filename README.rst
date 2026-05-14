@@ -54,7 +54,7 @@ Example
    mesh_case.set_size(0.1)
    surface_mesh = bslt.SurfaceMesh.from_model(nm_model, mesh_case)
    volume_mesh = bslt.VolumeMesh.from_surface_mesh(surface_mesh)
-   volume_mesh.write_gmsh("output.msh")
+   volume_mesh.write_msh("output.msh")
 
 ----------------
 Acknowledgements

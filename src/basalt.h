@@ -521,12 +521,12 @@ public:
       : s_mesh(s_mesh), model(model), mesh_case(mesh_case) {};
 
   /**
-   * Write mesh to Gmsh file.
+   * Write mesh to Gmsh .msh file.
    *
    * @param filename Filename
    * @nb
    */
-  void write_gmsh(std::string filename, double scale_factor = 1.0);
+  void write_msh(std::string filename, double scale_factor = 1.0);
 };
 
 /**
