@@ -18,6 +18,14 @@ Unreleased
 * **Renamed** ``Mesh.write_gmsh`` to ``Mesh.write_msh``. The file format
   (Gmsh ``.msh``) is unchanged. No deprecation shim — callers must
   update. See NE-11 sub-project D.
+* **Added** the W7-X end-to-end neutronics tutorial at
+  ``docs/notebooks/tutorials/w7x_neutronics.ipynb``. Demonstrates the
+  full Parasolid → basalt mesh → stellarmesh DAGMC → OpenMC pipeline
+  against the public W7-X fixture, with four neutronics tallies and a
+  3D PyVista flux render. See NE-11 sub-project D.
+* **Added** ``docs/format.rst`` documenting basalt's producer-side
+  ``.msh`` output semantics; defers to stellarmesh's canonical format
+  spec for the schema itself.
 
 -------------
 1.0.0 (TBD)

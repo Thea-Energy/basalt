@@ -57,6 +57,17 @@ Example
    volume_mesh.write_msh("output.msh")
 
 ----------------
+Try the tutorial
+----------------
+
+For an end-to-end neutronics workflow against the public W7-X
+stellarator fixture — from Parasolid CAD through basalt meshing,
+stellarmesh DAGMC conversion, and an OpenMC fixed-source DT-neutron
+calculation with four tallies and a 3D PyVista flux render — see the
+`W7-X neutronics tutorial
+<https://basalt.readthedocs.io/en/latest/notebooks/tutorials/w7x_neutronics.html>`__.
+
+----------------
 Acknowledgements
 ----------------
 
