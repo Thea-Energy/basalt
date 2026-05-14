@@ -5,6 +5,7 @@
    install
    usage
    format
+   notebooks/tutorials/w7x_neutronics
    api
    contributing
    changelog
