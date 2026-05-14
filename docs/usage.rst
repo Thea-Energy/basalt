@@ -103,6 +103,9 @@ Material names are resolved per region in this order:
 A ``material_namer`` callback can override this resolution. Names
 must be ≤ 28 characters — a hard MOAB limit downstream.
 
+See :doc:`format` for the full producer-side reference, including the
+slug-vs-material distinction and unit conventions.
+
 -------
 Helpers
 -------

@@ -4,6 +4,7 @@
 
    install
    usage
+   format
    api
    contributing
    changelog
