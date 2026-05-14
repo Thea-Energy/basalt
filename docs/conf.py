@@ -28,7 +28,15 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx_tabs.tabs",
+    "nbsphinx",
 ]
+
+# Tutorial notebooks under docs/notebooks/ are pre-executed locally; outputs
+# are committed in the .ipynb. RTD does not have SMS or OpenMC and must not
+# re-execute. Stored exception cells fail the build (don't silently ship a
+# half-broken tutorial). See docs/contributing.rst for re-execution discipline.
+nbsphinx_execute = "never"
+nbsphinx_allow_errors = False
 top_level = "basalt"
 linkcode_blob = "head"
 linkcode_url = "https://github.com/Thea-Energy/basalt"

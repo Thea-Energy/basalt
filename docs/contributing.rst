@@ -64,3 +64,40 @@ Code style
 
 Code style is enforced by ``ruff`` using the configuration in
 ``pyproject.toml``. Run ``ruff format .`` to auto-format your changes.
+
+--------------------------
+W7-X tutorial re-execution
+--------------------------
+
+The neutronics tutorial at
+``docs/notebooks/tutorials/w7x_neutronics.ipynb`` is committed with its
+cell outputs intact. Sphinx renders the notebook **without** re-executing
+it (``nbsphinx_execute = "never"``) — so the committed outputs are the
+source of truth for what readers see.
+
+Re-execute and commit the regenerated notebook whenever any of the
+following change:
+
+* basalt's public API (``Model``, ``MeshCase``, ``SurfaceMesh``,
+  ``VolumeMesh``, ``Mesh.write_msh``, ``print_hierarchy``,
+  ``load_material_metadata``).
+* The ``.msh`` format spec (stellarmesh's ``docs/format.rst``).
+* The W7-X fixture (``tests/data/scaled_w7x_stellarator.x_t`` or its
+  ``_attrs.json`` sidecar).
+* stellarmesh's DAGMC / Mesh / MOAB API surface that the notebook
+  consumes.
+* OpenMC's tally, source, or run APIs that the notebook consumes.
+
+To re-execute (requires a working Simmetrix SimModSuite license):
+
+.. code:: sh
+
+   pixi run jupyter nbconvert --to notebook --execute --inplace \
+     docs/notebooks/tutorials/w7x_neutronics.ipynb
+
+Then ``git diff`` the file to confirm only intended output changes
+landed, and commit.
+
+Before tagging a release, re-execute the notebook against ``main`` and
+commit any drift. CI does **not** detect stale outputs — this is a
+maintainer responsibility.
