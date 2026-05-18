@@ -88,8 +88,7 @@ following change:
   consumes.
 * OpenMC's tally, source, or run APIs that the notebook consumes.
 
-To re-execute (requires a working Simmetrix SimModSuite license **and
-substantial RAM** — see below):
+To re-execute (requires a working Simmetrix SimModSuite license):
 
 .. code:: sh
 
@@ -98,15 +97,6 @@ substantial RAM** — see below):
 
 Then ``git diff`` the file to confirm only intended output changes
 landed, and commit.
-
-.. note::
-
-   The non-manifold imprint step on the 55-body W7-X fixture
-   currently exceeds 31 GB resident memory in SMS 2025.1. A 32 GB
-   workstation will OOM during cell 6 (``make_non_manifold_model``).
-   At time of writing, ~64 GB is the recommended floor for end-to-end
-   execution. Optimizing basalt's imprint memory footprint is tracked
-   as a follow-up.
 
 Before tagging a release, re-execute the notebook against ``main`` and
 commit any drift. CI does **not** detect stale outputs — this is a
