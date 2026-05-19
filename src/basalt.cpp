@@ -577,8 +577,9 @@ auto Model::from_parasolid_file(std::string filename, bool load_nx_attrs)
       // Parse components dict and build attr_map.
       // Each component key is unique in the dict, so no deduplication needed
       // for component_name. Only seen_bases is needed because multiple
-      // component keys can share the same part_file_stem (e.g. 332 instances
-      // of "nnnnnnn" all map to stem "0012318_A").
+      // component keys can share the same part_file_stem (e.g. many
+      // instances of a base part all map to the same _A-suffixed assembly
+      // stem).
       auto &components = j["components"];
       for (auto &[comp_key, comp_node] : components.items()) {
         auto comp_name = comp_node["component_name"].get<std::string>();
