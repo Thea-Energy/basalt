@@ -7,28 +7,7 @@ The format follows `Keep a Changelog <https://keepachangelog.com>`__,
 and this project follows `Semantic Versioning <https://semver.org>`__.
 
 -------------
-Unreleased
--------------
-
-* **Renamed project.** Previously ``phnx``, now ``basalt``. The PyPI distribution
-  is now ``basalt-mesh`` and the Python import is ``basalt``. No compatibility
-  shim: ``import phnx`` raises ``ModuleNotFoundError``. The C extension module
-  name ``_core`` is unchanged. The NX journal environment variable changed from
-  ``PHNX_NX_EXPORT_DIR`` to ``BASALT_NX_EXPORT_DIR``. See NE-11.
-* **Renamed** ``Mesh.write_gmsh`` to ``Mesh.write_msh``. The file format
-  (Gmsh ``.msh``) is unchanged. No deprecation shim — callers must
-  update. See NE-11 sub-project D.
-* **Added** the W7-X end-to-end neutronics tutorial at
-  ``docs/notebooks/tutorials/w7x_neutronics.ipynb``. Demonstrates the
-  full Parasolid → basalt mesh → stellarmesh DAGMC → OpenMC pipeline
-  against the public W7-X fixture, with four neutronics tallies and a
-  3D PyVista flux render. See NE-11 sub-project D.
-* **Added** ``docs/format.rst`` documenting basalt's producer-side
-  ``.msh`` output semantics; defers to stellarmesh's canonical format
-  spec for the schema itself.
-
--------------
-1.0.0 (TBD)
+0.1
 -------------
 
 Initial public release.
@@ -38,3 +17,9 @@ Initial public release.
 * Non-manifold imprint and merge of conformal geometry.
 * Surface and volume meshing with curvature and proximity refinement.
 * Gmsh ``.msh`` export with metadata for downstream DAGMC conversion.
+* End-to-end W7-X stellarator neutronics tutorial demonstrating the
+  full Parasolid → basalt mesh → stellarmesh DAGMC → OpenMC pipeline,
+  with four tallies and a 3D PyVista flux render.
+* ``docs/format.rst`` documenting basalt's producer-side ``.msh``
+  output semantics; defers to stellarmesh's canonical format spec for
+  the schema itself.

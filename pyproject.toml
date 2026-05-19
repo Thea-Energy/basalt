@@ -10,8 +10,8 @@ build-backend = "scikit_build_core.build"
 name = "basalt-mesh"
 authors = [{ name = "Alex Koen" }]
 # dynamic = ["version"]
-version = "1.0.0"
-description = "Meshing library for nuclear workflows."
+version = "0.1"
+description = "Nuclear meshing library for NX and Parasolid based on the Simmetrix mesh suite"
 license = "MIT"
 license-files = ["LICENSE"]
 readme = "README.rst"
