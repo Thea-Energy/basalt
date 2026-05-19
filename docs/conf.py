@@ -7,14 +7,28 @@ from importlib.metadata import version as get_version
 
 sys.path.append(os.path.abspath("../"))
 
-# Always mock the compiled _core extension during docs build. Importing the
-# real _core.so triggers SMS init, which requires a valid Simmetrix license
-# and a reachable license file — CI runners do not have either. Docs only
-# cover the public Python API.
-from unittest.mock import MagicMock
+# Always stand in for the compiled _core extension during docs build.
+# Importing the real _core.so triggers SMS init, which requires a valid
+# Simmetrix license — CI/RTD runners do not have one. Instead of MagicMock
+# (whose docstrings autodoc would then surface for every class), we load
+# nanobindgen's generated `_core.pyi` as a real Python module so autodoc
+# sees real classes with real docstrings and signatures. PEP-563
+# annotations are forced so forward references in the stub don't fail at
+# class-definition time.
+import importlib.util as _importlib_util
+import types as _types
+from pathlib import Path as _Path
 
-sys.modules["basalt._core"] = MagicMock()
-sys.modules["basalt._core._core"] = MagicMock()
+_core_pkg = _types.ModuleType("basalt._core")
+_core_pkg.__path__ = [str(_Path(__file__).parent.parent / "basalt" / "_core")]
+sys.modules["basalt._core"] = _core_pkg
+
+_stub_path = _Path(__file__).parent.parent / "basalt" / "_core" / "_core.pyi"
+_stub_src = "from __future__ import annotations\n" + _stub_path.read_text()
+_stub_mod = _types.ModuleType("basalt._core._core")
+_stub_mod.__file__ = str(_stub_path)
+exec(compile(_stub_src, str(_stub_path), "exec"), _stub_mod.__dict__)
+sys.modules["basalt._core._core"] = _stub_mod
 
 import basalt  # noqa: E402, F401
 
