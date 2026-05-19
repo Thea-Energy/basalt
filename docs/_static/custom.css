@@ -1,1 +1,23 @@
-/* Reserved for future per-project overrides. */
+/* Cap notebook text outputs so massively verbose cells (e.g. openmc.run's
+   per-batch dump) don't blow up page length. Image outputs sit directly
+   in `.output_area` without a `.highlight > pre` wrapper, so they're
+   unaffected. */
+div.nboutput div.output_area div.highlight pre {
+    max-height: 28em;
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+    scrollbar-width: auto;
+    scrollbar-color: rgba(128, 128, 128, 0.7) rgba(128, 128, 128, 0.15);
+}
+
+div.nboutput div.output_area div.highlight pre::-webkit-scrollbar {
+    width: 12px;
+    background: rgba(128, 128, 128, 0.15);
+}
+
+div.nboutput div.output_area div.highlight pre::-webkit-scrollbar-thumb {
+    background: rgba(128, 128, 128, 0.7);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
