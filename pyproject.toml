@@ -38,6 +38,7 @@ exclude = [
     "*.lic",
     "simmodsuite.lic",
     "tests/data/*.x_t",
+    "tests/data/*.step",
     "tests/data/*.json",
     ".envrc",
     ".claude/**",
