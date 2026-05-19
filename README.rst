@@ -1,13 +1,7 @@
-.. image:: docs/_static/logo.svg
-   :alt: Basalt logo (top-down hexagonal cluster of basalt columns)
-   :width: 120px
-
-.. logo-end
-
 .. raw:: html
 
    <p align="center">
-     <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/%D0%9C%D1%8B%D1%81_%D0%A1%D1%82%D0%BE%D0%BB%D0%B1%D1%87%D0%B0%D1%82%D1%8B%D0%B9._%D0%9F%D0%BE%D1%81%D0%BB%D0%B5_%D0%B7%D0%B0%D0%BA%D0%B0%D1%82%D0%B0.jpg" alt="Columnar basalt formations at Cape Stolbchaty, Kunashir Island, after sunset" width="100%">
+     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/%D0%9C%D1%8B%D1%81_%D0%A1%D1%82%D0%BE%D0%BB%D0%B1%D1%87%D0%B0%D1%82%D1%8B%D0%B9._%D0%9F%D0%BE%D1%81%D0%BB%D0%B5_%D0%B7%D0%B0%D0%BA%D0%B0%D1%82%D0%B0.jpg/1920px-%D0%9C%D1%8B%D1%81_%D0%A1%D1%82%D0%BE%D0%BB%D0%B1%D1%87%D0%B0%D1%82%D1%8B%D0%B9._%D0%9F%D0%BE%D1%81%D0%BB%D0%B5_%D0%B7%D0%B0%D0%BA%D0%B0%D1%82%D0%B0.jpg" alt="Columnar basalt formations at Cape Stolbchaty, Kunashir Island, after sunset" width="100%">
      <br>
      <em>Columnar basalt prisms are formed as lava cools rapidly and develops polygonal fractures.</em>
      <br>
