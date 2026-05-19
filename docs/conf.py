@@ -15,7 +15,6 @@ sys.path.append(os.path.abspath("../"))
 # sees real classes with real docstrings and signatures. PEP-563
 # annotations are forced so forward references in the stub don't fail at
 # class-definition time.
-import importlib.util as _importlib_util
 import types as _types
 from pathlib import Path as _Path
 
