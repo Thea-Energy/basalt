@@ -5,11 +5,11 @@ Format
 .. module:: basalt
    :no-index:
 
-basalt emits Gmsh ``.msh`` v4.1 ASCII files conforming to the
+Basalt emits Gmsh ``.msh`` v4.1 ASCII files conforming to the
 `stellarmesh format specification
 <https://stellarmesh.readthedocs.io/en/latest/format.html>`__.
-That page is the canonical schema; this page documents basalt's
-**producer-side** semantics — what values basalt populates for each
+That page is the canonical schema; this page documents Basalt's
+**producer-side** semantics — what values Basalt populates for each
 schema field, the coordinate units it writes, and the
 :py:meth:`Mesh.write_msh` API surface.
 
@@ -17,7 +17,7 @@ schema field, the coordinate units it writes, and the
 Material name resolution
 -------------------------
 
-basalt populates each volume's ``material=<slug>`` field by walking
+Basalt populates each volume's ``material=<slug>`` field by walking
 the originating CAD attributes in this order, taking the first
 non-empty value:
 
@@ -52,14 +52,14 @@ mapping end-to-end.
 This is intentional: the same physical material (e.g. "stainless
 steel 316L") may be assigned to dozens of bodies, and the producer
 has no way of knowing which assemblies are intended to share material
-identity. Pushing that mapping to the consumer keeps basalt's output
+identity. Pushing that mapping to the consumer keeps Basalt's output
 faithful to the CAD source.
 
 ------
 Units
 ------
 
-basalt writes coordinates in **metres** (the Simmetrix SimModSuite
+Basalt writes coordinates in **metres** (the Simmetrix SimModSuite
 native unit) by default. Downstream consumers vary:
 
 * DAGMC and OpenMC expect **centimetres**.
@@ -79,21 +79,21 @@ factors apply uniformly to every node coordinate.
 Stability
 -----------
 
-basalt commits to producing files that conform to the stellarmesh
-format spec linked above. basalt does **not** unilaterally extend the
+Basalt commits to producing files that conform to the stellarmesh
+format spec linked above. Basalt does **not** unilaterally extend the
 URL-style key set — if a new key is needed (e.g. to encode a new
 piece of CAD metadata), the schema change goes into stellarmesh
 first.
 
-What is **not** part of basalt's commitment:
+What is **not** part of Basalt's commitment:
 
 * In-memory Python object shapes (``basalt.Model``, ``basalt.Mesh``,
-  etc.). These are versioned by basalt's release process and may
+  etc.). These are versioned by Basalt's release process and may
   change between releases.
 * Log line formats and verbosity.
 * The sidecar JSON schema (``*_attrs.json``); see the source for
   that contract.
 * The C++ ABI exposed by ``libbasalt.so`` or the nanobind bindings.
 * Internal Gmsh tag numbering. Tags are guaranteed unique and stable
-  within one written file; basalt makes no promise about consistency
-  across re-runs of the pipeline, or across basalt versions.
+  within one written file; Basalt makes no promise about consistency
+  across re-runs of the pipeline, or across Basalt versions.

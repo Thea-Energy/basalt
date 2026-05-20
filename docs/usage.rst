@@ -4,7 +4,7 @@ Usage
 .. module:: basalt
    :no-index:
 
-basalt transforms a Parasolid CAD assembly into a Gmsh mesh annotated
+Basalt transforms a Parasolid CAD assembly into a Gmsh mesh annotated
 for downstream DAGMC conversion. The pipeline has five distinct
 stages, each modelled by a small set of classes.
 
@@ -37,7 +37,7 @@ name — to each :py:class:`Part` and :py:class:`Assembly`.
 NX exports collapse all instances of the same base part into a single
 GAM assembly. A part referenced 332 times in NX appears as one
 :py:class:`Assembly` containing 332 anonymous child :py:class:`Part`
-objects in basalt. Per-instance NX names are not preserved.
+objects in Basalt. Per-instance NX names are not preserved.
 
 --------------------------
 Translating and imprinting

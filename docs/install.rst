@@ -2,9 +2,9 @@
 Installation
 ============
 
-basalt is a Python wrapper for `Simmetrix SimModSuite`_ that you build from source
-against your own SMS install. basalt itself is MIT-licensed; SMS is proprietary
-and is not bundled, redistributed, or accessible through basalt's wheel.
+Basalt is a Python wrapper for `Simmetrix SimModSuite`_ that you build from source
+against your own SMS install. Basalt itself is MIT-licensed; SMS is proprietary
+and is not bundled, redistributed, or accessible through Basalt's wheel.
 
 .. _Simmetrix SimModSuite: https://www.simmetrix.com/
 
@@ -24,7 +24,7 @@ Requirements
 Acquire SimModSuite
 ------------------------
 
-basalt links against four Simmetrix module tarballs. All four must be at the
+Basalt links against four Simmetrix module tarballs. All four must be at the
 **same version-datestamp**:
 
 * ``gmcore`` — geometric model core
@@ -85,7 +85,7 @@ Set environment variables
    ``SimModSuite_licenseFile`` is **case-sensitive** (Simmetrix convention).
    ``SIMMODSUITE_LICENSEFILE`` will not be picked up.
 
-``P_SCHEMA`` is **not** required: basalt bakes the schema directory at build time
+``P_SCHEMA`` is **not** required: Basalt bakes the schema directory at build time
 and exports it on import. Customers who need an override may still export
 ``P_SCHEMA`` and it will take precedence.
 
@@ -93,7 +93,7 @@ and exports it on import. Customers who need an override may still export
 Install with pip
 ----------------
 
-basalt ships as a source distribution, so ``pip`` builds the C++ extension at
+Basalt ships as a source distribution, so ``pip`` builds the C++ extension at
 install time against the SMS install at ``$SIMMODSUITE_ROOT``. ``scikit-build-core``
 pulls ``nanobind`` and ``nanobindgen`` into the build environment automatically,
 but **gmsh** must be available on the host (typically from conda-forge or the

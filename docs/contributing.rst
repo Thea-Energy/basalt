@@ -2,7 +2,7 @@
 Contributing
 ============
 
-Thank you for your interest in contributing to basalt. This page covers the
+Thank you for your interest in contributing to Basalt. This page covers the
 practical details of submitting bug reports, feature requests, and pull
 requests.
 
@@ -12,7 +12,7 @@ Bug reports
 
 File issues at the project's GitHub issue tracker. Please include:
 
-* The basalt version (``python -c "import basalt; print(basalt.__version__)"``)
+* The Basalt version (``python -c "import basalt; print(basalt.__version__)"``)
 * The Simmetrix SimModSuite version you have installed
 * A minimal reproducing example
 * The full error traceback or unexpected output
@@ -78,13 +78,13 @@ source of truth for what readers see.
 Re-execute and commit the regenerated notebook whenever any of the
 following change:
 
-* basalt's public API (``Model``, ``MeshCase``, ``SurfaceMesh``,
+* Basalt's public API (``Model``, ``MeshCase``, ``SurfaceMesh``,
   ``VolumeMesh``, ``Mesh.write_msh``, ``print_hierarchy``,
   ``load_material_metadata``).
-* The ``.msh`` format spec (stellarmesh's ``docs/format.rst``).
+* The ``.msh`` format spec (Stellarmesh's ``docs/format.rst``).
 * The W7-X fixture (``tests/data/scaled_w7x_stellarator.x_t`` or its
   ``_attrs.json`` sidecar).
-* stellarmesh's DAGMC / Mesh / MOAB API surface that the notebook
+* Stellarmesh's DAGMC / Mesh / MOAB API surface that the notebook
   consumes.
 * OpenMC's tally, source, or run APIs that the notebook consumes.
 

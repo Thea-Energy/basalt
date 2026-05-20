@@ -11,7 +11,7 @@ What are you trying to accomplish?
 
 ## Proposed solution
 
-How you imagine this would work in basalt (API sketch, behaviour, etc.).
+How you imagine this would work in Basalt (API sketch, behaviour, etc.).
 
 ## Alternatives considered
 

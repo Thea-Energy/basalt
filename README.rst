@@ -23,7 +23,7 @@ and DAGMC.
    <https://www.simmetrix.com/>`__ license and the corresponding
    module distribution (``gmcore``, ``mscore``, ``pskrnl``,
    ``simlicense``). The library cannot be built or run without
-   these. See `Installation <install.html>`__ for details.
+   these. See `Installation <https://basalt-mesh.readthedocs.io/en/latest/install.html>`__ for details.
 
 **Features**
 
@@ -37,9 +37,9 @@ and DAGMC.
 Getting Started
 ---------------
 
-* `Installation <install.html>`__
-* `Usage <usage.html>`__
-* `API <api.html>`__
+* `Installation <https://basalt-mesh.readthedocs.io/en/latest/install.html>`__
+* `Usage <https://basalt-mesh.readthedocs.io/en/latest/usage.html>`__
+* `API <https://basalt-mesh.readthedocs.io/en/latest/api.html>`__
 
 -------
 Example
@@ -62,17 +62,17 @@ Try the tutorial
 ----------------
 
 For an end-to-end neutronics workflow against the public W7-X
-stellarator fixture — from Parasolid CAD through basalt meshing,
+stellarator fixture — from Parasolid CAD through Basalt meshing,
 stellarmesh DAGMC conversion, and an OpenMC fixed-source DT-neutron
 calculation with four tallies and a 3D PyVista flux render — see the
 `W7-X neutronics tutorial
-<https://basalt.readthedocs.io/en/latest/notebooks/tutorials/w7x_neutronics.html>`__.
+<https://basalt-mesh.readthedocs.io/en/latest/notebooks/tutorials/w7x_neutronics.html>`__.
 
 ----------------
 Acknowledgements
 ----------------
 
-basalt is originally a project of Thea Energy, who are building the
+Basalt is originally a project of Thea Energy, who are building the
 world's first planar coil stellarator.
 
 .. figure:: https://github.com/user-attachments/assets/37b9ba1c-b22c-4837-b226-a6212854127e
