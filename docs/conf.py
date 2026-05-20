@@ -2,8 +2,8 @@
 
 import os
 import sys
+import tomllib
 import xml.parsers.expat  # noqa: F401 — must be imported before basalt to prevent SMS libexpat from shadowing pyexpat
-from importlib.metadata import version as get_version
 
 sys.path.append(os.path.abspath("../"))
 
@@ -34,7 +34,11 @@ import basalt  # noqa: E402, F401
 project = "Basalt"
 copyright = "2026, Thea Energy"  # noqa: A001
 author = "Thea Energy"
-release: str = get_version("basalt-mesh")
+# Read version from pyproject.toml rather than importlib.metadata so the docs
+# build does not depend on basalt-mesh being installed (RTD's runner doesn't
+# install it — would need Simmetrix SimModSuite).
+_pyproject = _Path(__file__).parent.parent / "pyproject.toml"
+release: str = tomllib.loads(_pyproject.read_text())["project"]["version"]
 
 extensions = [
     "sphinx_github_style",
