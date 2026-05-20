@@ -45,6 +45,11 @@ TheaEnergy*
 *.conda
 *.so
 *.pyi
+# Exception: the nanobindgen-generated _core.pyi is the API stub that
+# docs/conf.py loads instead of the compiled extension on no-SMS hosts
+# (ReadTheDocs, etc.). Treat as a committed artifact — regenerate locally
+# after API changes to `src/basalt.h` and commit alongside the source diff.
+!basalt/_core/_core.pyi
 
 *.log# pixi environments
 .pixi/*
