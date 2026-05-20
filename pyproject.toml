@@ -54,6 +54,8 @@ exclude = [
 [tool.ruff]
 target-version = "py312"
 extend-include = ["*.ipynb"]
+# basalt/_core/_core.pyi is nanobindgen-generated; we don't control its style.
+extend-exclude = ["basalt/_core/_core.pyi"]
 
 
 [tool.ruff.lint]
