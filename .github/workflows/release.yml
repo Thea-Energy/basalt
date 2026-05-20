@@ -1,0 +1,44 @@
+name: Publish to PyPI
+
+# Trusted Publisher flow: PyPI verifies our OIDC token against a configured
+# pending/active publisher on the project (owner=Thea-Energy, repo=basalt,
+# workflow=release.yml, environment=pypi). No API token is stored anywhere.
+# See https://docs.pypi.org/trusted-publishers/.
+#
+# Triggers:
+# - Publishing a GitHub Release (the standard path: tag + Release UI).
+# - Manual workflow_dispatch with an explicit ref input (used to publish
+#   tags that predate this workflow, e.g. v0.1).
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Tag or branch to publish from (e.g. v0.1)'
+        required: true
+        default: 'main'
+
+jobs:
+  publish:
+    name: Build sdist and publish to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/basalt-mesh/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.ref }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build sdist
+        run: |
+          python -m pip install --upgrade build
+          python -m build --sdist
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
