@@ -1,0 +1,14 @@
+# Python deps for Read the Docs builds.
+# Mirrors pixi.toml's [feature.docs.pypi-dependencies] for the local
+# `pixi run -e docs docs` flow — keep the two in sync when adding extensions.
+#
+# Notably absent: basalt-mesh itself. Installing it editable would trigger
+# the CMake build, which needs SIMMODSUITE_ROOT. docs/conf.py loads
+# basalt/_core/_core.pyi as a Python module instead so autodoc resolves
+# real class docstrings without the compiled .so.
+
+sphinx>=8.2.3,<10
+sphinx-github-style>=1.2.2,<2
+shibuya==2026.1.9
+sphinx-tabs>=3.4.7,<4
+nbsphinx>=0.9.7,<0.10

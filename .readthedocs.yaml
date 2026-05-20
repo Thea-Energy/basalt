@@ -6,9 +6,9 @@
 #   SimModSuite license, which RTD runners don't have). docs/conf.py loads
 #   basalt/_core/_core.pyi as a Python module so autodoc still sees real
 #   class docstrings without the compiled .so.
-# - We bypass pixi here because pixi.toml's [pypi-dependencies] block pulls
-#   in basalt-mesh = { path = ".", editable = true }, which would trigger
-#   the CMake build at install time. Plain pip + sphinx-only deps is enough.
+# - We do NOT install basalt-mesh itself here. Just the sphinx-ecosystem
+#   deps via docs/requirements.txt. basalt's package is on sys.path via
+#   conf.py's `sys.path.append(os.path.abspath("../"))`.
 # - pandoc (apt) is required by nbsphinx to render the W7-X tutorial notebook.
 
 version: 2
@@ -19,10 +19,10 @@ build:
     python: "3.12"
   apt_packages:
     - pandoc
-  jobs:
-    install:
-      - python -m pip install --upgrade pip
-      - python -m pip install "sphinx>=8.2.3,<10" "sphinx-github-style>=1.2.2,<2" "shibuya==2026.1.9" "sphinx-tabs>=3.4.7,<4" "nbsphinx>=0.9.7,<0.10"
+
+python:
+  install:
+    - requirements: docs/requirements.txt
 
 sphinx:
   configuration: docs/conf.py
