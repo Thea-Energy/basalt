@@ -1,5 +1,15 @@
-# Read the Docs configuration file
+# Read the Docs configuration file for basalt-mesh
 # https://docs.readthedocs.io/en/stable/config-file/v2.html
+#
+# Notes:
+# - Docs build does NOT compile basalt's C extension (would need a Simmetrix
+#   SimModSuite license, which RTD runners don't have). docs/conf.py loads
+#   basalt/_core/_core.pyi as a Python module so autodoc still sees real
+#   class docstrings without the compiled .so.
+# - We bypass pixi here because pixi.toml's [pypi-dependencies] block pulls
+#   in basalt-mesh = { path = ".", editable = true }, which would trigger
+#   the CMake build at install time. Plain pip + sphinx-only deps is enough.
+# - pandoc (apt) is required by nbsphinx to render the W7-X tutorial notebook.
 
 version: 2
 
@@ -7,13 +17,12 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.12"
+  apt_packages:
+    - pandoc
   jobs:
-    post_create_environment:
-      - pip install pixi-cli
-    post_install:
-      - pixi install -e docs
-  commands:
-    - pixi run -e docs sphinx-build -b html docs $READTHEDOCS_OUTPUT/html
+    install:
+      - python -m pip install --upgrade pip
+      - python -m pip install "sphinx>=8.2.3,<10" "sphinx-github-style>=1.2.2,<2" "shibuya==2026.1.9" "sphinx-tabs>=3.4.7,<4" "nbsphinx>=0.9.7,<0.10"
 
 sphinx:
   configuration: docs/conf.py
