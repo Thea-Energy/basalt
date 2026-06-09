@@ -154,6 +154,24 @@ class Vertex(Entity):
 class Edge(Entity):
     """Model edge"""
 
+    @property
+    def length(self) -> float:
+        """
+        Length of this edge.
+
+        Returns:
+            Length
+        """
+
+    @property
+    def midpoint(self) -> list[float]:
+        """
+        Midpoint of this edge [x, y, z].
+
+        Returns:
+            Midpoint
+        """
+
 class Face(Entity):
     """Model face"""
 
@@ -182,6 +200,15 @@ class Face(Entity):
 
         Returns:
             Edges
+        """
+
+    @property
+    def centroid(self) -> list[float]:
+        """
+        Compute the centroid (center of mass) of this face.
+
+        Returns:
+            Centroid [x, y, z]
         """
 
 class Region(Entity):

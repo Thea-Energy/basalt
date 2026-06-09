@@ -238,6 +238,25 @@ class Vertex : public Entity {
  */
 class Edge : public Entity {
   using Entity::Entity;
+
+public:
+  /**
+   * Length of this edge.
+   *
+   * @return Length
+   * @nb
+   * @nb_prop_ro length
+   */
+  auto get_length() const -> double;
+
+  /**
+   * Midpoint of this edge [x, y, z].
+   *
+   * @return Midpoint
+   * @nb
+   * @nb_prop_ro midpoint
+   */
+  auto get_midpoint() const -> std::array<double, 3>;
 };
 
 /**
@@ -276,6 +295,15 @@ public:
    * @nb_prop_ro edges
    */
   auto get_edges() const -> std::vector<nb::ref<Edge>>;
+
+  /**
+   * Compute the centroid (center of mass) of this face.
+   *
+   * @return Centroid [x, y, z]
+   * @nb
+   * @nb_prop_ro centroid
+   */
+  auto get_centroid() const -> std::array<double, 3>;
 };
 
 /**

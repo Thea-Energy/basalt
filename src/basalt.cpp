@@ -354,6 +354,25 @@ auto Region::get_centroid() const -> std::array<double, 3> {
   return cen;
 }
 
+auto Face::get_centroid() const -> std::array<double, 3> {
+  std::array<double, 3> cen;
+  GF_centroid(static_cast<pGFace>(this->s_model_item), 1.0, cen.data());
+  return cen;
+}
+
+auto Edge::get_length() const -> double {
+  return GE_length(static_cast<pGEdge>(this->s_model_item));
+}
+
+auto Edge::get_midpoint() const -> std::array<double, 3> {
+  auto s_edge = static_cast<pGEdge>(this->s_model_item);
+  double lo, hi;
+  GE_parRange(s_edge, &lo, &hi);
+  std::array<double, 3> xyz;
+  GE_point(s_edge, 0.5 * (lo + hi), xyz.data());
+  return xyz;
+}
+
 auto Part::get_centroid() const -> std::array<double, 3> {
   auto regions = this->get_regions();
   return regions.at(0)->get_centroid();
