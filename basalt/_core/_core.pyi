@@ -356,6 +356,29 @@ class MeshCase:
             model_item: Optional model entity
         """
 
+    def set_gradation_rate(self, rate: float) -> None:
+        """
+        Set the global mesh size gradation rate.
+
+        Controls how quickly element size grows from finer to coarser regions.
+        Smaller values give a slower, smoother transition. Wraps
+        MS_setGlobalSizeGradationRate.
+
+        Args:
+            rate: Gradation rate.
+        """
+
+    def set_no_mesh(self, model_item: ModelItem) -> None:
+        """
+        Exclude a model entity (e.g. a region/body) and its closure from meshing.
+
+        Use to mesh only a subset of an assembly: mark the bodies you do not want
+        meshed. Wraps MS_setNoMesh with closure enabled.
+
+        Args:
+            model_item: Model entity to exclude (Region, Face, ...).
+        """
+
 class Mesh:
     """Mesh attributes"""
 

@@ -788,6 +788,16 @@ void MeshCase::set_proximity_refinement(
   }
 }
 
+void MeshCase::set_gradation_rate(double rate) {
+  MS_setGlobalSizeGradationRate(this->s_mesh_case, rate);
+}
+
+void MeshCase::set_no_mesh(nb::ref<ModelItem> model_item) {
+  // closure = 1: also exclude the entity's lower-dimensional closure that is
+  // not shared with a meshed body.
+  MS_setNoMesh(this->s_mesh_case, model_item->s_model_item, 1);
+}
+
 static std::string get_native_string_attr(pGIPart part, const char *attr_name) {
   int n = GIP_numNativeStringAttribute(part, attr_name);
   if (n <= 0)

@@ -503,6 +503,29 @@ public:
   void set_proximity_refinement(
       double value, std::optional<double> min_size = std::nullopt,
       std::optional<nb::ref<ModelItem>> model_item = std::nullopt);
+
+  /**
+   * Set the global mesh size gradation rate.
+   *
+   * Controls how quickly element size grows from finer to coarser regions.
+   * Smaller values give a slower, smoother transition. Wraps
+   * MS_setGlobalSizeGradationRate.
+   *
+   * @param rate Gradation rate.
+   * @nb
+   */
+  void set_gradation_rate(double rate);
+
+  /**
+   * Exclude a model entity (e.g. a region/body) and its closure from meshing.
+   *
+   * Use to mesh only a subset of an assembly: mark the bodies you do not want
+   * meshed. Wraps MS_setNoMesh with closure enabled.
+   *
+   * @param model_item Model entity to exclude (Region, Face, ...).
+   * @nb
+   */
+  void set_no_mesh(nb::ref<ModelItem> model_item);
 };
 
 /**
