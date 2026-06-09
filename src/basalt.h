@@ -267,6 +267,15 @@ public:
    * @nb_prop_ro reverse_region
    */
   auto get_reverse_region() const -> std::optional<nb::ref<Region>>;
+
+  /**
+   * Get the edges bounding this face.
+   *
+   * @return Edges
+   * @nb
+   * @nb_prop_ro edges
+   */
+  auto get_edges() const -> std::vector<nb::ref<Edge>>;
 };
 
 /**
@@ -343,17 +352,23 @@ public:
   bool is_valid() const;
 
   /**
-   * Write to SMS native file .smd
+   * Cache this model to disk so it round-trips through read().
    *
-   * @param filename Filename
+   * Writes two files: the SMS model topology (the given .smd) and, alongside it,
+   * the underlying native (Parasolid) geometry as <stem>.xmt_txt. Both are
+   * needed -- the .smd alone has no geometry, so a reloaded model could not
+   * compute centroids or be meshed. read() reloads the pair.
+   *
+   * @param filename SMS model filename (.smd)
    * @nb
    */
   void write(std::string filename);
 
   /**
-   * Read from SMS native file .smd
+   * Read a model cached by write(): loads the native geometry companion
+   * (<stem>.xmt_txt) and binds it to the SMS model from the .smd.
    *
-   * @param filename Filename
+   * @param filename SMS model filename (.smd)
    * @return Model
    * @nb
    */

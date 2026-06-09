@@ -337,6 +337,17 @@ auto Face::get_reverse_region() const -> std::optional<nb::ref<Region>> {
   return {new Region(s_region, this->model)};
 }
 
+auto Face::get_edges() const -> std::vector<nb::ref<Edge>> {
+  std::vector<nb::ref<Edge>> edges;
+  auto s_edges = GF_edges(static_cast<pGFace>(this->s_model_item));
+  void *iter = nullptr;
+  while (auto s_edge = static_cast<pGEdge>(PList_next(s_edges, &iter))) {
+    edges.push_back({new Edge(s_edge, this->model)});
+  }
+  PList_delete(s_edges);
+  return edges;
+}
+
 auto Region::get_centroid() const -> std::array<double, 3> {
   std::array<double, 3> cen;
   GR_centroid(static_cast<pGRegion>(this->s_model_item), 1.0, cen.data());
@@ -378,10 +389,19 @@ bool Model::is_valid() const {
   return is_valid;
 }
 
+// Native-geometry companion file for a given .smd cache path (foo.smd ->
+// foo.xmt_txt). GM_load needs both: the .smd has topology, the native has
+// geometry.
+static std::string native_companion(const std::string &smd_filename) {
+  std::filesystem::path p(smd_filename);
+  p.replace_extension(".xmt_txt");
+  return p.string();
+}
+
 void Model::write(std::string filename) {
-  // GM_write(this->s_model, filename.c_str(), 0, nullptr);
-  pNativeModel nonManNative = GM_nativeModel(this->s_model);
-  NM_write(nonManNative, filename.c_str(), nullptr);
+  GM_write(this->s_model, filename.c_str(), 0, nullptr);
+  pNativeModel native = GM_nativeModel(this->s_model);
+  NM_write(native, native_companion(filename).c_str(), nullptr);
 }
 
 using AttrMap = std::unordered_map<std::string, std::deque<nlohmann::json>>;
@@ -536,7 +556,13 @@ static void apply_nx_attrs(pGAssembly assem, AttrMap &attr_map,
 }
 
 auto Model::read(std::string filename) -> nb::ref<Model> {
-  auto model = GM_load(filename.c_str(), nullptr, nullptr);
+  auto native_path = native_companion(filename);
+  pNativeModel native = ParasolidNM_createFromFile(native_path.c_str(), 0);
+  if (!native) {
+    throw std::runtime_error("failed to load native geometry companion: " +
+                             native_path);
+  }
+  auto model = GM_load(filename.c_str(), native, nullptr);
 
   return {new Model(model)};
 }
@@ -1052,33 +1078,35 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
     gmsh::model::addDiscreteEntity(dim, sg_tag, boundary_tags);
     gmsh::model::mesh::addNodes(dim, sg_tag, node_tags, node_coords);
 
-    // Create physical group with material name
-    auto related_parts = entity->get_related_parts();
-    if (related_parts.size() == 0) {
-      spdlog::warn("Region {} has no related parts", sg_tag);
-    } else if (related_parts.size() > 1) {
-      spdlog::warn("Region {} has more than one related part", sg_tag);
-    } else {
-      auto part = related_parts.at(0);
-      auto s_part = (pGIPart)part->s_model_item;
-      auto material_name = get_native_string_attr(s_part, "NX_MATERIAL");
-      if (material_name.empty()) {
-        // Non-NX fallback: leaf assembly name + region tag
-        auto parent = part->get_parent_assembly();
-        if (parent.has_value()) {
-          auto aname = parent->get()->get_name();
-          if (aname.has_value())
-            material_name = aname.value() + ".b" + std::to_string(sg_tag);
+    // Create physical group with material name. Material naming needs the
+    // assembly connection (related parts); a model reloaded from a .smd cache
+    // has none, so fall back to a tag-based name rather than failing.
+    std::string material_name;
+    if (this->model->has_connection()) {
+      auto related_parts = entity->get_related_parts();
+      if (related_parts.size() == 1) {
+        auto part = related_parts.at(0);
+        auto s_part = (pGIPart)part->s_model_item;
+        material_name = get_native_string_attr(s_part, "NX_MATERIAL");
+        if (material_name.empty()) {
+          auto parent = part->get_parent_assembly();
+          if (parent.has_value()) {
+            auto aname = parent->get()->get_name();
+            if (aname.has_value())
+              material_name = aname.value() + ".b" + std::to_string(sg_tag);
+          }
         }
-        if (material_name.empty())
-          material_name = "unknown_" + std::to_string(sg_tag);
+      } else {
+        spdlog::warn("Region {} has {} related parts", sg_tag,
+                     related_parts.size());
       }
-
-      std::stringstream physical_name;
-      physical_name << "tag=" << sg_tag << "&material=" << material_name;
-      gmsh::model::addPhysicalGroup(dim, {sg_tag}, sg_tag,
-                                    physical_name.str());
     }
+    if (material_name.empty())
+      material_name = "region_" + std::to_string(sg_tag);
+
+    std::stringstream physical_name;
+    physical_name << "tag=" << sg_tag << "&material=" << material_name;
+    gmsh::model::addPhysicalGroup(dim, {sg_tag}, sg_tag, physical_name.str());
 
     std::vector<int> element_types(1, gmsh_element_type);
     std::vector<std::vector<size_t>> element_tags(1);

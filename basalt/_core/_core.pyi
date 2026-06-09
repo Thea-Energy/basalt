@@ -175,6 +175,15 @@ class Face(Entity):
             Reverse region or None
         """
 
+    @property
+    def edges(self) -> list[Edge]:
+        """
+        Get the edges bounding this face.
+
+        Returns:
+            Edges
+        """
+
 class Region(Entity):
     """Model region"""
 
@@ -209,19 +218,25 @@ class Model:
 
     def write(self, filename: str) -> None:
         """
-        Write to SMS native file .smd
+        Cache this model to disk so it round-trips through read().
+
+        Writes two files: the SMS model topology (the given .smd) and, alongside it,
+        the underlying native (Parasolid) geometry as <stem>.xmt_txt. Both are
+        needed -- the .smd alone has no geometry, so a reloaded model could not
+        compute centroids or be meshed. read() reloads the pair.
 
         Args:
-            filename: Filename
+            filename: SMS model filename (.smd)
         """
 
     @staticmethod
     def read(filename: str) -> Model:
         """
-        Read from SMS native file .smd
+        Read a model cached by write(): loads the native geometry companion
+        (<stem>.xmt_txt) and binds it to the SMS model from the .smd.
 
         Args:
-            filename: Filename
+            filename: SMS model filename (.smd)
 
         Returns:
             Model
