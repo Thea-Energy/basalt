@@ -78,6 +78,24 @@ calculation with four tallies and a 3D PyVista flux render — see the
 `W7-X neutronics tutorial
 <https://basalt-mesh.readthedocs.io/en/latest/notebooks/tutorials/w7x_neutronics.html>`__.
 
+-------------
+Presentations
+-------------
+
+* `Automated CAD to Neutronics Workflows with Stellarmesh and Basalt
+  <https://github.com/Thea-Energy/basalt/blob/main/docs/_static/stellarmesh-basalt-fnm2026.pdf>`__
+  — 2nd Fusion Neutronics Meeting (2026)
+
+------
+Citing
+------
+
+If you use Basalt in your research, please cite it. Citation metadata is
+available in the `CITATION.cff
+<https://github.com/Thea-Energy/basalt/blob/main/CITATION.cff>`__ file, and
+GitHub can generate APA or BibTeX entries from the "Cite this repository" button
+on the repository page.
+
 ----------------
 Acknowledgements
 ----------------

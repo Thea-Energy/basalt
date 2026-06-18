@@ -19,6 +19,7 @@ scratch/
 *.lock
 CLAUDE.md
 *.pdf
+!docs/_static/*.pdf
 *.json
 *.Identifier
 
