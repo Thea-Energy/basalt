@@ -58,6 +58,37 @@ here. :py:meth:`Model.make_non_manifold_model` boolean-imprints
 shared faces between adjacent volumes so the final mesh is
 conformal.
 
+Conformal meshing & overlaps
+----------------------------
+
+:py:meth:`Model.make_non_manifold_model` resolves how adjacent bodies meet, so
+the mesh is conformal regardless of how the CAD was authored:
+
+* **Touching → one shared face.** Coincident faces merge into a single
+  conformal face shared by both volumes — non-manifold, not duplicated.
+* **Overlapping → new faces and regions.** Where bodies truly overlap, the
+  imprint creates new regions at the intersection.
+* **Coarse → still conformal.** Adjacent bodies never self-intersect, even at
+  coarse mesh sizes.
+
+.. figure:: _static/basalt_shared_face.png
+   :align: center
+   :width: 70%
+
+   *Touching bodies share one conformal face (red).*
+
+.. figure:: _static/basalt_overlap_rhs.png
+   :align: center
+   :width: 70%
+
+   *A true overlap imprints new regions (red).*
+
+.. figure:: _static/basalt_intersection_resolution.png
+   :align: center
+   :width: 70%
+
+   *The shared interface stays conformal even at coarse sizes.*
+
 -------
 Meshing
 -------
@@ -77,6 +108,14 @@ Meshing
 Each refinement method accepts an optional ``model_item`` argument to
 apply the setting to a single :py:class:`Part`, :py:class:`Region`, or
 :py:class:`Face` rather than the whole model.
+
+See :doc:`meshing` for the full set of refinement controls.
+
+.. seealso::
+
+   Basalt's meshing controls wrap the Simmetrix SimModSuite mesher. For the
+   full parameter semantics and meshing theory, consult the Simmetrix
+   SimModSuite documentation that ships with your SimModSuite distribution.
 
 ------------------
 Writing for DAGMC

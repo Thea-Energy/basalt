@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 
 
 class ModelItem:
@@ -364,13 +365,14 @@ class MeshCase:
             Mesh case
         """
 
-    def set_size(self, mesh_size: float, model_item: ModelItem | None = None) -> None:
+    def set_size(self, mesh_size: float, relative: bool = True, model_item: ModelItem | None = None) -> None:
         """
-        Set the mesh size
+        Set the mesh size.
 
         Args:
             mesh_size: Mesh size
-            entity: Optional model entity
+            relative: If true (default) the size is relative to the target entity's bounding box (Simmetrix type 2); if false it is an absolute size (type 1).
+            model_item: Optional model entity. A Region sets the volume element size; a Face/Edge sets the surface/edge size; default is the whole domain.
         """
 
     def set_curvature_refinement(self, value: float, relative: bool = False, use_edges: bool = False, min_size: float | None = None, anisotropic: bool = False, model_item: ModelItem | None = None) -> None:
@@ -421,6 +423,17 @@ class MeshCase:
             model_item: Model entity to exclude (Region, Face, ...).
         """
 
+    def add_point_refinement(self, size: float, point: Sequence[float]) -> None:
+        """
+        Add a point refinement: refine the mesh to `size` around a point.
+
+        Wraps MS_addPointRefinement.
+
+        Args:
+            size: Refinement size at the point.
+            point: Point [x, y, z] at which to refine.
+        """
+
 class Mesh:
     """Mesh attributes"""
 
@@ -452,12 +465,15 @@ class VolumeMesh(Mesh):
     """Volume Mesh"""
 
     @staticmethod
-    def from_surface_mesh(surface_mesh: SurfaceMesh) -> VolumeMesh:
+    def from_surface_mesh(surface_mesh: SurfaceMesh, enforce_size: int = 0) -> VolumeMesh:
         """
-        Create from surface mesh
+        Create from surface mesh.
 
         Args:
             surface_mesh: Surface mesh
+            enforce_size: Interior mesh-size enforcement (VolumeMesher_setEnforceSize):
+        0 = not strictly enforced (default, interior may be coarser than requested),
+        1 = adapt interior toward the requested size, 2 = adapt + redistribute.
 
         Returns:
             Volume Mesh
