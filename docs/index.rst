@@ -5,6 +5,8 @@
    install
    concepts
    usage
+   meshing
+   nx
    format
    notebooks/tutorials/w7x_neutronics
    api
