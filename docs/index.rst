@@ -3,6 +3,7 @@
    :hidden:
 
    install
+   concepts
    usage
    format
    notebooks/tutorials/w7x_neutronics
