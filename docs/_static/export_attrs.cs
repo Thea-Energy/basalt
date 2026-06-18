@@ -231,7 +231,7 @@ public class ExportAttrs
     /// Get solid bodies in the component's active reference set.
     /// Returns null = use all bodies; empty dict = no bodies (refset "Empty").
     /// Uses Dictionary<Body,bool> as a set substitute (HashSet unavailable here).
-    /// Wraps GetAllReferenceSets() in try/catch per CLAUDE.md NX Journal Pitfalls pitfall #2.
+    /// Wraps GetAllReferenceSets() in try/catch: it can throw on some assemblies.
     /// </summary>
     static Dictionary<Body, bool> GetReferenceSetBodies(Component component)
     {

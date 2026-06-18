@@ -119,13 +119,17 @@ Graded volume mesh
 
 A per-region size grades the **volume** tetrahedra between bodies while keeping
 the shared interface conformal — fine where it matters, coarse where it does
-not.
+not. Pass ``enforce_size=1`` so the volume mesher adapts the interior toward the
+requested per-region sizes; with the default the interior may stay coarser.
 
 .. code:: python
 
    fw, flibe = nm_model.regions
    mesh_case.set_size(0.08, model_item=fw)     # fine tets in the first wall
    mesh_case.set_size(0.30, model_item=flibe)  # coarse tets in the blanket
+
+   surface_mesh = bslt.SurfaceMesh.from_model(nm_model, mesh_case)
+   volume_mesh = bslt.VolumeMesh.from_surface_mesh(surface_mesh, enforce_size=1)
 
 .. figure:: _static/basalt_gradation_volume.png
    :align: center
