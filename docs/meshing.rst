@@ -115,7 +115,7 @@ the interior may stay coarser than requested.
    surface_mesh = bslt.SurfaceMesh.from_model(nm_model, mesh_case)
    volume_mesh = bslt.VolumeMesh.from_surface_mesh(surface_mesh, enforce_size=1)
 
-.. figure:: _static/basalt_gradation_volume.png
+.. figure:: _static/basalt_point_refinement.png
    :align: center
    :width: 80%
 
