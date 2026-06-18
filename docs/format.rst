@@ -30,14 +30,16 @@ The :py:meth:`Model.from_parasolid_file` ``material_namer`` callback
 overrides this resolution — set it for cases where the CAD attributes
 do not encode usable names.
 
+See :doc:`nx` for how CAD attributes become the body slug.
+
 Slug length is bounded to **28 characters** — a hard MOAB limit
 applied downstream when stellarmesh converts the ``.msh`` into a
 DAGMC ``.h5m`` file. :py:meth:`Mesh.write_msh` does not enforce this
 at write time; the limit surfaces as a stellarmesh error if violated.
 
-------------------------------------------------------
+-------------------------------------------------------
 The ``material`` slug identifies a body, not a material
-------------------------------------------------------
+-------------------------------------------------------
 
 A common pitfall: the ``material=<slug>`` field encodes a slug that
 uniquely identifies one **body** in the source CAD assembly. It does
