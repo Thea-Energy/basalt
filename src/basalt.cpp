@@ -790,12 +790,13 @@ auto MeshCase::make(nb::ref<Model> model) -> nb::ref<MeshCase> {
   return {new MeshCase(model)};
 }
 
-void MeshCase::set_size(double mesh_size,
+void MeshCase::set_size(double mesh_size, bool relative,
                         std::optional<nb::ref<ModelItem>> model_item) {
   auto s_model_item = model_item.has_value() ? model_item.value()->s_model_item
                                              : GM_domain(this->model->s_model);
 
-  MS_setMeshSize(this->s_mesh_case, s_model_item, 2, mesh_size, 0);
+  // type 1 = absolute size, type 2 = relative to entity bbox.
+  MS_setMeshSize(this->s_mesh_case, s_model_item, relative ? 2 : 1, mesh_size, 0);
 }
 
 void MeshCase::set_curvature_refinement(
@@ -841,6 +842,10 @@ void MeshCase::set_no_mesh(nb::ref<ModelItem> model_item) {
   // closure = 1: also exclude the entity's lower-dimensional closure that is
   // not shared with a meshed body.
   MS_setNoMesh(this->s_mesh_case, model_item->s_model_item, 1);
+}
+
+void MeshCase::add_point_refinement(double size, std::array<double, 3> point) {
+  MS_addPointRefinement(this->s_mesh_case, size, point.data());
 }
 
 static std::string get_native_string_attr(pGIPart part, const char *attr_name) {
@@ -1172,11 +1177,13 @@ auto SurfaceMesh::from_model(nb::ref<Model> model, nb::ref<MeshCase> mesh_case)
   return {new SurfaceMesh(s_mesh, model, mesh_case)};
 }
 
-auto VolumeMesh::from_surface_mesh(nb::ref<SurfaceMesh> surface_mesh)
-    -> nb::ref<VolumeMesh> {
+auto VolumeMesh::from_surface_mesh(nb::ref<SurfaceMesh> surface_mesh,
+                                   int enforce_size) -> nb::ref<VolumeMesh> {
   auto s_new_mesh = M_copy(surface_mesh->s_mesh, 1);
   auto s_volume_mesher =
       VolumeMesher_new(surface_mesh->mesh_case->s_mesh_case, s_new_mesh);
+  if (enforce_size != 0)
+    VolumeMesher_setEnforceSize(s_volume_mesher, enforce_size);
   VolumeMesher_execute(s_volume_mesher, nullptr);
   // M_write(s_new_mesh, "meshv.sms", 0, nullptr);
   VolumeMesher_delete(s_volume_mesher);

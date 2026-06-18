@@ -508,13 +508,14 @@ public:
   static auto make(nb::ref<Model> model) -> nb::ref<MeshCase>;
 
   /**
-   * Set the mesh size
+   * Set the mesh size.
    *
    * @param mesh_size Mesh size
-   * @param entity Optional model entity
+   * @param relative If true (default) the size is relative to the target entity's bounding box (Simmetrix type 2); if false it is an absolute size (type 1).
+   * @param model_item Optional model entity. A Region sets the volume element size; a Face/Edge sets the surface/edge size; default is the whole domain.
    * @nb
    */
-  void set_size(double mesh_size,
+  void set_size(double mesh_size, bool relative = true,
                 std::optional<nb::ref<ModelItem>> model_item = std::nullopt);
 
   /**
@@ -569,6 +570,17 @@ public:
    * @nb
    */
   void set_no_mesh(nb::ref<ModelItem> model_item);
+
+  /**
+   * Add a point refinement: refine the mesh to `size` around a point.
+   *
+   * Wraps MS_addPointRefinement.
+   *
+   * @param size Refinement size at the point.
+   * @param point Point [x, y, z] at which to refine.
+   * @nb
+   */
+  void add_point_refinement(double size, std::array<double, 3> point);
 };
 
 /**
@@ -628,12 +640,15 @@ public:
   using Mesh::Mesh;
 
   /**
-   * Create from surface mesh
+   * Create from surface mesh.
    *
    * @param surface_mesh Surface mesh
+   * @param enforce_size Interior mesh-size enforcement (VolumeMesher_setEnforceSize):
+   * 0 = not strictly enforced (default, interior may be coarser than requested),
+   * 1 = adapt interior toward the requested size, 2 = adapt + redistribute.
    * @return Volume Mesh
    * @nb
    */
-  static auto from_surface_mesh(nb::ref<SurfaceMesh> surface_mesh)
-      -> nb::ref<VolumeMesh>;
+  static auto from_surface_mesh(nb::ref<SurfaceMesh> surface_mesh,
+                                int enforce_size = 0) -> nb::ref<VolumeMesh>;
 };
