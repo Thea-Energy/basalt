@@ -73,19 +73,19 @@ the mesh is conformal regardless of how the CAD was authored:
 
 .. figure:: _static/basalt_shared_face.png
    :align: center
-   :width: 70%
+   :width: 45%
 
    *Touching bodies share one conformal face (red).*
 
 .. figure:: _static/basalt_overlap_rhs.png
    :align: center
-   :width: 70%
+   :width: 45%
 
    *A true overlap imprints new regions (red).*
 
 .. figure:: _static/basalt_intersection_resolution.png
    :align: center
-   :width: 70%
+   :width: 45%
 
    *The shared interface stays conformal even at coarse sizes.*
 

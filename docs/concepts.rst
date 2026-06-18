@@ -2,7 +2,7 @@
 Meshing for neutronics
 ======================
 
-Turning a CAD assembly into a transport-ready mesh is the hard part of a
+Turning a CAD assembly into a transport-ready mesh is a challenge in any
 neutronics workflow. Four constraints dominate:
 
 #. **No overlaps.** Overlapping volumes have undefined material where they

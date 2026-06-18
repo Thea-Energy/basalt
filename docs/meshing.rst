@@ -96,37 +96,21 @@ The same call seeds an edge or region:
 
    *The same control applied to a single edge.*
 
-Point refinement
-================
+Volume meshing
+==============
 
-Refine around a point in space — useful for a point of interest with no CAD
-entity to seed. A slow gradation rate spreads it smoothly.
-
-.. code:: python
-
-   mesh_case.set_size(0.3)                        # coarse everywhere
-   mesh_case.add_point_refinement(0.03, [4.43, 0, 0])
-   mesh_case.set_gradation_rate(0.3)              # slow, smooth spread
-
-.. figure:: _static/basalt_point_refinement.png
-   :align: center
-   :width: 80%
-
-   *Point refinement: a local fine size around a single point.*
-
-Graded volume mesh
-==================
-
-A per-region size grades the **volume** tetrahedra between bodies while keeping
-the shared interface conformal — fine where it matters, coarse where it does
-not. Pass ``enforce_size=1`` so the volume mesher adapts the interior toward the
-requested per-region sizes; with the default the interior may stay coarser.
+The controls above shape the surface mesh; two more act on the **volume**
+interior. A per-region size (``set_size(model_item=region)``) grades the volume
+tetrahedra between bodies, and a point refinement seeds a fine size anywhere in
+space — useful for a point of interest with no CAD entity to anchor to. Pass
+``enforce_size=1`` so the mesher honours these interior sizes; with the default
+the interior may stay coarser than requested.
 
 .. code:: python
 
-   fw, flibe = nm_model.regions
-   mesh_case.set_size(0.08, model_item=fw)     # fine tets in the first wall
-   mesh_case.set_size(0.30, model_item=flibe)  # coarse tets in the blanket
+   mesh_case.set_size(0.3)                              # coarse baseline
+   mesh_case.add_point_refinement(0.03, [4.43, 0, 0])  # fine around a point
+   mesh_case.set_gradation_rate(0.3)                   # slow, smooth spread
 
    surface_mesh = bslt.SurfaceMesh.from_model(nm_model, mesh_case)
    volume_mesh = bslt.VolumeMesh.from_surface_mesh(surface_mesh, enforce_size=1)
@@ -135,4 +119,4 @@ requested per-region sizes; with the default the interior may stay coarser.
    :align: center
    :width: 80%
 
-   *Volume tetrahedra grading between a fine first wall and a coarse blanket.*
+   *A graded volume mesh through the part interior.*
