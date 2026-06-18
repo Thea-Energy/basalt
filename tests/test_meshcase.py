@@ -1,5 +1,7 @@
 """Tests for new MeshCase mesh-size controls (gradation + body exclusion)."""
 
+import os
+
 import basalt
 
 
@@ -30,7 +32,6 @@ def test_set_no_mesh_excludes_regions(w7x_model):
     vm = basalt.VolumeMesh.from_surface_mesh(sm)
     out = "/tmp/basalt_no_mesh_test.msh"
     vm.write_msh(out, scale_factor=1.0)
-    import os
 
     assert os.path.getsize(out) > 0
 
@@ -53,7 +54,6 @@ def test_set_size_absolute(w7x_model):
     vm = basalt.VolumeMesh.from_surface_mesh(sm)
     out = "/tmp/basalt_size_absolute_test.msh"
     vm.write_msh(out, scale_factor=1.0)
-    import os
 
     assert os.path.getsize(out) > 0
 
@@ -68,7 +68,6 @@ def test_add_point_refinement(w7x_model):
     vm = basalt.VolumeMesh.from_surface_mesh(sm)
     out = "/tmp/basalt_point_refinement_test.msh"
     vm.write_msh(out, scale_factor=1.0)
-    import os
 
     assert os.path.getsize(out) > 0
 
@@ -81,6 +80,5 @@ def test_volume_mesh_enforce_size(w7x_model):
     vm = basalt.VolumeMesh.from_surface_mesh(sm, enforce_size=1)
     out = "/tmp/basalt_enforce_size_test.msh"
     vm.write_msh(out, scale_factor=1.0)
-    import os
 
     assert os.path.getsize(out) > 0
