@@ -15,11 +15,11 @@
 <!--
 The public CI runs lint and the Sphinx build only — it does NOT run
 the test suite (which requires a Simmetrix SimModSuite license).
-Maintainers: confirm `pixi run build` and `pixi run pytest` pass locally
-before merging.
+Maintainers: confirm `pixi install` builds the extension and `pixi run pytest`
+passes locally before merging.
 -->
 
-- [ ] `pixi run build` succeeds locally against my SMS install
+- [ ] `pixi install` builds the extension locally against my SMS install
 - [ ] `pixi run pytest` passes locally
 - [ ] Lint passes (`ruff check .` and `ruff format --check .`)
 - [ ] Documentation updated where relevant

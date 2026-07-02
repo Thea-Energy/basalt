@@ -51,12 +51,12 @@ test suite locally before merging**:
 
 .. code:: sh
 
-   pixi run build
+   pixi install    # builds the editable extension (use `pixi reinstall basalt-mesh` to force a from-scratch rebuild)
    pixi run pytest
 
 If you're submitting a PR as an external contributor, please confirm
-locally that ``pixi run build`` succeeds and the tests pass against your
-SMS install before requesting review.
+locally that ``pixi install`` builds the extension and the tests pass
+against your SMS install before requesting review.
 
 ----------
 Code style
