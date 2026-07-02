@@ -96,9 +96,11 @@ Install with pip
 Basalt ships as a source distribution, so ``pip`` builds the C++ extension at
 install time against the SMS install at ``$SIMMODSUITE_ROOT``. ``scikit-build-core``
 pulls ``nanobind`` and ``nanobindgen`` into the build environment automatically,
-but **gmsh** must be available on the host (typically from conda-forge or the
-``gmsh`` PyPI wheel) — both at build time (for headers and ``find_library``) and
-at runtime.
+and ``spdlog`` is fetched at configure time by CMake, but the remaining libraries
+basalt links — **gmsh** and **nlohmann_json** — must be present at build time
+(and gmsh at runtime). In practice basalt is built inside a conda/pixi
+environment where these come from conda-forge; a bare ``pip install`` outside
+such an environment is not supported.
 
 .. code:: sh
 
@@ -116,7 +118,9 @@ Install with pixi
 
    .. tab:: Pixi git source
 
-      Add to your ``pixi.toml`` under ``[pypi-dependencies]``:
+      Add to your ``pixi.toml`` under ``[pypi-dependencies]`` (basalt is a
+      pypi package that builds against the conda-forge libraries already in
+      your environment):
 
       .. code:: toml
 
