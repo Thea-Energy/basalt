@@ -20,7 +20,7 @@ requires-python = ">=3.12"
 [tool.scikit-build]
 minimum-version = "0.10"
 cmake.version = ">=3.15"
-cmake.build-type = "Release"
+cmake.build-type = "RelWithDebInfo"
 build-dir = "build/{wheel_tag}"
 wheel.packages = ["basalt"]
 # Rebuild the C++ extension automatically when a source file changed and the
