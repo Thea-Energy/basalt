@@ -29,6 +29,8 @@ ipykernel = ">=7.1.0, <8"
 [dependencies]
 python = "3.12.*"
 nanobind = ">=2.9.2,<3"
+cmake = ">=3.15"
+ninja = ">=1.11"
 gmsh = ">=4.13.1,<5"
 stellarmesh = ">=2.0.0,<3"
 openmc = { version = "==0.15.2", build = "dagmc_nompi*" }
