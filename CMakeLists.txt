@@ -157,12 +157,10 @@ file(GLOB PYTHON_SOURCES ${SRC_DIR}/python/*.cpp)
 nanobind_add_module(_core NB_SHARED # STATIC is the default
         ${PYTHON_SOURCES})
 
-# Each consumer sets CMAKE_INSTALL_PREFIX itself:
-#   - dev pixi `build` task installs with --prefix .
-#   - scikit-build-core installs into its temporary prefix and collects from there
-#   - pixi-build-python (which routes through scikit-build-core) likewise
+# scikit-build-core sets CMAKE_INSTALL_PREFIX and collects the install tree into
+# the editable/site-packages location (or the wheel for an sdist build).
 # $ORIGIN keeps _core.so finding sibling .so files inside basalt/_core/ regardless
-# of where the wheel is installed.
+# of where the package is installed.
 
 # Inspect RPATH with: readelf -d basalt/_core/_core.cpython-*.so | grep RUNPATH
 set_property(

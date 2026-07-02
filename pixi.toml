@@ -3,15 +3,18 @@ authors = ["akoen <git@koen.ca>"]
 channels = ["conda-forge"]
 name = "basalt"
 platforms = ["linux-64"]
-preview = ["pixi-build"]
 
 
 [tasks]
-conf = 'cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="$CONDA_PREFIX" -DCMAKE_INSTALL_PREFIX="$PWD" -DCMAKE_EXPORT_COMPILE_COMMANDS=TRUE'
-build = "cmake --build build -j 8 && cmake --install build"
-# Preserve `basalt/_core/__init__.py` (a source-tracked package marker that
-# scikit-build-core's editable install registers as a module).
-clean = "rm -rf build _deps && find basalt/_core -mindepth 1 -not -name __init__.py -delete 2>/dev/null; true"
+# The editable install rebuilds the extension automatically on import
+# (scikit-build-core editable.rebuild; build isolation is disabled so the rebuild
+# uses the stable env interpreter — see [pypi-options]). No separate build task is
+# needed for day-to-day edits. For a from-scratch rebuild run
+# `pixi reinstall basalt-mesh` (a plain `pixi install` is a no-op once the package
+# is already installed, so it will NOT reconfigure a wiped build dir). `clean`
+# wipes the CMake cache + FetchContent deps; follow it with
+# `pixi reinstall basalt-mesh`. Preserves tracked basalt/_core/__init__.py and _core.pyi.
+clean = "rm -rf build _deps && find basalt/_core -mindepth 1 ! -name __init__.py ! -name _core.pyi -delete 2>/dev/null; true"
 
 # Make the conda env discoverable to CMake during the scikit-build-core
 # editable install (`pixi install` triggers it; the build subprocess inherits
@@ -21,6 +24,15 @@ clean = "rm -rf build _deps && find basalt/_core -mindepth 1 -not -name __init__
 [activation.env]
 CMAKE_PREFIX_PATH = "$CONDA_PREFIX"
 
+# Build basalt-mesh without PEP 517 build isolation. scikit-build-core's editable
+# rebuild-on-import re-runs `cmake --build` against the interpreter baked into the
+# CMake cache at configure time; under an isolated build that interpreter is uv's
+# ephemeral temp venv, which is deleted after install, so rebuilds fail. Disabling
+# isolation makes the build use the stable pixi env interpreter. Requires the build
+# backend + build reqs (scikit-build-core, nanobind, nanobindgen) to be in the env.
+[pypi-options]
+no-build-isolation = ["basalt-mesh"]
+
 [pypi-dependencies]
 nanobindgen = ">=0.2.0,<1"
 basalt-mesh = { path = ".", editable = true }
@@ -29,6 +41,13 @@ ipykernel = ">=7.1.0, <8"
 [dependencies]
 python = "3.12.*"
 nanobind = ">=2.9.2,<3"
+# Build backend for basalt-mesh, in the env because build isolation is disabled
+# (see [pypi-options].no-build-isolation).
+scikit-build-core = ">=0.10"
+cmake = ">=3.15"
+ninja = ">=1.11"
+# For producing the PyPI source distribution (`python -m build --sdist`).
+python-build = ">=1.2"
 gmsh = ">=4.13.1,<5"
 stellarmesh = ">=2.0.0,<3"
 openmc = { version = "==0.15.2", build = "dagmc_nompi*" }
@@ -60,25 +79,3 @@ docs-watch = "sphinx-autobuild docs docs/_build/html"
 
 [environments]
 docs = ["docs"]
-
-
-[package]
-name = "basalt-mesh"
-version = "0.1"
-description = "Nuclear meshing library for NX and Parasolid based on the Simmetrix mesh suite"
-
-[package.build]
-backend = { name = "pixi-build-python", version = "0.4.*" }
-
-[package.host-dependencies]
-python = "3.12.*"
-nanobind = ">=2.9.2,<3"
-cmake = ">=3.15"
-ninja = ">=1.11"
-# scikit-build-core and nanobindgen come from build-system.requires in
-# pyproject.toml (PyPI). pixi-build-python honors that list.
-
-[package.run-dependencies]
-python = "3.12.*"
-nanobind = ">=2.9.2,<3"
-gmsh = ">=4.13.1,<5"

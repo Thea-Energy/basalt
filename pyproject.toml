@@ -20,9 +20,14 @@ requires-python = ">=3.12"
 [tool.scikit-build]
 minimum-version = "0.10"
 cmake.version = ">=3.15"
-cmake.build-type = "Release"
+cmake.build-type = "RelWithDebInfo"
 build-dir = "build/{wheel_tag}"
 wheel.packages = ["basalt"]
+# Rebuild the C++ extension automatically when a source file changed and the
+# package is imported (editable installs only; ignored by sdist/wheel installs).
+# Requires cmake + ninja in the runtime env (see pixi.toml [dependencies]).
+# build-dir above must stay persistent so the CMake cache survives between imports.
+editable.rebuild = true
 # nanobind installs its own CMake config under <site-packages>/nanobind/cmake; the
 # top-level CMakeLists.txt finds it via execute_process(... -m nanobind --cmake_dir).
 
