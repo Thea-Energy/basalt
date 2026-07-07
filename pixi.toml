@@ -14,7 +14,7 @@ platforms = ["linux-64"]
 # is already installed, so it will NOT reconfigure a wiped build dir). `clean`
 # wipes the CMake cache + FetchContent deps; follow it with
 # `pixi reinstall basalt-mesh`. Preserves tracked basalt/_core/__init__.py and _core.pyi.
-clean = "rm -rf build _deps && find basalt/_core -mindepth 1 ! -name __init__.py ! -name _core.pyi -delete 2>/dev/null; true"
+clean = "rm -rf build && find basalt/_core -mindepth 1 ! -name __init__.py ! -name _core.pyi -delete 2>/dev/null; true"
 
 # Make the conda env discoverable to CMake during the scikit-build-core
 # editable install (`pixi install` triggers it; the build subprocess inherits

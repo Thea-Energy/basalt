@@ -7,11 +7,10 @@ set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Resolves -fPIC errors
 
 include(FetchContent)
-set(FETCHCONTENT_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/_deps)
 set(FETCHCONTENT_QUIET TRUE)
 
 find_package(
-        Python 3.10
+        Python 3.12
         COMPONENTS Interpreter Development.Module
         REQUIRED)
 
@@ -182,7 +181,7 @@ nanobind_add_stub(
 
 target_link_libraries(_core PRIVATE main)
 target_include_directories(_core PRIVATE ${SRC_DIR}/python)
-target_include_directories(_core PRIVATE ${SRC_DIR}/autogen)
+target_include_directories(_core PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 set(GEN_FILES
 basalt.h
@@ -190,18 +189,16 @@ basalt.h
 foreach (SOURCE_FILE ${GEN_FILES})
     get_filename_component(FILE_NAME ${SOURCE_FILE} NAME_WE)
     set(INPUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/${SOURCE_FILE}")
-    set(OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/autogen")
+    set(OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/autogen")
     set (OUTPUT_FILE "${OUTPUT_DIR}/bind_${FILE_NAME}.h")
     list(APPEND GENERATED_FILES ${OUTPUT_FILE})
 
-    # nanobindgen does not create its output directory itself, and the sdist
-    # excludes the gitignored `src/autogen/` tree, so make sure the directory
-    # exists before invoking the generator.
+    # nanobindgen does not create its output directory itself.
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
 
     add_custom_command(
             OUTPUT ${OUTPUT_FILE}
-            COMMAND python -m nanobindgen -o ${OUTPUT_DIR}
+            COMMAND ${Python_EXECUTABLE} -m nanobindgen -o ${OUTPUT_DIR}
             ${INPUT_FILE}
             DEPENDS ${INPUT_FILE} ${GEN_SCRIPT}
             COMMENT "Generating bindings for ${SOURCE_FILE}")
