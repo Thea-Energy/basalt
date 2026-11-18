@@ -1,7 +1,7 @@
 """Tests for new MeshCase mesh-size controls (gradation + body exclusion)."""
 
 import os
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, quote, urlencode
 
 import gmsh
 import pytest
@@ -220,3 +220,33 @@ def test_write_msh_rejects_non_tetrahedra(w7x_model):
     vm = basalt.VolumeMesh.from_surface_mesh(sm)
     with pytest.raises(RuntimeError, match="not tetrahedra"):
         vm.write_msh("/tmp/basalt_non_tetrahedra_test.msh", scale_factor=1.0)
+
+
+def test_write_msh_names_round_trip(w7x_model):
+    """Every physical name is a URL query that re-encodes to itself and has a tag."""
+    nm, mc, _ = _single_region_meshcase(w7x_model)
+    mc.set_size(0.3)
+    sm = basalt.SurfaceMesh.from_model(nm, mc)
+    vm = basalt.VolumeMesh.from_surface_mesh(sm)
+    out = "/tmp/basalt_names_round_trip_test.msh"
+    vm.write_msh(out, scale_factor=1.0)
+
+    gmsh.initialize()
+    try:
+        gmsh.open(out)
+        names = [
+            gmsh.model.getPhysicalName(dim, tag)
+            for dim, tag in gmsh.model.getPhysicalGroups()
+        ]
+    finally:
+        gmsh.finalize()
+
+    assert names
+    for name in names:
+        parsed = parse_qs(name, keep_blank_values=True, strict_parsing=True)
+        assert all(len(v) == 1 for v in parsed.values()), name
+        reencoded = urlencode(
+            {k: v[0] for k, v in parsed.items()}, safe="", quote_via=quote
+        )
+        assert reencoded == name
+        assert "tag" in parsed, name
