@@ -13,6 +13,13 @@ That page is the canonical schema; this page documents Basalt's
 schema field, the coordinate units it writes, and the
 :py:meth:`Mesh.write_msh` API surface.
 
+Every physical-group value (``material``, ``forward_volume``,
+``reverse_volume``) is URL-encoded: bytes outside ``[A-Za-z0-9-._~]``
+are written as ``%XX`` (uppercase hex). A slug containing ``&``,
+``=`` or a space therefore decodes back exactly through Python's
+:py:func:`urllib.parse.parse_qs`. Numbers and ``None`` encode to
+themselves.
+
 -------------------------
 Material name resolution
 -------------------------

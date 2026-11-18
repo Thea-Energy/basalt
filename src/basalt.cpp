@@ -408,6 +408,27 @@ bool Model::is_valid() const {
   return is_valid;
 }
 
+// Percent-encode every byte outside RFC 3986 unreserved characters, so a
+// physical-group value with '&', '=' or spaces decodes back exactly through
+// Python's urllib.parse.parse_qs.
+static std::string url_encode(const std::string &s) {
+  static constexpr char hex[] = "0123456789ABCDEF";
+  std::string out;
+  out.reserve(s.size());
+  for (unsigned char c : s) {
+    if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
+        (c >= '0' && c <= '9') || c == '-' || c == '.' || c == '_' ||
+        c == '~') {
+      out.push_back(static_cast<char>(c));
+    } else {
+      out.push_back('%');
+      out.push_back(hex[c >> 4]);
+      out.push_back(hex[c & 0xF]);
+    }
+  }
+  return out;
+}
+
 // Native-geometry companion file for a given .smd cache path (foo.smd ->
 // foo.xmt_txt). GM_load needs both: the .smd has topology, the native has
 // geometry.
@@ -1035,8 +1056,9 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
             : std::to_string(GEN_tag(sg_reverse_volume));
 
     std::stringstream physical_name;
-    physical_name << "tag=" << sg_tag << "&forward_volume=" << forward_volume
-                  << "&reverse_volume=" << reverse_volume;
+    physical_name << "tag=" << sg_tag
+                  << "&forward_volume=" << url_encode(forward_volume)
+                  << "&reverse_volume=" << url_encode(reverse_volume);
 
     auto physical_tag = gmsh::model::addPhysicalGroup(dim, {sg_tag}, sg_tag,
                                                       physical_name.str());
@@ -1129,7 +1151,8 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
       material_name = "region_" + std::to_string(sg_tag);
 
     std::stringstream physical_name;
-    physical_name << "tag=" << sg_tag << "&material=" << material_name;
+    physical_name << "tag=" << sg_tag
+                  << "&material=" << url_encode(material_name);
     gmsh::model::addPhysicalGroup(dim, {sg_tag}, sg_tag, physical_name.str());
 
     std::vector<int> element_types(1, gmsh_element_type);
