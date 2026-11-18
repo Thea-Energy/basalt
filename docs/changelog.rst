@@ -26,6 +26,9 @@ Unreleased
 * :py:meth:`Mesh.write_msh` URL-encodes the ``material``,
   ``forward_volume`` and ``reverse_volume`` values, so slugs containing
   ``&``, ``=`` or spaces round-trip through ``urllib.parse.parse_qs``.
+* ``nx_journals/export_attrs.cs`` uses each component's ``GetPosition``
+  result as its world transform instead of composing it with its parent's,
+  which placed nested parts off by their parent's offset.
 
 -------------
 0.1
