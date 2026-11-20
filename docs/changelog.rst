@@ -20,6 +20,9 @@ Unreleased
   file to the working directory.
 * :py:meth:`MeshCase.set_domain` restricts meshing to the given entities and
   their closure.
+* :py:meth:`MeshCase.set_surface_mesh_type` selects triangle, quad-dominant
+  or all-quad surface meshes; :py:meth:`Mesh.write_msh` writes quads as Gmsh
+  type 3 and raises on volume elements other than tetrahedra.
 
 -------------
 0.1

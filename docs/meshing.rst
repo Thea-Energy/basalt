@@ -120,3 +120,18 @@ the interior may stay coarser than requested.
    :width: 80%
 
    *A graded volume mesh through the part interior.*
+
+Quad surface meshes
+===================
+
+:py:meth:`MeshCase.set_surface_mesh_type` switches the surface elements from
+triangles (``1``, the default) to quad-dominant (``2``) or all-quad (``3``),
+for the whole model or one face or region:
+
+.. code:: python
+
+   mesh_case.set_surface_mesh_type(3)   # all-quad
+
+Quad surface meshes are for surface-only output: a volume mesh built on one
+contains pyramids, which :py:meth:`Mesh.write_msh` rejects, and DAGMC
+conversion needs triangles (see :doc:`format`).
