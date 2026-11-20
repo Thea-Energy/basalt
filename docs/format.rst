@@ -65,19 +65,6 @@ Written entities
 carries mesh, so entities excluded from meshing are absent. A volume is
 written if it holds volume elements or bounds a written face.
 
---------------
-Element types
---------------
-
-Surface elements are 3-node triangles (Gmsh type 2) or, after
-:py:meth:`MeshCase.set_surface_mesh_type`, 4-node quadrangles (type 3).
-Volume elements are 4-node tetrahedra (type 4).
-:py:meth:`Mesh.write_msh` raises on any other element, such as the
-pyramids a volume mesh grows on a quad surface mesh.
-
-Quad faces are not usable for DAGMC: stellarmesh converts triangles
-only, dropping quads and rejecting a surface that has none.
-
 ------
 Units
 ------

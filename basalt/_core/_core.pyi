@@ -416,13 +416,9 @@ class MeshCase:
         """
         Set the surface element type: triangles, quad-dominant or all-quad.
 
-        Wraps MS_setSurfaceMeshType. Volume meshing on top of a quad or mixed
-        surface mesh produces pyramids, which write_msh rejects.
-
         Args:
             mesh_type: 1 = triangles (default), 2 = quad-dominant, 3 = all-quad.
             model_item: Optional Face or Region; default is the whole domain.
-        Has no effect on an Edge or Vertex.
         """
 
     def set_no_mesh(self, model_item: ModelItem) -> None:

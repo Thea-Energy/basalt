@@ -926,9 +926,7 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
     n_bad_regions += R_topoType(r) != Rtet;
   RIter_delete(check_rit);
   if (n_bad_regions > 0)
-    throw_exception("write_msh: {} volume elements are not tetrahedra (a quad "
-                    "surface mesh gives pyramids); only tetrahedra are "
-                    "supported.",
+    throw_exception("write_msh: {} volume elements are not tetrahedra.",
                     n_bad_regions);
 
   gmsh::initialize();
@@ -1120,7 +1118,7 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
                                                       physical_name.str());
 
     // Bucket 0: 3-node triangles (gmsh type 2); bucket 1: 4-node quads (gmsh
-    // type 3). Other polygons were rejected above.
+    // type 3).
     std::vector<int> element_types{2, 3};
     std::vector<std::vector<size_t>> element_tags(2);
     std::vector<std::vector<size_t>> element_nodes(2);
@@ -1138,7 +1136,7 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
       PList_delete(s_face_verts);
     }
     FIter_delete(sm_elements);
-    // gmsh rejects an element type with zero elements; drop empty buckets.
+    // Gmsh rejects an element type with zero elements; drop empty buckets.
     for (size_t b = element_types.size(); b-- > 0;)
       if (element_tags[b].empty()) {
         element_types.erase(element_types.begin() + b);
