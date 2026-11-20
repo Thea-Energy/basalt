@@ -120,19 +120,3 @@ the interior may stay coarser than requested.
    :width: 80%
 
    *A graded volume mesh through the part interior.*
-
-Meshing part of a model
-=======================
-
-:py:meth:`MeshCase.set_domain` meshes only the given entities and their
-closure (a face's edges and vertices, a region's faces). Every other region,
-face and edge is excluded. Select a single face to surface-mesh a sheet
-without meshing the bodies around it:
-
-.. code:: python
-
-   mesh_case.set_domain([nm_model.faces[FACE_ID]])
-   surface_mesh = bslt.SurfaceMesh.from_model(nm_model, mesh_case)
-
-Exclusions accumulate and cannot be undone: a second ``set_domain`` call, or
-:py:meth:`MeshCase.set_no_mesh`, narrows the meshed set further.
