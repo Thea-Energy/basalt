@@ -7,6 +7,19 @@ The format follows `Keep a Changelog <https://keepachangelog.com>`__,
 and this project follows `Semantic Versioning <https://semver.org>`__.
 
 -------------
+Unreleased
+-------------
+
+* :py:meth:`Mesh.write_msh` writes only the vertices, edges and faces that
+  carry mesh. A volume is written if it holds volume elements or bounds a
+  written face, so every ``forward_volume``/``reverse_volume`` a face names
+  is in the file; a surface mesh keeps all its volumes, without elements.
+  Entities excluded with :py:meth:`MeshCase.set_no_mesh` were previously
+  written as empty entities.
+* :py:meth:`SurfaceMesh.from_model` no longer writes a ``mesh.sms`` debug
+  file to the working directory.
+
+-------------
 0.1
 -------------
 

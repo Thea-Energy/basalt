@@ -57,6 +57,17 @@ has no way of knowing which assemblies are intended to share material
 identity. Pushing that mapping to the consumer keeps Basalt's output
 faithful to the CAD source.
 
+-----------------
+Written entities
+-----------------
+
+:py:meth:`Mesh.write_msh` writes a vertex, edge or face only if it
+carries mesh, so entities excluded from meshing are absent. A volume is
+written if it holds volume elements or bounds a written face; every
+``forward_volume`` and ``reverse_volume`` a face names is therefore
+present in the file. A surface mesh has no volume elements, so its
+volumes are written without elements, bounded by their faces.
+
 ------
 Units
 ------
