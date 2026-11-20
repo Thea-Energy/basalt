@@ -844,6 +844,41 @@ void MeshCase::set_no_mesh(nb::ref<ModelItem> model_item) {
   MS_setNoMesh(this->s_mesh_case, model_item->s_model_item, 1);
 }
 
+void MeshCase::set_domain(std::vector<nb::ref<Entity>> entities) {
+  if (entities.empty())
+    throw_exception("set_domain: at least one entity is required.");
+  for (const auto &e : entities)
+    if (e->model.get() != this->model.get())
+      throw_exception("set_domain: entity {} does not belong to this model.",
+                      e->get_tag());
+
+  auto gd = GDomain_new();
+  for (const auto &e : entities)
+    GDomain_addModelEntity(gd, (pGEntity)e->s_model_item, 1);
+
+  // Regions and faces use closure = 0: with closure enabled, SMS un-meshes a
+  // face whenever every region attached to it is no-mesh, which would also
+  // remove a selected face embedded in excluded regions. Faces and edges are
+  // excluded explicitly below instead. Edges keep closure = 1 so that a vertex
+  // is un-meshed once every edge attached to it is no-mesh.
+  auto rit = GM_regionIter(this->model->s_model);
+  while (auto r = GRIter_next(rit))
+    if (!GDomain_contains(gd, (pGEntity)r))
+      MS_setNoMesh(this->s_mesh_case, (pModelItem)r, 0);
+  GRIter_delete(rit);
+  auto fit = GM_faceIter(this->model->s_model);
+  while (auto f = GFIter_next(fit))
+    if (!GDomain_contains(gd, (pGEntity)f))
+      MS_setNoMesh(this->s_mesh_case, (pModelItem)f, 0);
+  GFIter_delete(fit);
+  auto eit = GM_edgeIter(this->model->s_model);
+  while (auto e = GEIter_next(eit))
+    if (!GDomain_contains(gd, (pGEntity)e))
+      MS_setNoMesh(this->s_mesh_case, (pModelItem)e, 1);
+  GEIter_delete(eit);
+  GDomain_delete(gd);
+}
+
 void MeshCase::add_point_refinement(double size, std::array<double, 3> point) {
   MS_addPointRefinement(this->s_mesh_case, size, point.data());
 }

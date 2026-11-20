@@ -18,6 +18,8 @@ Unreleased
   written as empty entities.
 * :py:meth:`SurfaceMesh.from_model` no longer writes a ``mesh.sms`` debug
   file to the working directory.
+* :py:meth:`MeshCase.set_domain` restricts meshing to the given entities and
+  their closure.
 
 -------------
 0.1

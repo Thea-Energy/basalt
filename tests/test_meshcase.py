@@ -4,6 +4,7 @@ import os
 from urllib.parse import parse_qs
 
 import gmsh
+import pytest
 
 import basalt
 
@@ -147,3 +148,32 @@ def test_write_msh_omits_unmeshed_entities(w7x_model):
     assert all(n == 0 for n in volumes.values())
     assert len(volumes) < len(regions) - 1, "every excluded region was written"
     _assert_face_volumes_written(entities)
+
+
+def test_set_domain_meshes_only_selected_face(w7x_model):
+    """set_domain([face]) meshes only that face and its closure."""
+    nm = w7x_model.make_non_manifold_model()
+    face = nm.faces[0]
+    mc = basalt.MeshCase(nm)
+    mc.set_size(0.3)
+    mc.set_domain([face])
+    sm = basalt.SurfaceMesh.from_model(nm, mc)
+    out = "/tmp/basalt_set_domain_test.msh"
+    sm.write_msh(out, scale_factor=1.0)
+
+    entities = _msh_entities(out)
+    assert [tag for dim, tag in entities if dim == 2] == [face.tag]
+    assert {tag for dim, tag in entities if dim == 1} == {e.tag for e in face.edges}
+    assert all(n > 0 for (dim, _), (_, n) in entities.items() if dim < 3)
+    fields = entities[2, face.tag][0]
+    sides = {fields[s] for s in ("forward_volume", "reverse_volume")} - {"None"}
+    volumes = {tag: n for (dim, tag), (_, n) in entities.items() if dim == 3}
+    assert set(volumes) == {int(s) for s in sides}
+    assert all(n == 0 for n in volumes.values())
+
+
+def test_set_domain_rejects_empty(w7x_model):
+    """set_domain([]) is an error: an empty domain would mesh nothing."""
+    nm = w7x_model.make_non_manifold_model()
+    with pytest.raises(RuntimeError):
+        basalt.MeshCase(nm).set_domain([])

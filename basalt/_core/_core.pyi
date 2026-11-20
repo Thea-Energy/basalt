@@ -423,6 +423,14 @@ class MeshCase:
             model_item: Model entity to exclude (Region, Face, ...).
         """
 
+    def set_domain(self, entities: Sequence[Entity]) -> None:
+        """
+        Restrict meshing to `entities` and their closure.
+
+        Args:
+            entities: Model entities (Region, Face, Edge, Vertex) to mesh.
+        """
+
     def add_point_refinement(self, size: float, point: Sequence[float]) -> None:
         """
         Add a point refinement: refine the mesh to `size` around a point.

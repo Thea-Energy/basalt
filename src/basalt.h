@@ -572,6 +572,15 @@ public:
   void set_no_mesh(nb::ref<ModelItem> model_item);
 
   /**
+   * Restrict meshing to `entities` and their closure.
+   *
+   *
+   * @param entities Model entities (Region, Face, Edge, Vertex) to mesh.
+   * @nb
+   */
+  void set_domain(std::vector<nb::ref<Entity>> entities);
+
+  /**
    * Add a point refinement: refine the mesh to `size` around a point.
    *
    * Wraps MS_addPointRefinement.
