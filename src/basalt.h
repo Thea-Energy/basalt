@@ -563,12 +563,8 @@ public:
   /**
    * Set the surface element type: triangles, quad-dominant or all-quad.
    *
-   * Wraps MS_setSurfaceMeshType. Volume meshing on top of a quad or mixed
-   * surface mesh produces pyramids, which write_msh rejects.
-   *
    * @param mesh_type 1 = triangles (default), 2 = quad-dominant, 3 = all-quad.
    * @param model_item Optional Face or Region; default is the whole domain.
-   * Has no effect on an Edge or Vertex.
    * @nb
    */
   void set_surface_mesh_type(
