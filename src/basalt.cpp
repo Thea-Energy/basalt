@@ -996,8 +996,7 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
   }
   FIter_delete(fit);
 
-  // A region is written if it holds volume elements or bounds a written face, so
-  // every forward_volume/reverse_volume a face names is present in the file.
+  // A region is written if it holds volume elements or bounds a written face.
   std::unordered_set<pGEntity> written_faces;
   for (auto entity : this->model->get_faces()) {
     auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
