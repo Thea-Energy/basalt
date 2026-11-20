@@ -23,6 +23,9 @@ Unreleased
 * :py:meth:`MeshCase.set_surface_mesh_type` selects triangle, quad-dominant
   or all-quad surface meshes; :py:meth:`Mesh.write_msh` writes quads as Gmsh
   type 3 and raises on volume elements other than tetrahedra.
+* :py:meth:`Mesh.write_msh` URL-encodes the ``material``,
+  ``forward_volume`` and ``reverse_volume`` values, so slugs containing
+  ``&``, ``=`` or spaces round-trip through ``urllib.parse.parse_qs``.
 
 -------------
 0.1
