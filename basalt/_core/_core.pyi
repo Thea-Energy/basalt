@@ -423,6 +423,24 @@ class MeshCase:
             model_item: Model entity to exclude (Region, Face, ...).
         """
 
+    def set_domain(self, entities: Sequence[Entity]) -> None:
+        """
+        Restrict meshing to `entities` and their closure.
+
+        Every model region, face and edge that is neither in `entities` nor in
+        their closure (a face's edges and vertices, a region's faces, ...) is
+        marked no-mesh (MS_setNoMesh). Edges and vertices shared with a selected
+        entity stay meshed. Membership is tracked with an SMS GDomain, which
+        computes the closure.
+
+        Exclusions accumulate and cannot be undone: a second call, or
+        set_no_mesh, narrows the meshed set further.
+
+        Args:
+            entities: Model entities (Region, Face, Edge, Vertex) to mesh. Must
+        be non-empty and belong to this mesh case's model.
+        """
+
     def add_point_refinement(self, size: float, point: Sequence[float]) -> None:
         """
         Add a point refinement: refine the mesh to `size` around a point.

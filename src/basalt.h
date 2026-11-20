@@ -572,6 +572,24 @@ public:
   void set_no_mesh(nb::ref<ModelItem> model_item);
 
   /**
+   * Restrict meshing to `entities` and their closure.
+   *
+   * Every model region, face and edge that is neither in `entities` nor in
+   * their closure (a face's edges and vertices, a region's faces, ...) is
+   * marked no-mesh (MS_setNoMesh). Edges and vertices shared with a selected
+   * entity stay meshed. Membership is tracked with an SMS GDomain, which
+   * computes the closure.
+   *
+   * Exclusions accumulate and cannot be undone: a second call, or
+   * set_no_mesh, narrows the meshed set further.
+   *
+   * @param entities Model entities (Region, Face, Edge, Vertex) to mesh. Must
+   * be non-empty and belong to this mesh case's model.
+   * @nb
+   */
+  void set_domain(std::vector<nb::ref<Entity>> entities);
+
+  /**
    * Add a point refinement: refine the mesh to `size` around a point.
    *
    * Wraps MS_addPointRefinement.
