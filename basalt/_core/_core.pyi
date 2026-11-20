@@ -412,6 +412,15 @@ class MeshCase:
             rate: Gradation rate.
         """
 
+    def set_surface_mesh_type(self, mesh_type: int, model_item: ModelItem | None = None) -> None:
+        """
+        Set the surface element type: triangles, quad-dominant or all-quad.
+
+        Args:
+            mesh_type: 1 = triangles (default), 2 = quad-dominant, 3 = all-quad.
+            model_item: Optional Face or Region; default is the whole domain.
+        """
+
     def set_no_mesh(self, model_item: ModelItem) -> None:
         """
         Exclude a model entity (e.g. a region/body) and its closure from meshing.

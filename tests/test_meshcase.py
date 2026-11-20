@@ -177,3 +177,46 @@ def test_set_domain_rejects_empty(w7x_model):
     nm = w7x_model.make_non_manifold_model()
     with pytest.raises(RuntimeError):
         basalt.MeshCase(nm).set_domain([])
+
+
+def test_set_surface_mesh_type_all_quad(w7x_model):
+    """set_surface_mesh_type(3) yields only 4-node quads (gmsh type 3)."""
+    nm = w7x_model.make_non_manifold_model()
+    face = nm.faces[0]
+    mc = basalt.MeshCase(nm)
+    mc.set_size(0.3)
+    mc.set_domain([face])
+    mc.set_surface_mesh_type(3)
+    sm = basalt.SurfaceMesh.from_model(nm, mc)
+    out = "/tmp/basalt_all_quad_test.msh"
+    sm.write_msh(out, scale_factor=1.0)
+
+    gmsh.initialize()
+    try:
+        gmsh.option.setNumber("General.Terminal", 0)
+        gmsh.open(out)
+        elem_types, elem_tags, node_tags = gmsh.model.mesh.getElements(2, face.tag)
+        assert list(elem_types) == [3]
+        assert len(elem_tags[0]) > 0
+        assert len(node_tags[0]) == 4 * len(elem_tags[0])
+    finally:
+        gmsh.finalize()
+
+
+def test_set_surface_mesh_type_rejects_unknown(w7x_model):
+    """Types outside 1-3 are refused (4/5 are thin-section variants)."""
+    nm = w7x_model.make_non_manifold_model()
+    with pytest.raises(RuntimeError):
+        basalt.MeshCase(nm).set_surface_mesh_type(4)
+
+
+def test_write_msh_rejects_non_tetrahedra(w7x_model):
+    """A volume mesh on a quad surface mesh has pyramids; write_msh refuses it."""
+    nm, mc, _ = _single_region_meshcase(w7x_model)
+    mc.set_size(0.3)
+    # Quad-dominant: all-quad fails on this region at this size (SMS error 1102).
+    mc.set_surface_mesh_type(2)
+    sm = basalt.SurfaceMesh.from_model(nm, mc)
+    vm = basalt.VolumeMesh.from_surface_mesh(sm)
+    with pytest.raises(RuntimeError, match="not tetrahedra"):
+        vm.write_msh("/tmp/basalt_non_tetrahedra_test.msh", scale_factor=1.0)

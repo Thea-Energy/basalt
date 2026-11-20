@@ -838,6 +838,18 @@ void MeshCase::set_gradation_rate(double rate) {
   MS_setGlobalSizeGradationRate(this->s_mesh_case, rate);
 }
 
+void MeshCase::set_surface_mesh_type(
+    int mesh_type, std::optional<nb::ref<ModelItem>> model_item) {
+  // Types 4 and 5 are thin-section variants of 2 and 3; basalt exposes no
+  // thin-section controls, so they are not accepted.
+  if (mesh_type < 1 || mesh_type > 3)
+    throw_exception("set_surface_mesh_type: mesh_type must be 1, 2 or 3, got {}.",
+                    mesh_type);
+  auto s_model_item = model_item.has_value() ? model_item.value()->s_model_item
+                                             : GM_domain(this->model->s_model);
+  MS_setSurfaceMeshType(this->s_mesh_case, s_model_item, mesh_type);
+}
+
 void MeshCase::set_no_mesh(nb::ref<ModelItem> model_item) {
   // closure = 1: also exclude the entity's lower-dimensional closure that is
   // not shared with a meshed body.
@@ -896,6 +908,27 @@ static std::string get_native_string_attr(pGIPart part, const char *attr_name) {
 }
 
 void Mesh::write_msh(std::string filename, double scale_factor) {
+  // Reject unsupported elements before touching gmsh, so a failed write leaves
+  // no gmsh session open.
+  size_t n_bad_faces = 0;
+  auto check_fit = M_faceIter(this->s_mesh);
+  while (auto f = FIter_next(check_fit)) {
+    int n = F_numEdges(f);
+    n_bad_faces += n != 3 && n != 4;
+  }
+  FIter_delete(check_fit);
+  if (n_bad_faces > 0)
+    throw_exception("write_msh: {} mesh faces are neither triangles nor quads.",
+                    n_bad_faces);
+  size_t n_bad_regions = 0;
+  auto check_rit = M_regionIter(this->s_mesh);
+  while (auto r = RIter_next(check_rit))
+    n_bad_regions += R_topoType(r) != Rtet;
+  RIter_delete(check_rit);
+  if (n_bad_regions > 0)
+    throw_exception("write_msh: {} volume elements are not tetrahedra.",
+                    n_bad_regions);
+
   gmsh::initialize();
   gmsh::model::add("basalt");
 
@@ -1023,7 +1056,6 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
 
   // Face
   dim = 2;
-  gmsh_element_type = 2;
 
   auto fit = M_faceIter(this->s_mesh);
   while (auto f = FIter_next(fit)) {
@@ -1085,35 +1117,40 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
     auto physical_tag = gmsh::model::addPhysicalGroup(dim, {sg_tag}, sg_tag,
                                                       physical_name.str());
 
-    std::vector<int> element_types(1, gmsh_element_type);
-    std::vector<std::vector<size_t>> element_tags(1);
-    std::vector<std::vector<size_t>> element_nodes(1);
+    // Bucket 0: 3-node triangles (gmsh type 2); bucket 1: 4-node quads (gmsh
+    // type 3).
+    std::vector<int> element_types{2, 3};
+    std::vector<std::vector<size_t>> element_tags(2);
+    std::vector<std::vector<size_t>> element_nodes(2);
     auto sm_elements = M_classifiedFaceIter(this->s_mesh, sg_entity, 0);
     while (auto sm_element = FIter_next(sm_elements)) {
-      auto s_mesh_face_tag = EN_id(sm_element);
-      element_tags[0].push_back(s_mesh_face_tag);
+      size_t bucket = F_numEdges(sm_element) == 3 ? 0 : 1;
+      element_tags[bucket].push_back(EN_id(sm_element));
 
+      // F_vertices(face, 1) is cyclic around the face: gmsh node order for
+      // both the 3-node triangle and the 4-node quadrangle.
       auto s_face_verts = F_vertices(sm_element, 1);
       void *it2 = 0;
-      std::vector<size_t> face_nodes;
-      while (auto s_vertex = (pVertex)PList_next(s_face_verts, &it2)) {
-        auto s_vertex_tag = EN_id(s_vertex);
-        face_nodes.push_back(s_vertex_tag);
-      }
+      while (auto s_vertex = (pVertex)PList_next(s_face_verts, &it2))
+        element_nodes[bucket].push_back(EN_id(s_vertex));
       PList_delete(s_face_verts);
-
-      element_nodes[0].insert(element_nodes[0].end(), face_nodes.begin(),
-                              face_nodes.end());
     }
+    FIter_delete(sm_elements);
+    // Gmsh rejects an element type with zero elements; drop empty buckets.
+    for (size_t b = element_types.size(); b-- > 0;)
+      if (element_tags[b].empty()) {
+        element_types.erase(element_types.begin() + b);
+        element_tags.erase(element_tags.begin() + b);
+        element_nodes.erase(element_nodes.begin() + b);
+      }
     gmsh::model::mesh::addElements(dim, sg_tag, element_types, element_tags,
                                    element_nodes);
-
-    FIter_delete(sm_elements);
   }
   // Region
   dim = 3;
 
   // TODO(akoen): Support hexahedral meshing
+  // Tetrahedra only; other region types were rejected above.
   gmsh_element_type = 4;
 
   for (auto entity : this->model->get_regions()) {
