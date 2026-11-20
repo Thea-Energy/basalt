@@ -324,10 +324,6 @@ public class ExportAttrs
         string pfile = "";
         try { pfile = component.Prototype.OwningPart.FullPath ?? ""; }
         catch (Exception) { }
-
-        // GetPosition already returns the component's absolute placement, so it is
-        // not composed with the parent's. Evidence: composing put NE-49 nested
-        // parts 0012573 and 0012734 76.2 cm off, exactly their parent's offset.
         double[][] worldRot;
         double[] worldOrigin;
         ComponentTransform(component, out worldRot, out worldOrigin);
