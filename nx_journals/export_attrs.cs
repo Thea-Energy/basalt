@@ -24,15 +24,6 @@ using NXOpen.Assemblies;
 
 public class ExportAttrs
 {
-    // Identity transform constants
-    static readonly double[][] IdentityRot = new double[][]
-    {
-        new double[] { 1.0, 0.0, 0.0 },
-        new double[] { 0.0, 1.0, 0.0 },
-        new double[] { 0.0, 0.0, 1.0 },
-    };
-    static readonly double[] IdentityOrigin = new double[] { 0.0, 0.0, 0.0 };
-
     // ---------------------------------------------------------------------------
     // Lightweight JSON builder: insertion-order-preserving, no external deps.
     // Produces correctly escaped, indented JSON.
@@ -198,26 +189,6 @@ public class ExportAttrs
         };
     }
 
-    static void ComposeTransforms(
-        double[][] parentRot, double[] parentOrigin,
-        double[][] childRot, double[] childOrigin,
-        out double[][] resultRot, out double[] resultOrigin)
-    {
-        resultRot = new double[3][];
-        for (int i = 0; i < 3; i++)
-        {
-            resultRot[i] = new double[3];
-            for (int j = 0; j < 3; j++)
-            {
-                double sum = 0.0;
-                for (int k = 0; k < 3; k++)
-                    sum += parentRot[i][k] * childRot[k][j];
-                resultRot[i][j] = sum;
-            }
-        }
-        resultOrigin = TransformPoint(childOrigin, parentRot, parentOrigin);
-    }
-
     // ---------------------------------------------------------------------------
     // Body helpers
     // ---------------------------------------------------------------------------
@@ -346,23 +317,16 @@ public class ExportAttrs
         MeasureManager measureManager,
         Unit[] massUnits,
         double unitToMeters,
-        string parentPath,
-        double[][] parentRot,
-        double[] parentOrigin)
+        string parentPath)
     {
         var attrs = CollectAttributes(component.GetUserAttributes());
 
         string pfile = "";
         try { pfile = component.Prototype.OwningPart.FullPath ?? ""; }
         catch (Exception) { }
-
-        double[][] localRot;
-        double[] localOrigin;
-        ComponentTransform(component, out localRot, out localOrigin);
-
         double[][] worldRot;
         double[] worldOrigin;
-        ComposeTransforms(parentRot, parentOrigin, localRot, localOrigin, out worldRot, out worldOrigin);
+        ComponentTransform(component, out worldRot, out worldOrigin);
 
         string name = component.Name ?? "";
 
@@ -447,7 +411,7 @@ public class ExportAttrs
             CollectBodies(
                 child, components, bodies,
                 measureManager, massUnits, unitToMeters,
-                nodePath, worldRot, worldOrigin);
+                nodePath);
         }
     }
 
@@ -665,7 +629,7 @@ public class ExportAttrs
             CollectBodies(
                 root, components, bodies,
                 measureManager, massUnits, unitToMeters,
-                "", IdentityRot, IdentityOrigin);
+                "");
         }
         session.LogFile.WriteLine(
             "basalt collected: components=" + components.Count +
