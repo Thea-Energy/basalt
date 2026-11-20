@@ -891,6 +891,8 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
 
   for (auto entity : this->model->get_vertices()) {
     auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
+    if (M_numClassifiedVertices(this->s_mesh, sg_entity) == 0)
+      continue;
     auto s_classified_verts =
         M_classifiedVertexIter(this->s_mesh, sg_entity, 0);
 
@@ -937,6 +939,8 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
 
   for (auto entity : this->model->get_edges()) {
     auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
+    if (M_numClassifiedEdges(this->s_mesh, sg_entity) == 0)
+      continue;
     auto s_classified_verts =
         M_classifiedVertexIter(this->s_mesh, sg_entity, 0);
 
@@ -992,8 +996,13 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
   }
   FIter_delete(fit);
 
+  // A region is written if it holds volume elements or bounds a written face.
+  std::unordered_set<pGEntity> written_faces;
   for (auto entity : this->model->get_faces()) {
     auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
+    if (M_numClassifiedFaces(this->s_mesh, sg_entity) == 0)
+      continue;
+    written_faces.insert(sg_entity);
     auto sg_tag = GEN_tag(sg_entity);
     auto s_classified_verts =
         M_classifiedVertexIter(this->s_mesh, sg_entity, 0);
@@ -1074,6 +1083,19 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
 
   for (auto entity : this->model->get_regions()) {
     auto sg_entity = static_cast<pGEntity>(entity->s_model_item);
+
+    std::vector<int> boundary_tags;
+    auto s_faces = GEN_faces(sg_entity);
+    void *iter = 0;
+    while (auto s_face = (pGEntity)PList_next(s_faces, &iter)) {
+      if (written_faces.count(s_face))
+        boundary_tags.push_back(GEN_tag(s_face));
+    }
+    PList_delete(s_faces);
+
+    if (M_numClassifiedRegions(this->s_mesh, sg_entity) == 0 &&
+        boundary_tags.empty())
+      continue;
     auto sg_tag = GEN_tag(sg_entity);
 
     auto s_classified_verts =
@@ -1090,14 +1112,6 @@ void Mesh::write_msh(std::string filename, double scale_factor) {
       node_coords.push_back(coord[1] * scale_factor);
       node_coords.push_back(coord[2] * scale_factor);
     }
-
-    std::vector<int> boundary_tags;
-    auto s_faces = GEN_faces(sg_entity);
-    void *iter = 0;
-    while (auto s_edge = (pGEntity)PList_next(s_faces, &iter)) {
-      boundary_tags.push_back(GEN_tag(s_edge));
-    }
-    PList_delete(s_faces);
 
     gmsh::model::addDiscreteEntity(dim, sg_tag, boundary_tags);
     gmsh::model::mesh::addNodes(dim, sg_tag, node_tags, node_coords);
@@ -1170,7 +1184,6 @@ auto SurfaceMesh::from_model(nb::ref<Model> model, nb::ref<MeshCase> mesh_case)
   auto s_surface_mesher = SurfaceMesher_new(s_mesh_case, s_mesh);
 
   SurfaceMesher_execute(s_surface_mesher, nullptr);
-  M_write(s_mesh, "mesh.sms", 0, nullptr);
 
   SurfaceMesher_delete(s_surface_mesher);
 
@@ -1185,7 +1198,6 @@ auto VolumeMesh::from_surface_mesh(nb::ref<SurfaceMesh> surface_mesh,
   if (enforce_size != 0)
     VolumeMesher_setEnforceSize(s_volume_mesher, enforce_size);
   VolumeMesher_execute(s_volume_mesher, nullptr);
-  // M_write(s_new_mesh, "meshv.sms", 0, nullptr);
   VolumeMesher_delete(s_volume_mesher);
 
   return {
